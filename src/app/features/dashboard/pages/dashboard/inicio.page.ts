@@ -6,16 +6,20 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { mensagemDeErro } from '../../../../core/http/api-error';
 import { interpretarErroDoPainel } from '../../utils/painel-erro';
 import { dataLocalIso } from '../../../contas-financeiras/utils/formatacao-contas';
-import { formatarDataLocal, formatarMoeda } from '../../../../shared/valor-monetario';
-import { FluxoCaixaConta, PainelFinanceiro, PendenciaPainel, TotalCategoria } from '../../models/painel-financeiro.model';
+import { formatarMoeda } from '../../../../shared/valor-monetario';
+import { FluxoCaixaConta, PainelFinanceiro, TotalCategoria } from '../../models/painel-financeiro.model';
 import { PainelFinanceiroService } from '../../services/painel-financeiro.service';
-import { criarPontosGrafico, largurasCategorias, pontosSvg } from '../../utils/painel-visuais';
 import { PainelPreferenciasService } from '../../services/painel-preferencias.service';
+import { ContasReceberCardComponent } from '../../components/contas-receber/contas-receber.component';
+import { ContasPagarCardComponent } from '../../components/contas-pagar/contas-pagar.component';
+import { SaldosContasCardComponent } from '../../components/saldos-contas/saldos-contas.component';
+import { FluxoCaixaCardComponent } from '../../components/fluxo-caixa/fluxo-caixa.component';
+import { DespesasCategoriaCardComponent } from '../../components/despesas-categoria/despesas-categoria.component';
 
 @Component({
   selector: 'app-inicio-page',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, ContasReceberCardComponent, ContasPagarCardComponent, SaldosContasCardComponent, FluxoCaixaCardComponent, DespesasCategoriaCardComponent],
   templateUrl: './inicio.page.html',
   styleUrl: './inicio.page.scss',
 })
@@ -42,13 +46,7 @@ export class InicioPage implements OnInit {
   readonly erroFluxo = signal<string | null>(null);
   readonly categorias = signal<TotalCategoria[]>([]);
   readonly erroCategorias = signal<string | null>(null);
-  readonly categoriasGraficos = computed(() => largurasCategorias(this.categorias()).slice(0, 7));
-  readonly aReceber = computed(() => this.painel()?.proximosVencimentos.filter(p => p.tipo === 'RECEITA').slice(0, 8) ?? []);
-  readonly aPagar = computed(() => this.painel()?.proximosVencimentos.filter(p => p.tipo === 'DESPESA').slice(0, 8) ?? []);
-  readonly saldoConfirmadoSvg = computed(() => pontosSvg(criarPontosGrafico(this.fluxo()?.pontos ?? [], 'saldoConfirmado')));
-  readonly saldoProjetadoSvg = computed(() => pontosSvg(criarPontosGrafico(this.fluxo()?.pontos ?? [], 'saldoProjetado')));
   readonly moeda = formatarMoeda;
-  readonly data = formatarDataLocal;
 
   constructor() { this.destroyRef.onDestroy(() => { this.destruido = true; this.versao++; this.versaoGrafico++; }); }
 
@@ -105,9 +103,8 @@ export class InicioPage implements OnInit {
     }
   }
 
-  alterarContaGrafico(event: Event): void {
-    const id = Number((event.target as HTMLSelectElement).value);
-    this.contaGraficoId.set(Number.isSafeInteger(id) && id > 0 ? id : null);
+  alterarContaGrafico(id: number | null): void {
+    this.contaGraficoId.set(id);
     void this.carregarFluxo();
   }
 
@@ -142,7 +139,4 @@ export class InicioPage implements OnInit {
     }
   }
 
-  status(p: PendenciaPainel): string {
-    return p.atrasado ? 'Atrasado' : 'Pendente';
-  }
 }

@@ -1,0 +1,17 @@
+<section class="panel category-panel" aria-labelledby="titulo-categorias">
+                <div class="panel-head"><div><span class="eyebrow">ANÁLISE</span><h2 id="titulo-categorias">Despesas por categoria</h2></div></div>
+                @if (erroCategorias()) {
+                  <p class="empty-data" role="alert">{{ erroCategorias() }}</p>
+                } @else if (categoriasGraficos().length === 0) {
+                  <p class="empty-data">Sem despesas realizadas neste período.</p>
+                } @else {
+                  <div class="category-bars">
+                    @for (categoria of categoriasGraficos(); track categoria.categoriaId) {
+                      <div class="category-item">
+                        <div class="category-label"><span>{{ categoria.categoriaNome }}</span><strong>{{ moeda(categoria.valor) }}</strong></div>
+                        <div class="category-track"><div class="category-fill" [style.width.%]="categoria.percentual"></div></div>
+                      </div>
+                    }
+                  </div>
+                }
+              </section>

@@ -1,5 +1,6 @@
-:host { display:block; min-width:0; }
-.dashboard { max-width:1350px; min-width:0; margin:0 auto; }
+/* Feature-owned styles: imported globally so standalone widget templates share the same dashboard scope. */
+.dashboard {
+ max-width:1350px; min-width:0; margin:0 auto; 
 .dashboard-heading { display:flex; flex-direction:column; gap:20px; align-items:flex-start; margin-bottom:25px; }
 .eyebrow { color:var(--rf-teal-700,#087d73); font-size:10px; font-weight:800; letter-spacing:1.6px; }
 h1 { margin:8px 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; color:#142e43; }
@@ -98,3 +99,5 @@ h1 { margin:8px 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; col
   .due-row { flex-wrap:wrap; }.due-value { margin-left:auto; }
 }
 
+
+}
