@@ -32,11 +32,12 @@
       </div>
       <div class="form-field">
         <label for="saldo-inicial">Saldo inicial (R$)</label>
-        <input id="saldo-inicial" formControlName="saldoInicial"
-               type="text" inputmode="decimal" autocomplete="off" placeholder="0,00"
+        <input id="saldo-inicial" formControlName="saldoInicial" rfMoedaBr
+               [rfMoedaBrPermiteNegativo]="true"
+               type="text" inputmode="decimal" autocomplete="off" placeholder="R$ 0,00"
                [attr.aria-invalid]="formulario.controls.saldoInicial.touched && formulario.controls.saldoInicial.invalid"
                aria-describedby="ajuda-saldo" />
-        <small id="ajuda-saldo" class="field-hint">Use vírgula para os centavos, por exemplo: 1.250,50. Valores negativos são aceitos.</small>
+        <small id="ajuda-saldo" class="field-hint">Valor em reais formatado durante a digitação. Use vírgula para os centavos; valores negativos são aceitos.</small>
         @if (formulario.controls.saldoInicial.touched && formulario.controls.saldoInicial.invalid) {
           <small class="field-error">Informe um valor válido com até 4 casas decimais.</small>
         }
