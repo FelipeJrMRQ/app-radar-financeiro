@@ -64,3 +64,19 @@ A marca principal aparece no login e no cadastro; o símbolo, na navegação; e 
 Cores base estão parametrizadas em `src/styles.scss` e podem evoluir sem alterar contratos de API.
 
 As imagens são locais e independentes de hospedagem externa. Consulte `docs/identidade-visual.md` para o inventário e instruções de substituição.
+
+## Terceira entrega — categorias e lançamentos
+
+Rotas Angular com lazy loading:
+
+- `/categorias`: lista categorias de sistema e personalizadas, filtra por tipo e cadastra categorias próprias.
+- `/lancamentos`: listagem de receitas/despesas com filtro por tipo e por conta. Renderização progressiva de até 30 itens por vez.
+- `/lancamentos/novo`: cadastro com categoria compatível com o tipo, conta, descrição, valor decimal exato, data e observação.
+
+Contratos usados: `GET/POST /espacos-financeiros/{id}/categorias` e `GET/POST /espacos-financeiros/{id}/lancamentos` (listagem admite `contaFinanceiraId`). Os endpoints são verificados na branch do PR #21 do backend.
+
+**Regra preservada:** a categoria define RECEITA ou DESPESA. A API determina se o lançamento nasce confirmado ou previsto conforme a data do lançamento. O Angular não soma valores, não confirma automaticamente pagamentos por conta própria e não interpreta o espaço financeiro como uma opção de navegação.
+
+**Limitação atual da API:** o endpoint de lançamentos não disponibiliza paginação por servidor, então a UI apenas limita a quantidade de itens renderizados. Uma paginação backend poderá ser proposta quando houver volume elevado.
+
+Os testes automatizados cobrem os contratos de cadastro, isolamento do ID interno do espaço e conversão monetária sem floats. Os fluxos de edição, confirmação parcial e estorno serão etapas futuras, após validação dessa jornada.

@@ -1,0 +1,89 @@
+<section class="lancamentos-page">
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">MOVIMENTAÇÃO FINANCEIRA</span>
+      <h1>Lançamentos</h1>
+      <p>Receitas e despesas confirmadas ou previstas, registradas no seu financeiro.</p>
+    </div>
+    <a class="button-primary" routerLink="/lancamentos/novo">+ Novo lançamento</a>
+  </div>
+  @if (paginaCriada) {
+    <p class="success-message" role="status">Lançamento cadastrado com sucesso.</p>
+  }
+
+  <div class="filter-panel">
+    <div class="filters" role="group" aria-label="Filtrar por tipo">
+      <button type="button" [class.selected]="filtroTipo() === 'TODOS'"
+              [attr.aria-pressed]="filtroTipo() === 'TODOS'"
+              (click)="alterarTipo('TODOS')">Todos</button>
+      <button type="button" [class.selected]="filtroTipo() === 'DESPESA'"
+              [attr.aria-pressed]="filtroTipo() === 'DESPESA'"
+              (click)="alterarTipo('DESPESA')">Despesas</button>
+      <button type="button" [class.selected]="filtroTipo() === 'RECEITA'"
+              [attr.aria-pressed]="filtroTipo() === 'RECEITA'"
+              (click)="alterarTipo('RECEITA')">Receitas</button>
+    </div>
+    <div class="account-filter">
+      <label for="conta-filtro">Conta</label>
+      <select id="conta-filtro" (change)="alterarConta($event)" [value]="contaSelecionada() ?? ''">
+        <option value="">Todas as contas</option>
+        @for (conta of contas(); track conta.id) {
+          <option [value]="conta.id">{{ conta.nome }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (carregando()) {
+    <div class="state-card" role="status">Carregando lançamentos…</div>
+  } @else if (erro()) {
+    <div class="state-card" role="alert">
+      <p>{{ erro() }}</p>
+      <button type="button" class="button-secondary" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else if (contas().length === 0) {
+    <div class="state-card empty">
+      <h2>Cadastre uma conta para começar</h2>
+      <p>Você precisa de uma conta financeira antes de registrar receitas ou despesas.</p>
+      <a routerLink="/contas/nova" class="button-primary">Criar conta financeira</a>
+    </div>
+  } @else if (filtrados().length === 0) {
+    <div class="state-card empty">
+      <h2>Nenhum lançamento encontrado</h2>
+      <p>Altere os filtros ou registre uma nova movimentação.</p>
+      <a class="button-primary" routerLink="/lancamentos/novo">Novo lançamento</a>
+    </div>
+  } @else {
+    <div class="results-caption">
+      <span>{{ visiveis().length }} de {{ filtrados().length }} lançamentos</span>
+      <button type="button" class="text-button" (click)="carregar()">Atualizar lista</button>
+    </div>
+    <div class="movement-list">
+      @for (lancamento of visiveis(); track lancamento.id) {
+        <article class="movement">
+          <div class="movement-icon" [class.receita]="lancamento.tipo === 'RECEITA'" aria-hidden="true">
+            {{ lancamento.tipo === 'RECEITA' ? '↗' : '↙' }}
+          </div>
+          <div class="movement-detail">
+            <strong>{{ lancamento.descricao }}</strong>
+            <span>{{ lancamento.categoriaNome }} · {{ lancamento.contaFinanceiraNome }}</span>
+            <small>{{ data(lancamento.dataLancamento) }}</small>
+          </div>
+          <div class="movement-value">
+            <strong [class.despesa]="lancamento.tipo === 'DESPESA'">
+              {{ lancamento.tipo === 'DESPESA' ? '−' : '+' }} {{ moeda(lancamento.valor) }}
+            </strong>
+            <span [class.previsto]="lancamento.situacao === 'PREVISTO'">
+              {{ lancamento.situacao === 'PREVISTO' ? 'Previsto' : 'Confirmado' }}
+            </span>
+          </div>
+        </article>
+      }
+    </div>
+    @if (filtrados().length > visiveis().length) {
+      <button type="button" class="button-secondary load-more" (click)="mostrarMais()">
+        Mostrar mais lançamentos
+      </button>
+    }
+  }
+</section>
