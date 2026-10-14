@@ -71,6 +71,11 @@ export class AuthService {
     await firstValueFrom(this.http.post<Usuario>(API_BASE_URL + '/usuarios', dados));
   }
 
+  /** ID técnico obtido da sessão; o espaço nunca é selecionável pela interface. */
+  obterIdEspacoAtual(): number | null {
+    return this.sessaoAtiva() ? (this.contextoState()?.id ?? null) : null;
+  }
+
   sair(): void {
     this.tokenState.set(null);
     this.expiracaoState.set(0);

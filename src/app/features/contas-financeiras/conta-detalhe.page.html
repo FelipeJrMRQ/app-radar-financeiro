@@ -1,0 +1,92 @@
+<section class="contas-page">
+  <a routerLink="/contas" class="back-link">← Voltar para contas</a>
+  @if (carregandoConta()) {
+    <div class="feedback-card" role="status">Carregando os dados da conta…</div>
+  } @else if (erroConta()) {
+    <div class="feedback-card danger" role="alert">
+      <p>{{ erroConta() }}</p>
+      <button type="button" class="secondary-action" (click)="carregarConta()">Tentar novamente</button>
+    </div>
+  } @else if (conta(); as contaAtual) {
+    <div class="page-heading">
+      <div>
+        <p class="section-label">{{ tipoConta(contaAtual.tipo) }}</p>
+        <h1>{{ contaAtual.nome }}</h1>
+        <p class="page-description">Informações e movimentações desta conta.</p>
+      </div>
+      <button type="button" class="secondary-action" (click)="carregarConta()">Atualizar saldo</button>
+    </div>
+
+    @if (saldo(); as saldoAtual) {
+      <div class="balance-grid">
+        <div class="summary-card major">
+          <span>Saldo confirmado</span>
+          <strong [class.negative]="negativo(saldoAtual.saldoConfirmado)">{{ moeda(saldoAtual.saldoConfirmado) }}</strong>
+          <small>Saldo informado pelo servidor</small>
+        </div>
+        <div class="summary-card">
+          <span>Saldo inicial</span>
+          <strong [class.negative]="negativo(contaAtual.saldoInicial)">{{ moeda(contaAtual.saldoInicial) }}</strong>
+          <small>Valor informado no cadastro</small>
+        </div>
+      </div>
+    }
+    <section aria-labelledby="titulo-extrato" class="statement-section">
+      <div class="statement-heading">
+        <div>
+          <p class="section-label">MOVIMENTAÇÕES</p>
+          <h2 id="titulo-extrato">Extrato da conta</h2>
+        </div>
+        <div class="month-switcher" aria-label="Período do extrato">
+          <button type="button" (click)="alterarMes(-1)" aria-label="Mês anterior">‹</button>
+          <span aria-live="polite">{{ mesDescricao() }}</span>
+          <button type="button" (click)="alterarMes(1)" aria-label="Próximo mês">›</button>
+        </div>
+      </div>
+      @if (carregandoExtrato()) {
+        <div class="feedback-card" role="status">Carregando extrato…</div>
+      } @else if (erroExtrato()) {
+        <div class="feedback-card danger" role="alert">
+          <p>{{ erroExtrato() }}</p>
+          <button type="button" class="secondary-action" (click)="carregarExtrato()">Tentar novamente</button>
+        </div>
+      } @else if (extrato(); as extratoAtual) {
+        <div class="statement-balances">
+          <div><span>Confirmado antes do período</span><strong>{{ moeda(extratoAtual.saldoConfirmadoAnterior) }}</strong></div>
+          <div><span>Confirmado ao fim do período</span><strong>{{ moeda(extratoAtual.saldoConfirmadoFinal) }}</strong></div>
+          <div><span>Projetado ao fim do período</span><strong>{{ moeda(extratoAtual.saldoProjetadoFinal) }}</strong></div>
+        </div>
+
+        @if (extratoAtual.movimentos.length === 0) {
+          <div class="feedback-card empty">
+            <h3>Sem movimentações neste mês</h3>
+            <p>Não há lançamentos, transferências ou pagamentos de fatura registrados para este período.</p>
+          </div>
+        } @else {
+          <div class="movement-list">
+            @for (movimento of extratoAtual.movimentos; track $index) {
+              <article class="movement">
+                <div class="movement-description">
+                  <span class="movement-date">{{ data(movimento.data) }}</span>
+                  <h3>{{ movimento.descricao }}</h3>
+                  <span class="movement-category">
+                    {{ movimento.categoriaNome || descricaoMovimento(movimento) }}
+                  </span>
+                </div>
+                <div class="movement-value">
+                  <strong [class.negative]="negativo(movimento.valor)">{{ moeda(movimento.valor) }}</strong>
+                  <span [class.pending]="movimento.situacao === 'PREVISTO'">
+                    {{ movimento.situacao === 'PREVISTO' ? 'Previsto' : 'Confirmado' }}
+                  </span>
+                  <small>Saldo {{ movimento.situacao === 'PREVISTO' ? 'projetado' : 'confirmado' }}:
+                    {{ moeda(movimento.situacao === 'PREVISTO' ? movimento.saldoProjetadoApos : movimento.saldoConfirmadoApos) }}
+                  </small>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      }
+    </section>
+  }
+</section>

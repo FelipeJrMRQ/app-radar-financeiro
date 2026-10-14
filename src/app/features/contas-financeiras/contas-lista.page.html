@@ -1,0 +1,52 @@
+<section class="contas-page">
+  <div class="page-heading">
+    <div>
+      <p class="section-label">CONTAS E SALDOS</p>
+      <h1>Contas financeiras</h1>
+      <p class="page-description">Consulte suas contas e os saldos informados pela API.</p>
+    </div>
+    <a class="primary-action" routerLink="/contas/nova">+ Nova conta</a>
+  </div>
+
+  @if (carregando()) {
+    <div class="feedback-card" role="status">Carregando suas contas e saldos…</div>
+  } @else if (erro()) {
+    <div class="feedback-card danger" role="alert">
+      <p>{{ erro() }}</p>
+      <button type="button" class="secondary-action" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else if (contas().length === 0) {
+    <div class="feedback-card empty">
+      <h2>Nenhuma conta cadastrada</h2>
+      <p>Adicione sua primeira conta corrente, carteira ou poupança para começar.</p>
+      <a routerLink="/contas/nova" class="primary-action">Cadastrar primeira conta</a>
+    </div>
+  } @else {
+    <div class="accounts-grid">
+      @for (item of contas(); track item.conta.id) {
+        <article class="account-card">
+          <div class="account-header">
+            <span class="account-icon" aria-hidden="true">▣</span>
+            <span class="account-type">{{ tipo(item.conta.tipo) }}</span>
+          </div>
+          <h2>{{ item.conta.nome }}</h2>
+          @if (item.saldo; as saldo) {
+            <span class="balance-caption">Saldo confirmado</span>
+            <strong class="account-balance" [class.negative]="negativo(saldo.saldoConfirmado)">
+              {{ moeda(saldo.saldoConfirmado) }}
+            </strong>
+          } @else {
+            <span class="balance-caption">Saldo indisponível</span>
+            <p class="balance-error" role="status">{{ item.erroSaldo }}</p>
+          }
+          <a [routerLink]="['/contas', item.conta.id]" class="account-link">
+            Ver conta e extrato <span aria-hidden="true">→</span>
+          </a>
+        </article>
+      }
+    </div>
+    <div class="refresh-actions">
+      <button type="button" class="secondary-action" (click)="carregar()">Atualizar saldos</button>
+    </div>
+  }
+</section>
