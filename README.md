@@ -150,3 +150,37 @@ a coordenação dos dados financeiros continua na página e nos serviços existe
 
 **Diretriz integral:** [docs/diretrizes-arquitetura-frontend-angular.md](docs/diretrizes-arquitetura-frontend-angular.md).
 A cópia em Fontes deve ser substituída pelo MD atualizado de 14/10/2026.
+
+## Navegação por grupos — Cadastros e Configurações
+
+No desktop, o menu lateral diferencia as operações financeiras (Início e Lançamentos)
+dos grupos expansíveis **Cadastros** (Contas financeiras, Categorias) e
+**Configurações** (Personalizar painel, Meu perfil). No celular, os quatro destinos
+inferiores são Início, Lançamentos, Cadastros e Configurações, sendo que as duas
+últimas entradas abrem centrais de navegação mobile first.
+
+Novas rotas: `/cadastros`, `/configuracoes` e `/configuracoes/perfil`.
+As rotas antigas permanecem inalteradas. Não foram adicionados endpoints ou
+migrações: perfil é somente leitura dos dados autenticados já carregados pelo
+`AuthService`; cartões, edição do perfil, segurança e notificações aparecem
+como futuras funcionalidades, sem links falsos.
+
+Rotas e páginas novas pertencem às features `cadastros/` e `configuracoes/`.
+
+## Ação flutuante de lançamento no celular
+
+Em telas com largura inferior a 860px, a navegação inferior mantém quatro
+destinos (Início, Lançamentos, Cadastros e Configurações). A criação é uma ação
+distinta da consulta: o botão flutuante **Novo lançamento** abre
+`/lancamentos/novo`, enquanto a aba **Lançamentos** continua abrindo a listagem.
+O botão é ocultado na própria tela de cadastro e na visualização desktop.
+
+A ação fica acima da barra inferior, com área de toque mínima de 58 px.
+`layout/app-shell.scss` define as variáveis `--mobile-nav-height`,
+`--mobile-fab-size` e `--mobile-fab-gap`: o padding inferior da
+`.page-content` considera a soma dessas dimensões, um respiro adicional e
+`env(safe-area-inset-bottom)`, permitindo que o último card role
+**completamente acima** do botão. Não aplicar posicionamento fixo em cada feature.
+
+A ação **Personalizar painel** foi retirada do cabeçalho do dashboard;
+permanece em `Configurações → Personalização do painel`.

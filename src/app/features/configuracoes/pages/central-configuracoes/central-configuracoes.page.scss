@@ -1,0 +1,21 @@
+:host { display:block; min-width:0; }
+.configuracoes-page { max-width:1050px; margin:0 auto; }
+.page-heading { margin-bottom:24px; }
+.eyebrow { font-size:10px; font-weight:800; letter-spacing:1.5px; color:var(--rf-teal-700,#087d73); }
+h1 { color:#173149; letter-spacing:-.7px; font-size:clamp(28px,5vw,36px); margin:9px 0; }
+.page-heading p { color:#698393; font-size:13px; line-height:1.65; margin:0; max-width:650px; }
+.menu-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:13px; }
+.menu-card { display:flex; align-items:center; gap:14px; min-height:115px; padding:19px 17px; border-radius:15px;
+  background:#fff; border:1px solid #e1eaf0; text-decoration:none; color:#19394c; min-width:0; }
+a.menu-card:hover,a.menu-card:focus-visible { border-color:#4bbda9; box-shadow:0 5px 16px #102e4210; }
+.card-icon { display:grid; place-items:center; flex:0 0 43px; height:43px; border-radius:11px;
+  background:#e5f5f0; color:#0a796b; font-size:23px; }
+.card-copy { display:flex; flex-direction:column; gap:7px; min-width:0; flex:1; }
+.card-copy strong { color:#203f53; font-size:14px; line-height:1.5; }
+.card-copy > span { color:#758c99; font-size:12px; line-height:1.6; }
+.card-arrow { color:#188574; font-size:20px; }
+.unavailable { background:#f9fbfc; }
+.unavailable .card-icon { background:#eaf0f3; color:#7a929e; }
+.tag { display:inline-block; margin-left:5px; color:#667f8b; background:#e8eef1;
+  padding:3px 7px; border-radius:6px; font-size:10px; vertical-align:middle; }
+@media(min-width:710px) { .menu-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:17px; } .menu-card { padding:24px; } }

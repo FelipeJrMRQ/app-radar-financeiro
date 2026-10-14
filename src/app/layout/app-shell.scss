@@ -1,5 +1,11 @@
 :host { display: block; min-height: 100dvh; }
-.app-layout { min-height: 100dvh; background: #f5f8fa; }
+.app-layout {
+  --mobile-nav-height: 65px;
+  --mobile-fab-size: 58px;
+  --mobile-fab-gap: 14px;
+  min-height: 100dvh;
+  background: #f5f8fa;
+}
 .sidebar { display: none; }
 .workspace { min-width: 0; }
 .mobile-header {
@@ -17,7 +23,28 @@
 }
 .mobile-logout { border: 1px solid #dbe4e9; border-radius: 9px; background: white; color: #314d5d; padding: 10px 14px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .desktop-header { display: none; }
-.page-content { width: 100%; min-width: 0; max-width: 1340px; margin: 0 auto; padding: 26px 18px calc(110px + env(safe-area-inset-bottom)); }
+.page-content { width: 100%; min-width: 0; max-width: 1340px; margin: 0 auto; padding: 26px 18px calc(var(--mobile-nav-height) + var(--mobile-fab-gap) + var(--mobile-fab-size) + 36px + env(safe-area-inset-bottom)); }
+/* Ação primária fixa no celular: acima da navegação e fora do fluxo dos cards. */
+.mobile-fab {
+  position: fixed;
+  z-index: 11;
+  right: calc(18px + env(safe-area-inset-right));
+  bottom: calc(var(--mobile-nav-height) + var(--mobile-fab-gap) + env(safe-area-inset-bottom));
+  display: grid;
+  place-items: center;
+  width: var(--mobile-fab-size);
+  height: var(--mobile-fab-size);
+  border: 2px solid rgba(255,255,255,.9);
+  border-radius: 50%;
+  background: var(--rf-teal-700,#087d73);
+  color: white;
+  box-shadow: 0 8px 22px rgba(5,61,70,.28);
+  text-decoration: none;
+}
+.mobile-fab:hover { background: var(--rf-teal-600,#099587); }
+.mobile-fab:focus-visible { outline-offset: 4px; }
+.mobile-fab svg { width: 26px; height: 26px; }
+
 .mobile-bottom-nav {
   display: flex; position: fixed; bottom: 0; right: 0; left: 0; z-index: 10;
   min-height: calc(65px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
@@ -61,7 +88,7 @@
     font: inherit; font-size: 12px; cursor: pointer; text-align: left;
   }
   .side-logout:hover { background: #1a4758; color: white; }
-  .mobile-header, .mobile-bottom-nav { display: none; }
+  .mobile-header, .mobile-bottom-nav, .mobile-fab { display: none; }
   .desktop-header {
     display: flex; align-items: center; justify-content: space-between;
     min-height: 86px; padding: 16px clamp(30px,4vw,66px);
@@ -103,4 +130,35 @@
 }
 @media (max-width: 359px) {
   .mobile-bottom-nav a { font-size: 9px; }
+}
+
+/* Menus agrupados: entradas de negócio separadas das preferências pessoais. */
+@media (min-width:860px) {
+  .sidebar { overflow-y:auto; overscroll-behavior:contain; }
+  .sidebar-navigation { padding-top:9px; }
+  .sidebar-navigation .sidebar-section-title { margin:30px 16px 10px; }
+  .sidebar-navigation .grouped-title { margin-top:25px; }
+  .sidebar-group { margin:2px 0; }
+  .sidebar-group-trigger { display:flex; align-items:center; gap:12px; border-radius:9px;
+    min-height:48px; padding:10px 15px; color:#c7d9e3; font-size:14px; font-weight:650;
+    cursor:pointer; list-style:none; }
+  .sidebar-group-trigger::-webkit-details-marker { display:none; }
+  .sidebar-group-trigger:hover,.sidebar-group-trigger:focus-visible { background:#1a4758; color:white; }
+  .sidebar-group-trigger svg { width:20px; height:20px; flex-shrink:0; }
+  .group-chevron { margin-left:auto; color:#a5bdc7; transition:transform .15s; }
+  .sidebar-group[open] .group-chevron { transform:rotate(180deg); }
+  .sidebar-subitems { display:flex; flex-direction:column; gap:2px; margin:1px 0 9px 31px;
+    padding-left:11px; border-left:1px solid #426171; }
+  .sidebar-sublink { display:flex; align-items:center; justify-content:space-between;
+    min-height:37px; border-radius:8px; padding:7px 10px; color:#bbd0d8; font-size:12px;
+    text-decoration:none; line-height:1.4; }
+  a.sidebar-sublink:hover,a.sidebar-sublink.active { background:#1a4758; color:white; }
+  .sidebar-sublink.active { box-shadow:inset 2px 0 0 var(--rf-gold-400,#d8ae60); }
+  .coming-soon { color:#728e9c; cursor:default; }
+  .coming-soon small { font-size:9px; color:#90a5b1; white-space:nowrap; }
+  .sidebar-footer { margin-top:auto; }
+}
+
+@media (min-width:860px) {
+  .sidebar-group.section-active > .sidebar-group-trigger { color:#fff; background:rgba(26,159,138,.14); }
 }

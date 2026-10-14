@@ -1,0 +1,29 @@
+<section class="perfil-page">
+  <a class="back-link" routerLink="/configuracoes">← Voltar às configurações</a>
+  <header class="page-heading">
+    <span class="eyebrow">DADOS DA SUA CONTA</span>
+    <h1>Meu perfil</h1>
+    <p>Confira os dados associados à sua sessão atual.</p>
+  </header>
+
+  @if (usuario(); as dados) {
+    <div class="profile-card">
+      <div class="profile-heading">
+        <span class="profile-avatar" aria-hidden="true">{{ (dados.nome || 'U').charAt(0).toUpperCase() }}</span>
+        <div>
+          <h2>{{ dados.nome }}</h2>
+          <span>Conta do Radar Financeiro</span>
+        </div>
+      </div>
+      <dl class="profile-fields">
+        <div><dt>Nome</dt><dd>{{ dados.nome }}</dd></div>
+        <div><dt>E-mail</dt><dd>{{ dados.email }}</dd></div>
+      </dl>
+      <p class="read-only-note">Neste momento, os dados são apenas para consulta.
+        A edição do perfil e da senha será disponibilizada após a implementação
+        das respectivas operações seguras na API.</p>
+    </div>
+  } @else {
+    <p class="read-only-note" role="status">Não foi possível consultar as informações da sessão.</p>
+  }
+</section>
