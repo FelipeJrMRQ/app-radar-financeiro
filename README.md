@@ -275,3 +275,28 @@ Para validar a API em execução, com o JWT da própria sessão:
 `GET /espacos-financeiros/{id}/lancamentos/resumo-periodo?dataInicio=2026-10-01&dataFim=2026-10-31&tipo=RECEITA`.
 O retorno esperado na nova versão é HTTP 200 com `totalLancado`.
 Os testes de MVC na API verificam a rota para RECEITA, DESPESA e Todos.
+
+
+## Gerenciar lançamentos (edição, exclusão, confirmações)
+
+A tela de Lançamentos e os cards Contas a receber / Contas a pagar possuem
+menu de três pontos, implementado pela feature
+`features/lancamentos/components/lancamento-acoes`:
+**Editar**, **Confirmar** (somente o atual), **Realização parcial**,
+**Ver realizações / Estornar** e **Excluir**. Excluir e estornar exigem
+uma segunda confirmação explícita. Após mutações, os dados são recarregados
+pelo serviço correspondente, sem cálculos financeiros locais.
+
+A página lazy `/lancamentos/:lancamentoId/editar` permite a correção
+individual inclusive de registros antigos. Somente séries previstas,
+ativas e com data igual ou posterior a hoje oferecem a escolha
+`Somente este` / `Este e os próximos`.
+A edição em lote preserva os vencimentos; registros antigos e
+realizações financeiras têm validações adicionais no backend.
+O frontend usa o vínculo técnico de recorrência ou parcelamento,
+não a descrição, para selecionar os endpoints.
+
+**Obrigatório atualizar a API primeiro:** branch
+`chatgpt/gestao-lancamentos-sequencias`. O backend tem os endpoints
+`/parcelas-restantes` e os metadados de parcelas no DTO.
+Sem ele, não testar operações em lote de parcelamentos.
