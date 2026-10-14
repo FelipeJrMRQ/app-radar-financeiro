@@ -100,6 +100,7 @@
               {{ lancamento.situacao === 'PREVISTO' ? 'Previsto' : 'Confirmado' }}
             </span>
           </div>
+          <app-lancamento-acoes [lancamentoId]="lancamento.id" (alterado)="carregar()" />
         </article>
       }
     </div>

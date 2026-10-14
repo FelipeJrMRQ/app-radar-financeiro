@@ -20,7 +20,7 @@
 
 .text-button { padding:8px 0; background:none; border:none; color:var(--rf-teal-700,#087d73); font:inherit; font-weight:750; cursor:pointer; }
 
-.movement-list { background:white; border:1px solid #e3e9ec; border-radius:14px; overflow:hidden; }
+.movement-list { background:white; border:1px solid #e3e9ec; border-radius:14px; overflow:visible; }
 
 .movement { display:flex; align-items:flex-start; gap:12px; min-width:0; padding:18px 14px; border-bottom:1px solid #ebf0f1; flex-wrap:wrap; }
 
@@ -88,3 +88,6 @@
   .total-periodo { align-items:flex-start; flex-direction:column; gap:11px; }
   .total-periodo-valor { text-align:left; }
 }
+
+.movement { position:relative; }
+.movement app-lancamento-acoes { margin-left:auto; }

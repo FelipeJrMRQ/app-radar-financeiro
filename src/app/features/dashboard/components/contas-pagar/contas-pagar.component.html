@@ -18,6 +18,7 @@
                           @if (item.atrasado) { <span class="late-label">Atrasado</span> }
                         </div>
                         <strong class="due-value expense-text">{{ moeda(item.valorRestante) }}</strong>
+                        <app-lancamento-acoes [lancamentoId]="item.lancamentoId" (alterado)="alterado.emit()" />
                       </div>
                     }
                   </div>

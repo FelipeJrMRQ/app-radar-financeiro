@@ -82,10 +82,10 @@
       @for (preferencia of preferencias.visiveis(); track preferencia.codigoComponente) {
         @switch (preferencia.codigoComponente) {
       @case ('CONTAS_RECEBER') {
-        <app-contas-receber-card [itens]="aReceber()" [mesReferencia]="mesReferencia()" />
+        <app-contas-receber-card [itens]="aReceber()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" />
       }
       @case ('CONTAS_PAGAR') {
-        <app-contas-pagar-card [itens]="aPagar()" [mesReferencia]="mesReferencia()" />
+        <app-contas-pagar-card [itens]="aPagar()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" />
       }
       @case ('SALDOS_CONTAS') {
         <app-saldos-contas-card [contas]="dados.contas.slice(0, 5)" [saldoConfirmado]="dados.saldoConfirmado" [saldoProjetado]="dados.saldoProjetado" />
