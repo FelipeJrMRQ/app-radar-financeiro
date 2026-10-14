@@ -96,3 +96,27 @@ O cadastro de contas (saldo inicial) e de lançamentos (valor) utiliza a diretiv
 
 Para novos formulários monetários, reutilizar `rfMoedaBr` e importar a diretiva no componente standalone.
 Não duplicar manipulações de `input` por tela.
+
+## Painel financeiro e obrigações (quarta etapa)
+
+O dashboard `/` consome **dados reais** do endpoint consolidado
+`GET /espacos-financeiros/{id}/relatorios/painel-financeiro?dataInicio&dataFim`,
+com saldos confirmado/projetado por conta, obrigações a pagar e receber, atrasos e próximos vencimentos.
+O gráfico utiliza `/contas-financeiras/{contaId}/fluxo-caixa`; a análise por categoria consulta
+`/relatorios/despesas-por-categoria` somente até a data atual.
+
+O lançamento único permite situação inicial `PREVISTO` mesmo quando já vencido; a confirmação
+`CONFIRMADO` exige data não futura. Clientes legados sem o campo ainda usam a regra original,
+por compatibilidade. Os lançamentos recorrentes usam o endpoint mensal existente
+`POST /recorrencias-lancamentos`; os parcelamentos diretos em conta usam
+`POST /parcelamentos-lancamentos` (nova migration do backend).
+
+**Pré-requisito desta etapa:** rodar backend na branch
+`chatgpt/painel-pendencias-obrigacoes` (base: `chatgpt/espaco-automatico-cadastro`).
+Não executar o frontend desta branch contra o backend anterior, que ainda não oferece
+o novo contrato do painel nem o parcelamento em conta.
+
+**Limites explícitos:** Faturas de cartão não foram agregadas ao total a pagar nessa etapa;
+compras de cartão e pagamentos de fatura precisam de integração contábil própria para não
+contabilizar o mesmo gasto duas vezes. Valores de pendências descontam realizações
+parciais pelo backend. O dashboard não recalcula saldos com JavaScript.

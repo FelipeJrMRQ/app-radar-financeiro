@@ -41,10 +41,35 @@ describe('LancamentosService', () => {
     await retorno;
   });
 
+
+  it('encaminha recorrência mensal para endpoint próprio', async () => {
+    const result = firstValueFrom(api.criarRecorrencia({
+      contaFinanceiraId: 11, categoriaId: 3, descricao: 'Aluguel',
+      valor: '1500.00', dataInicio: '2026-11-01', dataFim: null, observacao: null,
+    }));
+    const req = http.expectOne('/api/espacos-financeiros/7/recorrencias-lancamentos');
+    expect(req.request.body.dataFim).toBeNull();
+    req.flush({ id: 17 });
+    await result;
+  });
+
+  it('encaminha parcelas para endpoint distinto dos lançamentos únicos', async () => {
+    const result = firstValueFrom(api.criarParcelamento({
+      contaFinanceiraId: 11, categoriaId: 3, descricao: 'Celular',
+      valorTotal: '999.99', quantidadeParcelas: 3,
+      primeiroVencimento: '2026-11-20', observacao: null,
+    }));
+    const req = http.expectOne('/api/espacos-financeiros/7/parcelamentos-lancamentos');
+    expect(req.request.body.quantidadeParcelas).toBe(3);
+    req.flush({ parcelamentoId: 3 });
+    await result;
+  });
+
   it('cria lançamento usando string decimal exata', async () => {
     const retorno = firstValueFrom(api.criar({
       contaFinanceiraId: 11, categoriaId: 3, descricao: 'Mercado',
       valor: '1234.5678', dataLancamento: '2026-10-14', observacao: null,
+      situacaoInicial: 'PREVISTO',
     }));
     const req = http.expectOne('/api/espacos-financeiros/7/lancamentos');
     expect(req.request.method).toBe('POST');

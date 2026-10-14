@@ -1,38 +1,185 @@
-<div class="dashboard-page">
-  <div class="welcome-line">
+<section class="dashboard">
+  <header class="dashboard-heading">
     <div>
-      <span class="eyebrow">PAINEL FINANCEIRO</span>
-      <h1>Olá, {{ primeiroNome() }} <span aria-hidden="true">✳</span></h1>
-      <p>Seu ponto de partida para uma vida financeira mais organizada.</p>
+      <span class="eyebrow">SUA VISÃO FINANCEIRA</span>
+      <h1>Visão geral, {{ primeiroNome() }}</h1>
+      <p>Acompanhe obrigações, saldos e movimentações com dados atualizados das suas contas.</p>
     </div>
-    <span class="account-badge"><span class="status-dot"></span> Conta ativa</span>
-  </div>
+    <div class="month-controls" aria-label="Período do painel">
+      <button type="button" (click)="mudarMes(-1)" aria-label="Mês anterior">‹</button>
+      <span aria-live="polite">{{ mesDescricao() }}</span>
+      <button type="button" (click)="mudarMes(1)" aria-label="Próximo mês">›</button>
+    </div>
+  </header>
 
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="hero-content">
-      <div class="hero-label">BEM-VINDO AO RADAR</div>
-      <h2 id="hero-title">Tudo começa com uma visão mais clara.</h2>
-      <p>Seu acesso está configurado. Estamos preparando as funcionalidades para você acompanhar contas, receitas e despesas em um só lugar.</p>
-      <a class="hero-action" routerLink="/contas">Explorar minhas contas <span aria-hidden="true">→</span></a>
+  @if (carregando()) {
+    <div class="dashboard-state" role="status">Carregando informações financeiras…</div>
+  } @else if (erro()) {
+    <div class="dashboard-state error" role="alert">
+      <strong>Não foi possível carregar o painel financeiro.</strong>
+      <p>{{ erro() }}</p>
+      @if (rotaNaoEncontrada()) {
+        <p>Os seus lançamentos continuam disponíveis. Não é necessário cadastrá-los novamente.</p>
+        <div class="dashboard-error-links">
+          <a routerLink="/lancamentos" class="secondary-action">Ver lançamentos</a>
+          <a routerLink="/contas" class="secondary-action">Ver contas</a>
+        </div>
+      }
+      <button type="button" class="secondary-action retry-action" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else if (painel(); as dados) {
+    <div class="stats-grid">
+      <article class="stat-card">
+        <span class="stat-label"><span class="stat-dot income"></span>A receber no período</span>
+        <strong class="income-text">{{ moeda(dados.aReceberPeriodo) }}</strong>
+        <small>Receitas pendentes com vencimento no mês</small>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label"><span class="stat-dot expense"></span>A pagar no período</span>
+        <strong class="expense-text">{{ moeda(dados.aPagarPeriodo) }}</strong>
+        <small>Despesas pendentes com vencimento no mês</small>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label"><span class="stat-dot neutral"></span>Saldo confirmado</span>
+        <strong>{{ moeda(dados.saldoConfirmado) }}</strong>
+        <small>Soma dos saldos confirmados de todas as contas</small>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label"><span class="stat-dot warning"></span>Em atraso</span>
+        <strong class="warning-text">{{ moeda(dados.receberAtrasado) }} <span class="small-divider">/</span> {{ moeda(dados.pagarAtrasado) }}</strong>
+        <small>A receber / a pagar vencidos e ainda pendentes</small>
+      </article>
     </div>
 
-  </section>
+    <div class="dashboard-grid">
+      <section class="panel due-panel" aria-labelledby="titulo-receber">
+        <div class="panel-head"><div><span class="eyebrow">COMPROMISSOS</span><h2 id="titulo-receber">Contas a receber</h2></div>
+          <a routerLink="/lancamentos" class="panel-link">Ver lançamentos →</a></div>
+        @if (aReceber().length === 0) {
+          <p class="empty-data">Nenhum recebimento pendente neste período.</p>
+        } @else {
+          <div class="due-list">
+            @for (item of aReceber(); track item.lancamentoId) {
+              <div class="due-row">
+                <span class="date-block">{{ data(item.vencimento) }}</span>
+                <div class="due-description">
+                  <strong>{{ item.descricao }}</strong>
+                  <small>{{ item.contaFinanceiraNome }} · {{ item.categoriaNome }}</small>
+                  @if (item.atrasado) { <span class="late-label">Atrasado</span> }
+                </div>
+                <strong class="due-value income-text">{{ moeda(item.valorRestante) }}</strong>
+              </div>
+            }
+          </div>
+        }
+        <footer class="panel-total"><span>Total no período</span><strong class="income-text">{{ moeda(dados.aReceberPeriodo) }}</strong></footer>
+      </section>
 
-  <h2 class="section-title">Sua conta está preparada</h2>
-  <div class="information-grid">
-    <article class="info-card">
-      <span class="card-icon" aria-hidden="true">✓</span>
-      <div>
-        <h3>Acesso conectado</h3>
-        <p>Login validado e seus dados de perfil obtidos pela API.</p>
-      </div>
-    </article>
-    <article class="info-card">
-      <span class="card-icon muted" aria-hidden="true"><img src="/assets/brand/icone-analise.webp" alt="" width="160" height="160" loading="lazy" /></span>
-      <div>
-        <h3>Organize seus lançamentos</h3>
-        <p>Registre receitas e despesas usando categorias e acompanhe tudo pela área Lançamentos.</p>
-      </div>
-    </article>
-  </div>
-</div>
+      <section class="panel account-panel" aria-labelledby="titulo-saldos">
+        <div class="panel-head"><div><span class="eyebrow">PATRIMÔNIO DISPONÍVEL</span><h2 id="titulo-saldos">Saldos das contas</h2></div><a class="panel-link" routerLink="/contas">Ver contas →</a></div>
+        <div class="account-head-row"><span>Conta</span><span>Confirmado</span><span>Projetado</span></div>
+        @if (dados.contas.length === 0) {
+          <div class="empty-data">Nenhuma conta cadastrada. <a routerLink="/contas/nova">Criar conta</a></div>
+        } @else {
+          <div class="account-list">
+            @for (conta of dados.contas; track conta.contaFinanceiraId) {
+              <div class="account-row">
+                <span class="account-name"><span class="account-indicator" aria-hidden="true"></span>{{ conta.nome }}</span>
+                <strong>{{ moeda(conta.saldoConfirmado) }}</strong>
+                <strong>{{ moeda(conta.saldoProjetado) }}</strong>
+              </div>
+            }
+          </div>
+        }
+        <footer class="panel-total account-footer">
+          <span>Total</span><strong>{{ moeda(dados.saldoConfirmado) }}</strong><strong>{{ moeda(dados.saldoProjetado) }}</strong>
+        </footer>
+      </section>
+
+      <section class="panel chart-panel" aria-labelledby="titulo-fluxo">
+        <div class="panel-head"><div><span class="eyebrow">PLANEJAMENTO</span><h2 id="titulo-fluxo">Fluxo de caixa</h2></div>
+          @if (dados.contas.length > 0) {
+            <label class="chart-select-label" for="conta-fluxo">Conta
+              <select id="conta-fluxo" (change)="alterarContaGrafico($event)" [value]="contaGraficoId() ?? ''">
+                @for (conta of dados.contas; track conta.contaFinanceiraId) {
+                  <option [value]="conta.contaFinanceiraId">{{ conta.nome }}</option>
+                }
+              </select>
+            </label>
+          }
+        </div>
+        @if (carregandoFluxo()) {
+          <p class="empty-data" role="status">Carregando projeção de fluxo de caixa…</p>
+        } @else if (erroFluxo()) {
+          <p class="empty-data" role="alert">{{ erroFluxo() }}</p>
+        } @else if (fluxo(); as fluxoAtual) {
+          <div class="chart-legend"><span><i class="legend-confirmed"></i>Confirmado</span><span><i class="legend-projected"></i>Projetado</span></div>
+          <svg class="cash-chart" viewBox="0 0 710 215" role="img" aria-label="Comparação visual dos saldos confirmado e projetado ao longo do mês">
+            <line x1="14" y1="20" x2="694" y2="20" class="gridline" />
+            <line x1="14" y1="70" x2="694" y2="70" class="gridline" />
+            <line x1="14" y1="120" x2="694" y2="120" class="gridline" />
+            <line x1="14" y1="172" x2="694" y2="172" class="gridline" />
+            <polyline [attr.points]="saldoConfirmadoSvg()" fill="none" class="chart-confirmed"/>
+            <polyline [attr.points]="saldoProjetadoSvg()" fill="none" class="chart-projected"/>
+            <text x="14" y="202" class="axis-label">{{ data(fluxoAtual.dataInicio) }}</text>
+            <text x="694" y="202" text-anchor="end" class="axis-label">{{ data(fluxoAtual.dataFim) }}</text>
+          </svg>
+          <div class="chart-footer"><span>Saldo projetado ao fim do período</span><strong>{{ moeda(fluxoAtual.saldoProjetadoFinal) }}</strong></div>
+        } @else {
+          <p class="empty-data">Selecione uma conta para visualizar o fluxo de caixa.</p>
+        }
+      </section>
+
+      <section class="panel due-panel" aria-labelledby="titulo-pagar">
+        <div class="panel-head"><div><span class="eyebrow">COMPROMISSOS</span><h2 id="titulo-pagar">Contas a pagar</h2></div>
+          <a routerLink="/lancamentos" class="panel-link">Ver lançamentos →</a></div>
+        @if (aPagar().length === 0) {
+          <p class="empty-data">Nenhum pagamento pendente neste período.</p>
+        } @else {
+          <div class="due-list">
+            @for (item of aPagar(); track item.lancamentoId) {
+              <div class="due-row">
+                <span class="date-block">{{ data(item.vencimento) }}</span>
+                <div class="due-description">
+                  <strong>{{ item.descricao }}</strong>
+                  <small>{{ item.contaFinanceiraNome }} · {{ item.categoriaNome }}</small>
+                  @if (item.atrasado) { <span class="late-label">Atrasado</span> }
+                </div>
+                <strong class="due-value expense-text">{{ moeda(item.valorRestante) }}</strong>
+              </div>
+            }
+          </div>
+        }
+        <footer class="panel-total"><span>Total no período</span><strong class="expense-text">{{ moeda(dados.aPagarPeriodo) }}</strong></footer>
+      </section>
+
+      <section class="panel category-panel" aria-labelledby="titulo-categorias">
+        <div class="panel-head"><div><span class="eyebrow">ANÁLISE</span><h2 id="titulo-categorias">Despesas por categoria</h2></div></div>
+        @if (erroCategorias()) {
+          <p class="empty-data" role="alert">{{ erroCategorias() }}</p>
+        } @else if (categoriasGraficos().length === 0) {
+          <p class="empty-data">Sem despesas realizadas neste período.</p>
+        } @else {
+          <div class="category-bars">
+            @for (categoria of categoriasGraficos(); track categoria.categoriaId) {
+              <div class="category-item">
+                <div class="category-label"><span>{{ categoria.categoriaNome }}</span><strong>{{ moeda(categoria.valor) }}</strong></div>
+                <div class="category-track"><div class="category-fill" [style.width.%]="categoria.percentual"></div></div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <section class="panel shortcuts-panel" aria-labelledby="titulo-acoes">
+        <div class="panel-head"><div><span class="eyebrow">ACESSO RÁPIDO</span><h2 id="titulo-acoes">O que deseja fazer?</h2></div></div>
+        <div class="shortcuts">
+          <a routerLink="/lancamentos/novo"><span aria-hidden="true">+</span> Novo lançamento</a>
+          <a routerLink="/contas"><span aria-hidden="true">▣</span> Consultar contas</a>
+          <a routerLink="/categorias"><span aria-hidden="true">≡</span> Organizar categorias</a>
+        </div>
+        <p class="scope-note">O painel apresenta lançamentos de contas financeiras. Faturas de cartão serão integradas em etapa própria, sem duplicar despesas.</p>
+      </section>
+    </div>
+  }
+</section>

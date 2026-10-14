@@ -3,7 +3,9 @@ import { inject, Injectable } from '@angular/core';
 
 import { AuthService } from '../../core/auth/auth.service';
 import { API_BASE_URL } from '../../core/config/api.config';
-import { CriarLancamento, Lancamento } from './lancamento.model';
+import {
+  CriarLancamento, Lancamento, CriarRecorrenciaLancamento, CriarParcelamentoLancamento,
+} from './lancamento.model';
 
 @Injectable({ providedIn: 'root' })
 export class LancamentosService {
@@ -21,6 +23,15 @@ export class LancamentosService {
       ? {}
       : { params: new HttpParams().set('contaFinanceiraId', String(contaFinanceiraId)) };
     return this.http.get<Lancamento[]>(this.endpoint(), options);
+  }
+
+
+  criarRecorrencia(dados: CriarRecorrenciaLancamento) {
+    return this.http.post(this.endpoint().replace(/\/lancamentos$/, '/recorrencias-lancamentos'), dados);
+  }
+
+  criarParcelamento(dados: CriarParcelamentoLancamento) {
+    return this.http.post(this.endpoint().replace(/\/lancamentos$/, '/parcelamentos-lancamentos'), dados);
   }
 
   criar(dados: CriarLancamento) {
