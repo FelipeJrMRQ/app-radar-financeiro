@@ -1,0 +1,50 @@
+<app-auth-shell>
+  <div class="auth-form">
+    <span class="eyebrow">COMECE PELO ESSENCIAL</span>
+    <h2>Crie sua conta</h2>
+    <p class="subtitle">Alguns dados e você já pode começar a organizar suas finanças.</p>
+    @if (erro()) {
+      <p class="form-error" role="alert">{{ erro() }}</p>
+    }
+    <form [formGroup]="formulario" (ngSubmit)="cadastrar()" novalidate>
+      <div class="field">
+        <label for="nome">Seu nome</label>
+        <input id="nome" type="text" formControlName="nome" autocomplete="name"
+               placeholder="Como podemos chamar você?"
+               [attr.aria-invalid]="formulario.controls.nome.touched && formulario.controls.nome.invalid" />
+        @if (formulario.controls.nome.touched && formulario.controls.nome.invalid) {
+          <small class="field-error">Informe seu nome (até 150 caracteres).</small>
+        }
+      </div>
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input id="email" type="email" formControlName="email" autocomplete="email"
+               inputmode="email" placeholder="seu@email.com"
+               [attr.aria-invalid]="formulario.controls.email.touched && formulario.controls.email.invalid" />
+        @if (formulario.controls.email.touched && formulario.controls.email.invalid) {
+          <small class="field-error">Informe um e-mail válido.</small>
+        }
+      </div>
+      <div class="field">
+        <label for="senha">Crie uma senha</label>
+        <div class="password-field">
+          <input id="senha" [type]="mostrarSenha() ? 'text' : 'password'"
+                 formControlName="senha" autocomplete="new-password" placeholder="Pelo menos 8 caracteres"
+                 [attr.aria-invalid]="formulario.controls.senha.touched && formulario.controls.senha.invalid" />
+          <button type="button" class="show-password" (click)="mostrarSenha.set(!mostrarSenha())"
+                  [attr.aria-label]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'">
+            {{ mostrarSenha() ? 'Ocultar' : 'Mostrar' }}
+          </button>
+        </div>
+        @if (formulario.controls.senha.touched && formulario.controls.senha.invalid) {
+          <small class="field-error">Use uma senha entre 8 e 100 caracteres.</small>
+        }
+      </div>
+      <button class="primary-button" type="submit" [disabled]="carregando()">
+        {{ carregando() ? 'Criando conta...' : 'Criar minha conta' }}
+        <span aria-hidden="true">→</span>
+      </button>
+    </form>
+    <div class="form-footer">Já tem uma conta? <a routerLink="/entrar">Fazer login</a></div>
+  </div>
+</app-auth-shell>

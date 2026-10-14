@@ -1,1 +1,14 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  color: #173149;
+  background: #f6f9fb;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { min-width: 320px; }
+body { min-width: 320px; margin: 0; }
+button, input { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 3px solid #37ac98; outline-offset: 3px; }
