@@ -138,3 +138,15 @@ impeça recuperar o acesso às funcionalidades. Indicadores do topo associados a
 também respeitam a visibilidade. O frontend não armazena preferências no navegador.
 
 A ordenação segue a sequência informada pela API em mobile (coluna) e desktop (grid).
+
+## Estrutura interna das features (refatoração de outubro/2026)
+
+Cada feature concentra páginas (`pages`), componentes reais (`components`), serviços (`services`),
+modelos (`models`), utilitários (`utils`), estilos (`styles`) e suas rotas
+(`<feature>.routes.ts`), conforme sua necessidade concreta.
+O `app.routes.ts` compõe essas rotas e preserva o lazy loading.
+O dashboard contém cinco widgets standalone, compatíveis com a ordem/visibilidade por usuário;
+a coordenação dos dados financeiros continua na página e nos serviços existentes.
+
+**Diretriz integral:** [docs/diretrizes-arquitetura-frontend-angular.md](docs/diretrizes-arquitetura-frontend-angular.md).
+A cópia em Fontes deve ser substituída pelo MD atualizado de 14/10/2026.
