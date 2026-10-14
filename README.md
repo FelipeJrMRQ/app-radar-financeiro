@@ -236,3 +236,24 @@ somente do dashboard para priorizar leitura em telas pequenas. O detalhamento
 permanece em **Lançamentos**, sem alteração no modelo ou no contrato da API.
 Os cards **Saldos das contas** e **Despesas por categoria** mantêm os nomes,
 pois nesses componentes eles identificam os dados exibidos.
+
+## Dashboard e totais mensais de Lançamentos
+
+O dashboard exibe no máximo **cinco** lançamentos por card de recebimentos e pagamentos.
+Os cards não possuem rolagem própria nem rodapé de total; a página inteira rola
+normalmente. O botão **Ver lançamentos** abre o mês selecionado e o filtro correto
+(`/lancamentos?tipo=RECEITA&mes=2026-10` ou `DESPESA`).
+
+A listagem de Lançamentos mostra mês selecionável, filtro por tipo/conta,
+registros do período e **Total lançado no período**, calculado pela API em
+`GET /espacos-financeiros/{id}/lancamentos/resumo-periodo`.
+O total é a soma dos valores originais dos lançamentos ativos do período (confirmados
+e previstos) e **não** representa dinheiro efetivamente pago ou recebido. As
+consultas `GET /lancamentos` recebem os mesmos filtros de
+`dataInicio`, `dataFim`, `tipo` e `contaFinanceiraId`.
+A listagem permanece completa, mesmo se o usuário escolher carregar apenas os 30
+primeiros registros na UI.
+
+**Dependência:** backend branch `chatgpt/resumo-periodo-lancamentos`
+(empilhada sobre `chatgpt/preferencias-painel-usuario`). O Angular desta etapa
+precisa dessa versão da API. Nenhuma migration nem regra contábil anterior foi alterada.

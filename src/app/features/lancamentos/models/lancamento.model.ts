@@ -54,3 +54,20 @@ export interface CriarParcelamentoLancamento {
   primeiroVencimento: string;
   observacao: string | null;
 }
+
+/** Filtros comuns à listagem e ao resumo calculado no backend. */
+export interface FiltroLancamentosPeriodo {
+  contaFinanceiraId: number | null;
+  tipo: TipoCategoria | null;
+  dataInicio: string;
+  dataFim: string;
+}
+
+export interface ResumoLancamentosPeriodo {
+  dataInicio: string;
+  dataFim: string;
+  tipo: TipoCategoria | null;
+  contaFinanceiraId: number | null;
+  /** Soma bruta dos valores originais, previstos e confirmados. */
+  totalLancado: ValorFinanceiroApi;
+}

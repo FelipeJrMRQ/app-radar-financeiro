@@ -15,7 +15,7 @@
                 } @else if (erroFluxo()) {
                   <p class="empty-data" role="alert">{{ erroFluxo() }}</p>
                 } @else if (fluxo(); as fluxoAtual) {
-                  <div class="chart-body" tabindex="0" aria-label="Gráfico do fluxo de caixa">
+                  <div class="chart-body">
                   <div class="chart-legend"><span><i class="legend-confirmed"></i>Confirmado</span><span><i class="legend-projected"></i>Projetado</span></div>
                   <svg class="cash-chart" viewBox="0 0 710 215" role="img" aria-label="Comparação visual dos saldos confirmado e projetado ao longo do mês">
                     <title>Período: {{ dataCompleta(fluxoAtual.dataInicio) }} até {{ dataCompleta(fluxoAtual.dataFim) }}</title>

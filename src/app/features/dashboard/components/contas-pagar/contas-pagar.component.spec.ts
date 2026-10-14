@@ -11,7 +11,6 @@ describe('Card de contas a pagar', () => {
     }).compileComponents();
 
     const fixture = TestBed.createComponent(ContasPagarCardComponent);
-    fixture.componentRef.setInput('total', '120.00');
     fixture.componentRef.setInput('itens', [{
       lancamentoId: 2,
       contaFinanceiraId: 5,

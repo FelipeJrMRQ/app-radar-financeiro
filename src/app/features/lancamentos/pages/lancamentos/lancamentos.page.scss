@@ -67,3 +67,24 @@
 @media (min-width:620px) {
 .movement-value { align-items:flex-end; width:auto; text-align:right; padding-left:0; }
 }
+
+/* Período selecionável, coerente com os links do dashboard. */
+.periodo-selector { display:flex; align-items:center; justify-content:space-between; width:100%;
+  max-width:360px; min-height:54px; gap:12px; margin:0 0 20px; padding:5px; border-radius:12px;
+  border:1px solid #dce9e9; background:#fff; }
+.periodo-selector button { width:44px; height:44px; flex:0 0 44px; border:0;
+  border-radius:8px; background:#eef6f6; color:#155f62; font:inherit; font-size:25px; cursor:pointer; }
+.periodo-selector strong { font-size:14px; text-transform:capitalize; color:#204759; text-align:center; }
+.total-periodo { display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:18px 17px; margin:0 0 20px; border:1px solid #dce8e9; border-radius:14px;
+  background:#fff; min-width:0; }
+.total-periodo-label { display:flex; flex-direction:column; gap:6px; min-width:0; }
+.total-periodo-label strong { font-size:14px; color:#1d4658; }
+.total-periodo-label small { font-size:12px; color:#718794; line-height:1.5; }
+.total-periodo-valor { flex-shrink:0; font-size:clamp(17px,3vw,23px); font-weight:800;
+  color:#078468; overflow-wrap:anywhere; text-align:right; }
+.total-periodo-valor.despesa { color:#b64c54; }
+@media (max-width:460px) {
+  .total-periodo { align-items:flex-start; flex-direction:column; gap:11px; }
+  .total-periodo-valor { text-align:left; }
+}

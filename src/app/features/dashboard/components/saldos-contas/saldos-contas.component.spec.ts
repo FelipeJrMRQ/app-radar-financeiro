@@ -22,6 +22,6 @@ describe('Card de saldos por conta', () => {
     const labels = Array.from(card.querySelectorAll('.account-value-label'))
       .map(node => node.textContent?.trim());
     expect(labels).toEqual(['Confirmado', 'Projetado', 'Confirmado', 'Projetado']);
-    expect(card.querySelector('.account-list')?.getAttribute('tabindex')).toBe('0');
+    expect(card.querySelector('.account-list')?.getAttribute('tabindex')).toBeNull();
   });
 });

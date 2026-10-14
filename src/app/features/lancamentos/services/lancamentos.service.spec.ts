@@ -42,6 +42,28 @@ describe('LancamentosService', () => {
   });
 
 
+
+  it('consulta período e soma da API com os mesmos filtros de tipo e conta', async () => {
+    const filtros = {
+      contaFinanceiraId: 5, tipo: 'RECEITA' as const,
+      dataInicio: '2026-10-01', dataFim: '2026-10-31',
+    };
+    const lista = firstValueFrom(api.listarPeriodo(filtros));
+    const resumo = firstValueFrom(api.resumirPeriodo(filtros));
+    const chamadas = http.match(r => r.url.startsWith('/api/espacos-financeiros/7/lancamentos'));
+    expect(chamadas.length).toBe(2);
+    for (const req of chamadas) {
+      expect(req.request.params.get('tipo')).toBe('RECEITA');
+      expect(req.request.params.get('dataInicio')).toBe('2026-10-01');
+      expect(req.request.params.get('dataFim')).toBe('2026-10-31');
+      expect(req.request.params.get('contaFinanceiraId')).toBe('5');
+      req.flush(req.request.url.endsWith('/resumo-periodo') ?
+        { totalLancado: '250.0000', dataInicio: '2026-10-01', dataFim: '2026-10-31' } : []);
+    }
+    expect(await lista).toEqual([]);
+    expect((await resumo).totalLancado).toBe('250.0000');
+  });
+
   it('encaminha recorrência mensal para endpoint próprio', async () => {
     const result = firstValueFrom(api.criarRecorrencia({
       contaFinanceiraId: 11, categoriaId: 3, descricao: 'Aluguel',

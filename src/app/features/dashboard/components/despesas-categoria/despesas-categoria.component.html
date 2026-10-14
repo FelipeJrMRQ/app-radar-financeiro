@@ -5,7 +5,7 @@
                 } @else if (categoriasGraficos().length === 0) {
                   <p class="empty-data">Sem despesas realizadas neste período.</p>
                 } @else {
-                  <div class="category-bars" tabindex="0" aria-label="Despesas realizadas por categoria">
+                  <div class="category-bars">
                     @for (categoria of categoriasGraficos(); track categoria.categoriaId) {
                       <div class="category-item">
                         <div class="category-label"><span>{{ categoria.categoriaNome }}</span><strong>{{ moeda(categoria.valor) }}</strong></div>

@@ -8,6 +8,6 @@ import { largurasCategorias } from '../../utils/painel-visuais';
 export class DespesasCategoriaCardComponent {
   readonly categorias = input.required<TotalCategoria[]>();
   readonly erroCategorias = input<string | null>(null);
-  readonly categoriasGraficos = computed(() => largurasCategorias(this.categorias()).slice(0,7));
+  readonly categoriasGraficos = computed(() => largurasCategorias(this.categorias()).slice(0,5));
   readonly moeda = formatarMoeda;
 }
