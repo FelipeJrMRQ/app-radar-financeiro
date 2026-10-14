@@ -26,6 +26,24 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/dashboard/inicio.page').then((m) => m.InicioPage),
       },
+      {
+        path: 'contas',
+        title: 'Contas financeiras | Radar Financeiro',
+        loadComponent: () =>
+          import('./features/contas-financeiras/contas-lista.page').then((m) => m.ContasListaPage),
+      },
+      {
+        path: 'contas/nova',
+        title: 'Nova conta | Radar Financeiro',
+        loadComponent: () =>
+          import('./features/contas-financeiras/conta-nova.page').then((m) => m.ContaNovaPage),
+      },
+      {
+        path: 'contas/:contaId',
+        title: 'Detalhes da conta | Radar Financeiro',
+        loadComponent: () =>
+          import('./features/contas-financeiras/conta-detalhe.page').then((m) => m.ContaDetalhePage),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

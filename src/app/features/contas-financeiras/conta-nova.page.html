@@ -1,0 +1,52 @@
+<section class="contas-page">
+  <a routerLink="/contas" class="back-link">← Voltar para contas</a>
+  <div class="page-heading">
+    <div>
+      <p class="section-label">CADASTRO</p>
+      <h1>Nova conta financeira</h1>
+      <p class="page-description">Preencha os dados iniciais de sua conta.</p>
+    </div>
+  </div>
+
+  <div class="form-panel">
+    @if (erro()) {
+      <div class="inline-error" role="alert">{{ erro() }}</div>
+    }
+    <form [formGroup]="formulario" (ngSubmit)="salvar()" novalidate>
+      <div class="form-field">
+        <label for="nome">Nome da conta</label>
+        <input id="nome" formControlName="nome" type="text" autocomplete="off"
+               placeholder="Ex.: Conta principal" maxlength="150"
+               [attr.aria-invalid]="formulario.controls.nome.touched && formulario.controls.nome.invalid" />
+        @if (formulario.controls.nome.touched && formulario.controls.nome.invalid) {
+          <small class="field-error">Informe um nome com até 150 caracteres.</small>
+        }
+      </div>
+      <div class="form-field">
+        <label for="tipo">Tipo de conta</label>
+        <select id="tipo" formControlName="tipo">
+          @for (opcao of tipos; track opcao.valor) {
+            <option [value]="opcao.valor">{{ opcao.descricao }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="saldo-inicial">Saldo inicial (R$)</label>
+        <input id="saldo-inicial" formControlName="saldoInicial"
+               type="text" inputmode="decimal" autocomplete="off" placeholder="0,00"
+               [attr.aria-invalid]="formulario.controls.saldoInicial.touched && formulario.controls.saldoInicial.invalid"
+               aria-describedby="ajuda-saldo" />
+        <small id="ajuda-saldo" class="field-hint">Use vírgula para os centavos, por exemplo: 1.250,50. Valores negativos são aceitos.</small>
+        @if (formulario.controls.saldoInicial.touched && formulario.controls.saldoInicial.invalid) {
+          <small class="field-error">Informe um valor válido com até 4 casas decimais.</small>
+        }
+      </div>
+      <div class="form-actions">
+        <a routerLink="/contas" class="secondary-action cancel-link">Cancelar</a>
+        <button type="submit" class="primary-action" [disabled]="salvando()">
+          {{ salvando() ? 'Salvando…' : 'Criar conta' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

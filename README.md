@@ -17,6 +17,18 @@ npm start
 
 Acesse `http://localhost:4200`. O proxy do Angular recebe chamadas em `/api/*` e encaminha ao backend em `http://localhost:8080/*`. O proxy fica em `proxy.conf.json`, referenciado pelo `angular.json`. Em produção, o servidor HTTPS deve realizar o mesmo encaminhamento para `/api`, removendo o prefixo.
 
+## Segunda entrega — contas financeiras
+
+Rotas protegidas e mobile first:
+
+- `/contas`: lista contas reais da API e consulta o saldo confirmado por conta.
+- `/contas/nova`: cadastra nome, tipo e saldo inicial com formulário validado.
+- `/contas/:contaId`: exibe saldo retornado pelo backend e extrato mensal com paginação por mês.
+
+Os contratos foram verificados no controller/DTO de contas financeiras da API. Os valores monetários apresentados vêm do backend: **o Angular não calcula saldos ou totais**. O formulário converte `pt-BR` para string decimal e não utiliza `number` para construir o valor inicial.
+
+A identidade visual destes módulos é provisória e seguirá a padronização do projeto futuramente. O desenho atual parte das larguras móveis e expande progressivamente. Nenhum dado financeiro fictício é apresentado.
+
 ## Primeira entrega
 
 - Cadastro `POST /usuarios`.
