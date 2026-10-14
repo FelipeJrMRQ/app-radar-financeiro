@@ -29,7 +29,7 @@
 
       <span class="sidebar-section-title grouped-title">GERENCIAMENTO</span>
       <nav aria-label="Cadastros e configurações">
-        <details class="sidebar-group" open>
+        <details class="sidebar-group" [class.section-active]="cadastrosAtivo()" open>
           <summary class="sidebar-group-trigger">
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -47,7 +47,7 @@
             <span class="sidebar-sublink coming-soon">Cartões <small>Em breve</small></span>
           </div>
         </details>
-        <details class="sidebar-group" open>
+        <details class="sidebar-group" [class.section-active]="configuracoesAtivo()" open>
           <summary class="sidebar-group-trigger">
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -113,14 +113,16 @@
         <path d="M8 4h12M8 10h12M8 16h12M4 4h.01M4 10h.01M4 16h.01"/>
       </svg><span>Lançamentos</span>
     </a>
-    <a routerLink="/cadastros" routerLinkActive="active">
+    <a routerLink="/cadastros" [class.active]="cadastrosAtivo()"
+       [attr.aria-current]="cadastrosAtivo() ? 'page' : null">
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="5" width="18" height="15" rx="2"/>
         <path d="M3 10h18M8 15h8"/>
       </svg><span>Cadastros</span>
     </a>
-    <a routerLink="/configuracoes" routerLinkActive="active">
+    <a routerLink="/configuracoes" [class.active]="configuracoesAtivo()"
+       [attr.aria-current]="configuracoesAtivo() ? 'page' : null">
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>

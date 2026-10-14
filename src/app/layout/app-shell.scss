@@ -131,3 +131,7 @@
   .coming-soon small { font-size:9px; color:#90a5b1; white-space:nowrap; }
   .sidebar-footer { margin-top:auto; }
 }
+
+@media (min-width:860px) {
+  .sidebar-group.section-active > .sidebar-group-trigger { color:#fff; background:rgba(26,159,138,.14); }
+}
