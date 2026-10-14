@@ -49,6 +49,8 @@ export class LancamentosPage implements OnInit {
 
   ngOnInit(): void { void this.carregar(); }
 
+  mostrarMais(): void { this.limiteExibicao.update(atual => atual + 30); }
+
   alterarTipo(tipo: FiltroTipo): void {
     this.filtroTipo.set(tipo);
     this.limiteExibicao.set(30);
