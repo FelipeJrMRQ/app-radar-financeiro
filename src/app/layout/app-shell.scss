@@ -1,5 +1,11 @@
 :host { display: block; min-height: 100dvh; }
-.app-layout { min-height: 100dvh; background: #f5f8fa; }
+.app-layout {
+  --mobile-nav-height: 65px;
+  --mobile-fab-size: 58px;
+  --mobile-fab-gap: 14px;
+  min-height: 100dvh;
+  background: #f5f8fa;
+}
 .sidebar { display: none; }
 .workspace { min-width: 0; }
 .mobile-header {
@@ -17,7 +23,28 @@
 }
 .mobile-logout { border: 1px solid #dbe4e9; border-radius: 9px; background: white; color: #314d5d; padding: 10px 14px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .desktop-header { display: none; }
-.page-content { width: 100%; min-width: 0; max-width: 1340px; margin: 0 auto; padding: 26px 18px calc(110px + env(safe-area-inset-bottom)); }
+.page-content { width: 100%; min-width: 0; max-width: 1340px; margin: 0 auto; padding: 26px 18px calc(var(--mobile-nav-height) + var(--mobile-fab-gap) + var(--mobile-fab-size) + 36px + env(safe-area-inset-bottom)); }
+/* Ação primária fixa no celular: acima da navegação e fora do fluxo dos cards. */
+.mobile-fab {
+  position: fixed;
+  z-index: 11;
+  right: calc(18px + env(safe-area-inset-right));
+  bottom: calc(var(--mobile-nav-height) + var(--mobile-fab-gap) + env(safe-area-inset-bottom));
+  display: grid;
+  place-items: center;
+  width: var(--mobile-fab-size);
+  height: var(--mobile-fab-size);
+  border: 2px solid rgba(255,255,255,.9);
+  border-radius: 50%;
+  background: var(--rf-teal-700,#087d73);
+  color: white;
+  box-shadow: 0 8px 22px rgba(5,61,70,.28);
+  text-decoration: none;
+}
+.mobile-fab:hover { background: var(--rf-teal-600,#099587); }
+.mobile-fab:focus-visible { outline-offset: 4px; }
+.mobile-fab svg { width: 26px; height: 26px; }
+
 .mobile-bottom-nav {
   display: flex; position: fixed; bottom: 0; right: 0; left: 0; z-index: 10;
   min-height: calc(65px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
@@ -61,7 +88,7 @@
     font: inherit; font-size: 12px; cursor: pointer; text-align: left;
   }
   .side-logout:hover { background: #1a4758; color: white; }
-  .mobile-header, .mobile-bottom-nav { display: none; }
+  .mobile-header, .mobile-bottom-nav, .mobile-fab { display: none; }
   .desktop-header {
     display: flex; align-items: center; justify-content: space-between;
     min-height: 86px; padding: 16px clamp(30px,4vw,66px);

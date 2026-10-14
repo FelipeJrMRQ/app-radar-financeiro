@@ -19,6 +19,8 @@ export class AppShell {
   private readonly rotaAtual = signal(this.router.url);
   readonly cadastrosAtivo = computed(() => grupoNavegacao(this.rotaAtual()) === 'cadastros');
   readonly configuracoesAtivo = computed(() => grupoNavegacao(this.rotaAtual()) === 'configuracoes');
+  readonly cadastroLancamentoAtivo = computed(() =>
+    this.rotaAtual().split(/[?#]/, 1)[0] === '/lancamentos/novo');
 
   constructor() {
     this.router.events.pipe(

@@ -5,15 +5,10 @@
       <h1>Visão geral, {{ primeiroNome() }}</h1>
       <p>Acompanhe obrigações, saldos e movimentações com dados atualizados das suas contas.</p>
     </div>
-    <div class="dashboard-tools">
-      <a routerLink="/configuracoes/painel" class="secondary-action panel-preferences-link">
-        Personalizar painel
-      </a>
-      <div class="month-controls" aria-label="Período do painel">
+    <div class="month-controls" aria-label="Período do painel">
       <button type="button" (click)="mudarMes(-1)" aria-label="Mês anterior">‹</button>
       <span aria-live="polite">{{ mesDescricao() }}</span>
       <button type="button" (click)="mudarMes(1)" aria-label="Próximo mês">›</button>
-      </div>
     </div>
   </header>
 
