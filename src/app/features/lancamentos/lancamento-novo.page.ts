@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom, forkJoin } from 'rxjs';
 
 import { mensagemDeErro } from '../../core/http/api-error';
+import { MoedaBrInputDirective } from '../../shared/directives/moeda-br-input.directive';
 import { decimalPositivo, dataHojeLocal } from '../../shared/valor-monetario';
 import { Categoria, TipoCategoria } from '../categorias/categoria.model';
 import { CategoriasService } from '../categorias/categorias.service';
@@ -21,7 +22,7 @@ function valorLancamentoValido(control: AbstractControl): ValidationErrors | nul
 @Component({
   selector: 'app-lancamento-novo-page',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, ReactiveFormsModule, MoedaBrInputDirective],
   templateUrl: './lancamento-novo.page.html',
   styleUrl: './lancamentos.page.scss',
 })
@@ -48,7 +49,7 @@ export class LancamentoNovoPage implements OnInit {
     contaFinanceiraId: this.fb.control<number | null>(null, Validators.required),
     categoriaId: this.fb.control<number | null>(null, Validators.required),
     descricao: ['', [Validators.required, Validators.maxLength(200)]],
-    valor: ['0,00', [valorLancamentoValido]],
+    valor: ['', [valorLancamentoValido]],
     dataLancamento: [dataHojeLocal(), Validators.required],
     observacao: ['', Validators.maxLength(500)],
   });

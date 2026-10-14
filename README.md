@@ -80,3 +80,19 @@ Contratos usados: `GET/POST /espacos-financeiros/{id}/categorias` e `GET/POST /e
 **Limitação atual da API:** o endpoint de lançamentos não disponibiliza paginação por servidor, então a UI apenas limita a quantidade de itens renderizados. Uma paginação backend poderá ser proposta quando houver volume elevado.
 
 Os testes automatizados cobrem os contratos de cadastro, isolamento do ID interno do espaço e conversão monetária sem floats. Os fluxos de edição, confirmação parcial e estorno serão etapas futuras, após validação dessa jornada.
+
+## Campos monetários — máscara pt-BR
+
+O cadastro de contas (saldo inicial) e de lançamentos (valor) utiliza a diretiva standalone
+`src/app/shared/directives/moeda-br-input.directive.ts`. É compartilhada entre funcionalidades.
+
+- Campo inicialmente vazio: `R$ 0,00` aparece apenas como placeholder.
+- Ao focar: o placeholder desaparece e `R$ ` aparece sem criar um valor no `FormControl`.
+- Ao digitar: o prefixo `R$ ` e o separador de milhar são formatados dinamicamente; vírgula é o separador decimal.
+- Ao sair: a parte decimal é complementada até duas casas (ex.: `R$ 1.250,50`).
+- Até **quatro casas decimais** são preservadas para compatibilidade com `DECIMAL(19,4)`, sem usar `parseFloat` ou `Number` para montar o valor.
+- Saldo inicial admite sinal negativo, enquanto receitas e despesas exigem valor maior que zero.
+- O `FormControl` contém somente o valor em pt-BR sem `R$ `. O service envia o valor decimal canônico (`"1250.50"`) à API.
+
+Para novos formulários monetários, reutilizar `rfMoedaBr` e importar a diretiva no componente standalone.
+Não duplicar manipulações de `input` por tela.

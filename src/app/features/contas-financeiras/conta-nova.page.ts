@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import { mensagemDeErro } from '../../core/http/api-error';
+import { MoedaBrInputDirective } from '../../shared/directives/moeda-br-input.directive';
 import { TIPOS_CONTA, TipoContaFinanceira } from './contas-financeiras.model';
 import { ContasFinanceirasService } from './contas-financeiras.service';
 import { normalizarSaldoInicial } from './formatacao-contas';
@@ -17,7 +18,7 @@ function saldoValido(controle: AbstractControl): ValidationErrors | null {
 @Component({
   selector: 'app-conta-nova-page',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, ReactiveFormsModule, MoedaBrInputDirective],
   templateUrl: './conta-nova.page.html',
   styleUrl: './contas-financeiras.scss',
 })
@@ -32,7 +33,7 @@ export class ContaNovaPage {
   readonly formulario = this.fb.group({
     nome: this.fb.control('', [Validators.required, Validators.maxLength(150)]),
     tipo: this.fb.control<TipoContaFinanceira>('CONTA_CORRENTE', Validators.required),
-    saldoInicial: this.fb.control('0,00', saldoValido),
+    saldoInicial: this.fb.control('', saldoValido),
   });
 
   async salvar(): Promise<void> {
