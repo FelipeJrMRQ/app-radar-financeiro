@@ -1,10 +1,23 @@
 :root {
+  /* Tokens centrais para ajustes futuros da identidade sem alterar cada feature. */
+  --rf-navy-950: #03111f;
+  --rf-navy-900: #082338;
+  --rf-navy-800: #123b50;
+  --rf-teal-700: #087d73;
+  --rf-teal-600: #099587;
+  --rf-teal-400: #32d5ba;
+  --rf-gold-400: #d8ae60;
+  --rf-gold-300: #f1d48b;
+  --rf-background: #f6f9fa;
+  --rf-surface: #ffffff;
+  --rf-text-primary: #173149;
+  --rf-text-muted: #788894;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  color: #173149;
-  background: #f6f9fb;
+  color: var(--rf-text-primary);
+  background: var(--rf-background);
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { min-width: 320px; }
@@ -12,3 +25,7 @@ body { min-width: 320px; margin: 0; }
 button, input { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 3px solid #37ac98; outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
