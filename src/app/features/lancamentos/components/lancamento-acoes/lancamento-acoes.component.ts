@@ -1,7 +1,7 @@
 import { Component, DestroyRef, EventEmitter, inject, Injector, input, Output, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom, forkJoin, of } from 'rxjs';
 
 import { mensagemDeErro } from '../../../../core/http/api-error';
 import { MoedaBrInputDirective } from '../../../../shared/directives/moeda-br-input.directive';
@@ -36,6 +36,7 @@ export class LancamentoAcoesComponent {
   readonly erro = signal<string | null>(null);
   readonly mensagem = signal<string | null>(null);
   readonly aguardandoEstorno = signal<number | null>(null);
+  readonly possuiRealizacoes = signal(false);
   readonly atual = signal<Lancamento | null>(null);
   readonly resumo = signal<ResumoRealizacoesLancamento | null>(null);
   readonly acao = signal<Acao>(null);
@@ -57,10 +58,17 @@ export class LancamentoAcoesComponent {
     this.erro.set(null);
     this.mensagem.set(null);
     this.aguardandoEstorno.set(null);
+    this.possuiRealizacoes.set(false);
     this.carregando.set(true);
     try {
-      const item = await firstValueFrom(this.api.buscar(this.lancamentoId()));
-      if (!this.destruido) this.atual.set(item);
+      const resultado = await firstValueFrom(forkJoin({
+        item: this.api.buscar(this.lancamentoId()),
+        resumo: this.api.realizacoes(this.lancamentoId()).pipe(catchError(() => of(null))),
+      }));
+      if (!this.destruido) {
+        this.atual.set(resultado.item);
+        this.possuiRealizacoes.set(!!resultado.resumo?.realizacoes.length);
+      }
     } catch (e) {
       if (!this.destruido) this.erro.set(mensagemDeErro(e));
     } finally {

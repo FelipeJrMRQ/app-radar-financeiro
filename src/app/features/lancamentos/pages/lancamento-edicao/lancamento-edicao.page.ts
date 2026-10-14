@@ -142,7 +142,7 @@ export class LancamentoEdicaoPage implements OnInit {
       }, escopo, l.parcelamentoLancamentoId !== null));
       if (!this.destruido) {
         await this.router.navigate(['/lancamentos'], {
-          queryParams: { mes: l.dataLancamento.slice(0, 7), tipo: l.tipo },
+          queryParams: { mes: f.dataLancamento.slice(0, 7), tipo: l.tipo },
         });
       }
     } catch (e) {

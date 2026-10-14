@@ -18,9 +18,11 @@
           <strong class="actions-heading">{{ l.descricao }}</strong>
           <a class="action-link" [routerLink]="['/lancamentos', l.id, 'editar']">Editar</a>
           @if (l.situacao === 'PREVISTO') {
-            <button type="button" (click)="escolher('CONFIRMAR')">
-              {{ l.tipo === 'RECEITA' ? 'Confirmar recebimento' : 'Confirmar pagamento' }}
-            </button>
+            @if (!possuiRealizacoes()) {
+              <button type="button" (click)="escolher('CONFIRMAR')">
+                {{ l.tipo === 'RECEITA' ? 'Confirmar recebimento' : 'Confirmar pagamento' }}
+              </button>
+            }
             <button type="button" (click)="escolher('PARCIAL')">
               {{ l.tipo === 'RECEITA' ? 'Recebimento parcial' : 'Pagamento parcial' }}
             </button>
