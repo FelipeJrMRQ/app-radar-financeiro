@@ -1,4 +1,4 @@
-import { decimalPositivo, formatarDataLocal, normalizarDecimalBr } from './valor-monetario';
+import { decimalPositivo, formatarDataLocal, formatarDiaMes, normalizarDecimalBr } from './valor-monetario';
 
 describe('Conversão monetária sem arredondamento no formulário', () => {
   it('aceita centavos, milhar e quatro casas exatas', () => {
@@ -18,5 +18,8 @@ describe('Conversão monetária sem arredondamento no formulário', () => {
 
   it('não altera uma data financeira por fuso', () => {
     expect(formatarDataLocal('2026-10-14')).toBe('14/10/2026');
+    expect(formatarDiaMes('2026-10-20')).toBe('20/10');
+    expect(formatarDiaMes('2027-01-05')).toBe('05/01');
+    expect(formatarDiaMes('data-invalida')).toBe('data-invalida');
   });
 });

@@ -184,3 +184,21 @@ A ação fica acima da barra inferior, com área de toque mínima de 58 px.
 
 A ação **Personalizar painel** foi retirada do cabeçalho do dashboard;
 permanece em `Configurações → Personalização do painel`.
+
+## Legibilidade dos cards do dashboard em celular
+
+Os vencimentos das listas de contas a pagar/receber são exibidos em
+`dd/MM` (por exemplo `20/10`) e preservam `dd/MM/aaaa` no
+`title` e no rótulo acessível do elemento `time[datetime]`.
+O utilitário `formatarDiaMes` não converte fuso horário.
+
+As fontes, valores e totais foram ampliados; no celular a listagem de
+saldos apresenta o nome da conta acima de **Confirmado** e
+**Projetado**, em duas colunas legíveis.
+
+Os widgets de dashboard têm altura limitada responsivamente. Listas de
+pendências, contas e categorias e o corpo do gráfico fazem rolagem
+vertical própria quando o conteúdo ultrapassa a altura disponível. O
+título e, quando aplicável, o rodapé de total permanecem visíveis.
+As áreas roláveis aceitam foco de teclado e rolagem por toque. Nenhuma
+consulta, cálculo financeiro ou valor da API foi alterado.

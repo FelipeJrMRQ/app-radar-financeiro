@@ -35,6 +35,12 @@ export function formatarDataLocal(dataIso: string): string {
   return data ? data[3] + '/' + data[2] + '/' + data[1] : dataIso;
 }
 
+/** Exibição compacta em dashboards mensais (dd/MM), sem conversão de fuso. */
+export function formatarDiaMes(dataIso: string): string {
+  const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dataIso);
+  return partes ? partes[3] + '/' + partes[2] : dataIso;
+}
+
 export function dataHojeLocal(): string {
   const data = new Date();
   return data.getFullYear() + '-' + String(data.getMonth() + 1).padStart(2, '0')
