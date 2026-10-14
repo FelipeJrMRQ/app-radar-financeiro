@@ -1,0 +1,33 @@
+<section class="panel chart-panel" aria-labelledby="titulo-fluxo">
+                <div class="panel-head"><div><span class="eyebrow">PLANEJAMENTO</span><h2 id="titulo-fluxo">Fluxo de caixa</h2></div>
+                  @if (contas().length > 0) {
+                    <label class="chart-select-label" for="conta-fluxo">Conta
+                      <select id="conta-fluxo" (change)="alterarConta($event)" [value]="contaId() ?? ''">
+                        @for (conta of contas(); track conta.contaFinanceiraId) {
+                          <option [value]="conta.contaFinanceiraId">{{ conta.nome }}</option>
+                        }
+                      </select>
+                    </label>
+                  }
+                </div>
+                @if (carregandoFluxo()) {
+                  <p class="empty-data" role="status">Carregando projeção de fluxo de caixa…</p>
+                } @else if (erroFluxo()) {
+                  <p class="empty-data" role="alert">{{ erroFluxo() }}</p>
+                } @else if (fluxo(); as fluxoAtual) {
+                  <div class="chart-legend"><span><i class="legend-confirmed"></i>Confirmado</span><span><i class="legend-projected"></i>Projetado</span></div>
+                  <svg class="cash-chart" viewBox="0 0 710 215" role="img" aria-label="Comparação visual dos saldos confirmado e projetado ao longo do mês">
+                    <line x1="14" y1="20" x2="694" y2="20" class="gridline" />
+                    <line x1="14" y1="70" x2="694" y2="70" class="gridline" />
+                    <line x1="14" y1="120" x2="694" y2="120" class="gridline" />
+                    <line x1="14" y1="172" x2="694" y2="172" class="gridline" />
+                    <polyline [attr.points]="saldoConfirmadoSvg()" fill="none" class="chart-confirmed"/>
+                    <polyline [attr.points]="saldoProjetadoSvg()" fill="none" class="chart-projected"/>
+                    <text x="14" y="202" class="axis-label">{{ data(fluxoAtual.dataInicio) }}</text>
+                    <text x="694" y="202" text-anchor="end" class="axis-label">{{ data(fluxoAtual.dataFim) }}</text>
+                  </svg>
+                  <div class="chart-footer"><span>Saldo projetado ao fim do período</span><strong>{{ moeda(fluxoAtual.saldoProjetadoFinal) }}</strong></div>
+                } @else {
+                  <p class="empty-data">Selecione uma conta para visualizar o fluxo de caixa.</p>
+                }
+              </section>

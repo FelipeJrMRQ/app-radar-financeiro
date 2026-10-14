@@ -1,0 +1,29 @@
+@use '../../styles/base';
+.feedback-card.danger, .inline-error { border: 1px solid #efc6c6; color: #993a3e; background: #fff1f1; }
+
+.form-panel { max-width: 620px; background: white; border: 1px solid #e1eaf0; border-radius: 15px; padding: 24px 20px; }
+
+.form-field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
+
+.form-field label { font-size: 13px; font-weight: 750; color: #2a465c; }
+
+.form-field input, .form-field select {
+  width: 100%; min-width: 0; min-height: 49px; border: 1px solid #d4e0e6; border-radius: 10px;
+  background: #fff; color: #213c50; padding: 11px 13px; font: inherit; font-size: 15px;
+}
+
+.form-field input[aria-invalid="true"] { border-color: #cb6363; }
+
+.form-field input:focus-visible, .form-field select:focus-visible { outline: 2px solid #1b9c8a; outline-offset: 2px; }
+
+.field-error { font-size: 12px; color: #ab3e47; }
+
+.field-hint { color: #78909b; line-height: 1.5; font-size: 12px; }
+
+.form-actions { display: flex; flex-direction: column-reverse; gap: 10px; margin-top: 26px; }
+
+.inline-error { border-radius: 10px; padding: 14px; font-size: 13px; margin-bottom: 22px; line-height: 1.6; }
+
+@media (min-width: 580px) {
+.form-actions { flex-direction: row; justify-content: flex-end; }
+}

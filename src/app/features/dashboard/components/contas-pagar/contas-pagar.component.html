@@ -1,0 +1,22 @@
+<section class="panel due-panel" aria-labelledby="titulo-pagar">
+                <div class="panel-head"><div><span class="eyebrow">COMPROMISSOS</span><h2 id="titulo-pagar">Contas a pagar</h2></div>
+                  <a routerLink="/lancamentos" class="panel-link">Ver lançamentos →</a></div>
+                @if (itens().length === 0) {
+                  <p class="empty-data">Nenhum pagamento pendente neste período.</p>
+                } @else {
+                  <div class="due-list">
+                    @for (item of itens(); track item.lancamentoId) {
+                      <div class="due-row">
+                        <span class="date-block">{{ data(item.vencimento) }}</span>
+                        <div class="due-description">
+                          <strong>{{ item.descricao }}</strong>
+                          <small>{{ item.contaFinanceiraNome }} · {{ item.categoriaNome }}</small>
+                          @if (item.atrasado) { <span class="late-label">Atrasado</span> }
+                        </div>
+                        <strong class="due-value expense-text">{{ moeda(item.valorRestante) }}</strong>
+                      </div>
+                    }
+                  </div>
+                }
+                <footer class="panel-total"><span>Total no período</span><strong class="expense-text">{{ moeda(total()) }}</strong></footer>
+              </section>

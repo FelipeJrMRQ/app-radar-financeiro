@@ -1,0 +1,122 @@
+<section class="dashboard">
+  <header class="dashboard-heading">
+    <div>
+      <span class="eyebrow">SUA VISÃO FINANCEIRA</span>
+      <h1>Visão geral, {{ primeiroNome() }}</h1>
+      <p>Acompanhe obrigações, saldos e movimentações com dados atualizados das suas contas.</p>
+    </div>
+    <div class="dashboard-tools">
+      <a routerLink="/configuracoes/painel" class="secondary-action panel-preferences-link">
+        Personalizar painel
+      </a>
+      <div class="month-controls" aria-label="Período do painel">
+      <button type="button" (click)="mudarMes(-1)" aria-label="Mês anterior">‹</button>
+      <span aria-live="polite">{{ mesDescricao() }}</span>
+      <button type="button" (click)="mudarMes(1)" aria-label="Próximo mês">›</button>
+      </div>
+    </div>
+  </header>
+
+  @if (carregando()) {
+    <div class="dashboard-state" role="status">Carregando informações financeiras…</div>
+  } @else if (erro()) {
+    <div class="dashboard-state error" role="alert">
+      <strong>Não foi possível carregar o painel financeiro.</strong>
+      <p>{{ erro() }}</p>
+      @if (rotaNaoEncontrada()) {
+        <p>Os seus lançamentos continuam disponíveis. Não é necessário cadastrá-los novamente.</p>
+        <div class="dashboard-error-links">
+          <a routerLink="/lancamentos" class="secondary-action">Ver lançamentos</a>
+          <a routerLink="/contas" class="secondary-action">Ver contas</a>
+        </div>
+      }
+      <button type="button" class="secondary-action retry-action" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else if (painel(); as dados) {
+    @if (preferencias.erro()) {
+      <div class="dashboard-state" role="status">{{ preferencias.erro() }}</div>
+    }
+    @if (preferencias.estaVisivel('CONTAS_RECEBER') ||
+         preferencias.estaVisivel('CONTAS_PAGAR') || preferencias.estaVisivel('SALDOS_CONTAS')) {
+      <div class="stats-grid">
+        @for (item of preferencias.visiveis(); track item.codigoComponente) {
+          @switch (item.codigoComponente) {
+            @case ('CONTAS_RECEBER') {
+              <article class="stat-card">
+                <span class="stat-label"><span class="stat-dot income"></span>A receber no período</span>
+                <strong class="income-text">{{ moeda(dados.aReceberPeriodo) }}</strong>
+                <small>Receitas pendentes com vencimento no mês</small>
+              </article>
+            }
+            @case ('CONTAS_PAGAR') {
+              <article class="stat-card">
+                <span class="stat-label"><span class="stat-dot expense"></span>A pagar no período</span>
+                <strong class="expense-text">{{ moeda(dados.aPagarPeriodo) }}</strong>
+                <small>Despesas pendentes com vencimento no mês</small>
+              </article>
+            }
+            @case ('SALDOS_CONTAS') {
+              <article class="stat-card">
+                <span class="stat-label"><span class="stat-dot neutral"></span>Saldo confirmado</span>
+                <strong>{{ moeda(dados.saldoConfirmado) }}</strong>
+                <small>Soma dos saldos confirmados de todas as contas</small>
+              </article>
+            }
+          }
+        }
+        @if (preferencias.estaVisivel('CONTAS_RECEBER') || preferencias.estaVisivel('CONTAS_PAGAR')) {
+          <article class="stat-card">
+            <span class="stat-label"><span class="stat-dot warning"></span>Em atraso</span>
+            @if (preferencias.estaVisivel('CONTAS_RECEBER') && preferencias.estaVisivel('CONTAS_PAGAR')) {
+              <strong class="warning-text">{{ moeda(dados.receberAtrasado) }} <span class="small-divider">/</span> {{ moeda(dados.pagarAtrasado) }}</strong>
+              <small>A receber / a pagar vencidos e ainda pendentes</small>
+            } @else if (preferencias.estaVisivel('CONTAS_RECEBER')) {
+              <strong class="warning-text">{{ moeda(dados.receberAtrasado) }}</strong>
+              <small>Recebimentos vencidos e pendentes</small>
+            } @else {
+              <strong class="warning-text">{{ moeda(dados.pagarAtrasado) }}</strong>
+              <small>Pagamentos vencidos e pendentes</small>
+            }
+          </article>
+        }
+      </div>
+    }
+
+    <div class="dashboard-grid">
+      
+      @for (preferencia of preferencias.visiveis(); track preferencia.codigoComponente) {
+        @switch (preferencia.codigoComponente) {
+      @case ('CONTAS_RECEBER') {
+        <app-contas-receber-card [itens]="aReceber()" [total]="dados.aReceberPeriodo" />
+      }
+      @case ('CONTAS_PAGAR') {
+        <app-contas-pagar-card [itens]="aPagar()" [total]="dados.aPagarPeriodo" />
+      }
+      @case ('SALDOS_CONTAS') {
+        <app-saldos-contas-card [contas]="dados.contas" [saldoConfirmado]="dados.saldoConfirmado" [saldoProjetado]="dados.saldoProjetado" />
+      }
+      @case ('FLUXO_CAIXA') {
+        <app-fluxo-caixa-card [contas]="dados.contas" [contaId]="contaGraficoId()" [fluxo]="fluxo()" [carregandoFluxo]="carregandoFluxo()" [erroFluxo]="erroFluxo()" (contaAlterada)="alterarContaGrafico($event)" />
+      }
+      @case ('DESPESAS_CATEGORIA') {
+        <app-despesas-categoria-card [categorias]="categorias()" [erroCategorias]="erroCategorias()" />
+      }
+        }
+      }
+      @if (!preferencias.visiveis().length) {
+        <div class="dashboard-state">
+          Você ocultou todos os componentes. <a routerLink="/configuracoes/painel">Reativar componentes</a>
+        </div>
+      }
+<section class="panel shortcuts-panel" aria-labelledby="titulo-acoes">
+        <div class="panel-head"><div><span class="eyebrow">ACESSO RÁPIDO</span><h2 id="titulo-acoes">O que deseja fazer?</h2></div></div>
+        <div class="shortcuts">
+          <a routerLink="/lancamentos/novo"><span aria-hidden="true">+</span> Novo lançamento</a>
+          <a routerLink="/contas"><span aria-hidden="true">▣</span> Consultar contas</a>
+          <a routerLink="/categorias"><span aria-hidden="true">≡</span> Organizar categorias</a>
+        </div>
+        <p class="scope-note">O painel apresenta lançamentos de contas financeiras. Faturas de cartão serão integradas em etapa própria, sem duplicar despesas.</p>
+      </section>
+    </div>
+  }
+</section>
