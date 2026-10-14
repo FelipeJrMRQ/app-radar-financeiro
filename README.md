@@ -257,3 +257,21 @@ primeiros registros na UI.
 **Dependência:** backend branch `chatgpt/resumo-periodo-lancamentos`
 (empilhada sobre `chatgpt/preferencias-painel-usuario`). O Angular desta etapa
 precisa dessa versão da API. Nenhuma migration nem regra contábil anterior foi alterada.
+
+## Diagnóstico de versão do backend na tela de Lançamentos
+
+O endpoint `GET /lancamentos/resumo-periodo` foi criado na branch
+`chatgpt/resumo-periodo-lancamentos`. Ao iniciar um Angular novo contra
+uma API anterior, a rota `/resumo-periodo` pode ser confundida com
+`/lancamentos/{lancamentoId}` e retornar **400 Bad Request** porque a
+palavra `resumo-periodo` não é um ID numérico.
+
+O Angular trata falhas do resumo separadamente: mantém os lançamentos visíveis
+e filtrados por mês/tipo/conta, exibe aviso de incompatibilidade e **não cria
+totais locais ou artificiais**. O valor total só aparece depois que a API
+atualizada responder corretamente.
+
+Para validar a API em execução, com o JWT da própria sessão:
+`GET /espacos-financeiros/{id}/lancamentos/resumo-periodo?dataInicio=2026-10-01&dataFim=2026-10-31&tipo=RECEITA`.
+O retorno esperado na nova versão é HTTP 200 com `totalLancado`.
+Os testes de MVC na API verificam a rota para RECEITA, DESPESA e Todos.

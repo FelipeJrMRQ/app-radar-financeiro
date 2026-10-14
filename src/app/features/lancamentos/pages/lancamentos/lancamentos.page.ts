@@ -1,6 +1,6 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, isDevMode, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { firstValueFrom, forkJoin } from 'rxjs';
+import { catchError, firstValueFrom, forkJoin, map, of } from 'rxjs';
 
 import { mensagemDeErro } from '../../../../core/http/api-error';
 import { ContaFinanceira } from '../../../contas-financeiras/models/contas-financeiras.model';
@@ -33,6 +33,7 @@ export class LancamentosPage implements OnInit {
   readonly contas = signal<ContaFinanceira[]>([]);
   readonly lancamentos = signal<Lancamento[]>([]);
   readonly resumo = signal<ResumoLancamentosPeriodo | null>(null);
+  readonly avisoResumo = signal<string | null>(null);
   readonly mes = signal(this.mesInicial());
   readonly mesDescricao = computed(() =>
     new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(this.mes()));
@@ -45,7 +46,18 @@ export class LancamentosPage implements OnInit {
   readonly limiteExibicao = signal(30);
   readonly paginaCriada = this.route.snapshot.queryParamMap.get('criado') === 'ok';
 
-  readonly filtrados = computed(() => this.lancamentos());
+  /**
+   * Protege a apresentação caso uma API antiga ignore os filtros opcionais.
+   * Nenhum cálculo de valores financeiros é realizado no Angular.
+   */
+  readonly filtrados = computed(() => {
+    const { contaFinanceiraId, tipo, dataInicio, dataFim } = this.filtrosAtuais();
+    return this.lancamentos().filter(lancamento =>
+      (!tipo || lancamento.tipo === tipo)
+      && (!contaFinanceiraId || lancamento.contaFinanceiraId === contaFinanceiraId)
+      && lancamento.dataLancamento >= dataInicio
+      && lancamento.dataLancamento <= dataFim);
+  });
   readonly visiveis = computed(() => this.filtrados().slice(0, this.limiteExibicao()));
   readonly moeda = formatarMoeda;
   readonly data = formatarDataLocal;
@@ -115,22 +127,35 @@ export class LancamentosPage implements OnInit {
     this.carregando.set(true);
     this.erro.set(null);
     this.resumo.set(null);
+    this.avisoResumo.set(null);
     const filtros = this.filtrosAtuais();
     try {
       const resultado = await firstValueFrom(forkJoin({
         contas: this.contasApi.listar(),
         lancamentos: this.api.listarPeriodo(filtros),
-        resumo: this.api.resumirPeriodo(filtros),
+        resumo: this.api.resumirPeriodo(filtros).pipe(
+          map(dados => ({ dados, falha: null as unknown })),
+          catchError(falha => of({ dados: null, falha })),
+        ),
       }));
       if (this.destruida || consulta !== this.versaoConsulta) return;
       this.contas.set(resultado.contas);
       this.lancamentos.set(resultado.lancamentos);
-      this.resumo.set(resultado.resumo);
+      this.resumo.set(resultado.resumo.dados);
+      if (resultado.resumo.falha) {
+        this.avisoResumo.set(
+          'O total do período está indisponível no momento. ' +
+          'A lista continua acessível, sem estimar valores financeiros.' +
+          (isDevMode() ? ' No ambiente de desenvolvimento, confira se a API ' +
+            'foi atualizada para a branch chatgpt/resumo-periodo-lancamentos.' : ''),
+        );
+      }
     } catch (erro) {
       if (!this.destruida && consulta === this.versaoConsulta) {
         this.erro.set(mensagemDeErro(erro));
         this.lancamentos.set([]);
         this.resumo.set(null);
+        this.avisoResumo.set(null);
       }
     } finally {
       if (!this.destruida && consulta === this.versaoConsulta) this.carregando.set(false);
