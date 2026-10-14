@@ -56,3 +56,11 @@ Validar visualmente em larguras **360 px, 768 px e desktop**. Não avançar sem 
 - `Radar_Financeiro_Manual_Continuidade_2026-09-25.md`
 
 Os documentos são mantidos nas fontes do projeto ChatGPT Radar Financeiro.
+
+## Identidade visual (outubro/2026)
+
+Os arquivos visuais aprovados no pacote `identidade_visual.zip` estão em `public/assets/brand`, em versões WebP compactas, sem os PNGs de vários megabytes.
+A marca principal aparece no login e no cadastro; o símbolo, na navegação; e os fundos, apenas em áreas de destaque. O favicon usa o mesmo símbolo do radar.
+Cores base estão parametrizadas em `src/styles.scss` e podem evoluir sem alterar contratos de API.
+
+As imagens são locais e independentes de hospedagem externa. Consulte `docs/identidade-visual.md` para o inventário e instruções de substituição.

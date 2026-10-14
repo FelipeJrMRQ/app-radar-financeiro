@@ -35,3 +35,49 @@ h1 span { color: #1da48b; font-size: .65em; vertical-align: 18%; }
   .graph-bars span:nth-child(5) { height: 61%; }.graph-bars span:nth-child(6) { height: 91%; }
   .information-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
+
+/* Capa panorâmica da identidade, sem substituir os dados reais do painel. */
+.hero {
+  isolation: isolate;
+  background:
+    linear-gradient(100deg, rgba(3, 21, 35, .98) 0%, rgba(4, 30, 46, .95) 51%, rgba(4, 30, 46, .35) 100%),
+    url('/assets/brand/fundo-dashboard.webp') 72% center / cover no-repeat,
+    var(--rf-navy-950, #03111f);
+  border: 1px solid rgba(37, 195, 173, .18);
+  box-shadow: 0 12px 33px rgba(3, 34, 50, .12);
+}
+.hero-content { max-width: 610px; }
+.hero-label { color: var(--rf-gold-300, #f1d48b); }
+.hero-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  margin-top: 24px;
+  padding: 12px 17px;
+  border: 1px solid rgba(236, 196, 109, .6);
+  border-radius: 10px;
+  color: #fff;
+  background: rgba(5, 49, 54, .6);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 750;
+}
+.hero-action:hover { background: rgba(9, 100, 88, .82); }
+.account-badge { background: #e5f6f0; }
+.status-dot { background: var(--rf-teal-600, #099587); }
+.card-icon { background: #e5f6f0; }
+@media (min-width: 700px) {
+  .hero { min-height: 315px; background-position: center, center right; }
+  .hero-content { max-width: 58%; }
+}
+@media (min-width: 1150px) {
+  .hero-content { max-width: 55%; }
+}
+@media (max-width: 699px) {
+  .hero {
+    background-image: linear-gradient(95deg, rgba(3, 21, 35, .97), rgba(4, 30, 46, .86)), url('/assets/brand/fundo-dashboard.webp');
+  }
+}
+
+.card-icon img { display: block; width: 38px; height: 38px; object-fit: contain; }
