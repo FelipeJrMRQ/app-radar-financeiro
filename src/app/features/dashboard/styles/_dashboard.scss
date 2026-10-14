@@ -35,7 +35,6 @@ h1 { margin:8px 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; col
 .date-block { flex:0 0 68px; font-size:10px; font-weight:800; color:#49718a; white-space:nowrap; }
 .due-description { min-width:0; flex:1; }
 .due-description strong { display:block; font-size:12px; color:#263f52; overflow-wrap:anywhere; }
-.due-description small { display:block; font-size:10px; color:#869ba7; line-height:1.5; margin-top:4px; overflow-wrap:anywhere; }
 .due-value { text-align:right; font-size:12px; letter-spacing:-.2px; overflow-wrap:anywhere; max-width:115px; }
 .late-label { display:inline-block; margin-top:5px; padding:2px 6px; border-radius:5px; color:#aa4d3f; background:#fff0e9; font-size:9px; font-weight:750; }
 .panel-total { margin-top:auto; display:flex; gap:10px; justify-content:space-between; align-items:center; padding:17px 20px; border-top:1px solid #e6eef0; background:#fbfdfd; font-size:12px; font-weight:750; color:#304c5c; }
@@ -129,7 +128,6 @@ h1 { margin:8px 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; col
 .panel-head h2 { font-size: 19px; line-height: 1.3; }
 .panel-link { font-size: 13px; line-height: 1.4; }
 .due-description strong { font-size: 15px; line-height: 1.45; }
-.due-description small { font-size: 13px; line-height: 1.45; }
 .date-block { font-size: 13px; }
 .due-value { font-size: 15px; line-height: 1.4; }
 .panel-total, .chart-footer { font-size: 14px; }
@@ -162,7 +160,6 @@ h1 { margin:8px 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; col
   }
   .due-row .date-block { min-width: 0; white-space: nowrap; font-size: 13px; }
   .due-description strong { font-size: 15px; }
-  .due-description small { font-size: 12px; }
   .due-value { max-width: 125px; font-size: 15px; overflow-wrap: anywhere; }
   .panel-total { padding: 16px; }
   .account-panel, .chart-panel, .category-panel { min-height: 0; }

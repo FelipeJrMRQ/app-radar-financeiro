@@ -226,3 +226,13 @@ o backend para refresh tokens revogáveis em cookie \`HttpOnly\`, \`Secure\`,
 \`SameSite\` e proteção CSRF adequada. Fechar a aba encerra a persistência
 daquela aba. Em ambientes que bloqueiem \`sessionStorage\`, o login continua
 funcionando em memória e F5 exigirá novo login.
+
+## Resumo limpo das pendências no dashboard
+
+Os cards **Contas a receber** e **Contas a pagar** apresentam apenas o vencimento
+(dd/MM), a descrição, o valor pendente e o indicador de atraso quando aplicável.
+A linha secundária com o nome da conta financeira e da categoria foi removida
+somente do dashboard para priorizar leitura em telas pequenas. O detalhamento
+permanece em **Lançamentos**, sem alteração no modelo ou no contrato da API.
+Os cards **Saldos das contas** e **Despesas por categoria** mantêm os nomes,
+pois nesses componentes eles identificam os dados exibidos.
