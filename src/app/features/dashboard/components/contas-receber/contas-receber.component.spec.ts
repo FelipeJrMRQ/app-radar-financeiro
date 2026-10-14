@@ -34,5 +34,9 @@ describe('Card de contas a receber', () => {
     expect(data?.getAttribute('aria-label')).toBe('Vencimento: 20/10/2026');
     expect(card.querySelector('.due-list')?.getAttribute('tabindex')).toBe('0');
     expect(card.querySelector('.panel-total')?.textContent).toContain('1.500,00');
+    // Informações detalhadas pertencem à listagem de Lançamentos, não ao resumo.
+    expect(card.querySelector('.due-description')?.textContent).toContain('Salário');
+    expect(card.textContent).not.toContain('Nubank');
+    expect(card.querySelector('.due-description small')).toBeNull();
   });
 });

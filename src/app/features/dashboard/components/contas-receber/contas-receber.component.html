@@ -15,7 +15,6 @@
                         </time>
                         <div class="due-description">
                           <strong>{{ item.descricao }}</strong>
-                          <small>{{ item.contaFinanceiraNome }} · {{ item.categoriaNome }}</small>
                           @if (item.atrasado) { <span class="late-label">Atrasado</span> }
                         </div>
                         <strong class="due-value income-text">{{ moeda(item.valorRestante) }}</strong>
