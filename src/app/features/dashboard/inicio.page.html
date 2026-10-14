@@ -36,36 +36,51 @@
     @if (preferencias.erro()) {
       <div class="dashboard-state" role="status">{{ preferencias.erro() }}</div>
     }
-    <div class="stats-grid">
-      @if (preferencias.estaVisivel('CONTAS_RECEBER')) {
-      <article class="stat-card">
-        <span class="stat-label"><span class="stat-dot income"></span>A receber no período</span>
-        <strong class="income-text">{{ moeda(dados.aReceberPeriodo) }}</strong>
-        <small>Receitas pendentes com vencimento no mês</small>
-      </article>
-      }
-      @if (preferencias.estaVisivel('CONTAS_PAGAR')) {
-      <article class="stat-card">
-        <span class="stat-label"><span class="stat-dot expense"></span>A pagar no período</span>
-        <strong class="expense-text">{{ moeda(dados.aPagarPeriodo) }}</strong>
-        <small>Despesas pendentes com vencimento no mês</small>
-      </article>
-      }
-      @if (preferencias.estaVisivel('SALDOS_CONTAS')) {
-      <article class="stat-card">
-        <span class="stat-label"><span class="stat-dot neutral"></span>Saldo confirmado</span>
-        <strong>{{ moeda(dados.saldoConfirmado) }}</strong>
-        <small>Soma dos saldos confirmados de todas as contas</small>
-      </article>
-      }
-      @if (preferencias.estaVisivel('CONTAS_RECEBER') || preferencias.estaVisivel('CONTAS_PAGAR')) {
-      <article class="stat-card">
-        <span class="stat-label"><span class="stat-dot warning"></span>Em atraso</span>
-        <strong class="warning-text">{{ moeda(dados.receberAtrasado) }} <span class="small-divider">/</span> {{ moeda(dados.pagarAtrasado) }}</strong>
-        <small>A receber / a pagar vencidos e ainda pendentes</small>
-      </article>
-      }
-    </div>
+    @if (preferencias.estaVisivel('CONTAS_RECEBER') ||
+         preferencias.estaVisivel('CONTAS_PAGAR') || preferencias.estaVisivel('SALDOS_CONTAS')) {
+      <div class="stats-grid">
+        @for (item of preferencias.visiveis(); track item.codigoComponente) {
+          @switch (item.codigoComponente) {
+            @case ('CONTAS_RECEBER') {
+              <article class="stat-card">
+                <span class="stat-label"><span class="stat-dot income"></span>A receber no período</span>
+                <strong class="income-text">{{ moeda(dados.aReceberPeriodo) }}</strong>
+                <small>Receitas pendentes com vencimento no mês</small>
+              </article>
+            }
+            @case ('CONTAS_PAGAR') {
+              <article class="stat-card">
+                <span class="stat-label"><span class="stat-dot expense"></span>A pagar no período</span>
+                <strong class="expense-text">{{ moeda(dados.aPagarPeriodo) }}</strong>
+                <small>Despesas pendentes com vencimento no mês</small>
+              </article>
+            }
+            @case ('SALDOS_CONTAS') {
+              <article class="stat-card">
+                <span class="stat-label"><span class="stat-dot neutral"></span>Saldo confirmado</span>
+                <strong>{{ moeda(dados.saldoConfirmado) }}</strong>
+                <small>Soma dos saldos confirmados de todas as contas</small>
+              </article>
+            }
+          }
+        }
+        @if (preferencias.estaVisivel('CONTAS_RECEBER') || preferencias.estaVisivel('CONTAS_PAGAR')) {
+          <article class="stat-card">
+            <span class="stat-label"><span class="stat-dot warning"></span>Em atraso</span>
+            @if (preferencias.estaVisivel('CONTAS_RECEBER') && preferencias.estaVisivel('CONTAS_PAGAR')) {
+              <strong class="warning-text">{{ moeda(dados.receberAtrasado) }} <span class="small-divider">/</span> {{ moeda(dados.pagarAtrasado) }}</strong>
+              <small>A receber / a pagar vencidos e ainda pendentes</small>
+            } @else if (preferencias.estaVisivel('CONTAS_RECEBER')) {
+              <strong class="warning-text">{{ moeda(dados.receberAtrasado) }}</strong>
+              <small>Recebimentos vencidos e pendentes</small>
+            } @else {
+              <strong class="warning-text">{{ moeda(dados.pagarAtrasado) }}</strong>
+              <small>Pagamentos vencidos e pendentes</small>
+            }
+          </article>
+        }
+      </div>
+    }
 
     <div class="dashboard-grid">
       
