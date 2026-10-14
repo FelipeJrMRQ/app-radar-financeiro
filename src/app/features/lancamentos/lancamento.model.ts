@@ -32,4 +32,25 @@ export interface CriarLancamento {
   valor: string;
   dataLancamento: string;
   observacao: string | null;
+  situacaoInicial: SituacaoLancamento;
+}
+
+export interface CriarRecorrenciaLancamento {
+  contaFinanceiraId: number;
+  categoriaId: number;
+  descricao: string;
+  valor: string;
+  dataInicio: string;
+  dataFim: string | null;
+  observacao: string | null;
+}
+
+export interface CriarParcelamentoLancamento {
+  contaFinanceiraId: number;
+  categoriaId: number;
+  descricao: string;
+  valorTotal: string;
+  quantidadeParcelas: number;
+  primeiroVencimento: string;
+  observacao: string | null;
 }

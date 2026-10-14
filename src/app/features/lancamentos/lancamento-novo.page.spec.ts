@@ -28,6 +28,17 @@ describe('LancamentoNovoPage', () => {
     expect(pagina.form.valid).toBeTrue();
   });
 
+
+  it('começa com lançamento único pendente sem pagamento automático', () => {
+    const pagina = TestBed.createComponent(LancamentoNovoPage).componentInstance;
+    expect(pagina.modalidade()).toBe('UNICO');
+    expect(pagina.form.controls.situacaoInicial.value).toBe('PREVISTO');
+    pagina.selecionarModalidade('PARCELADO');
+    expect(pagina.form.controls.quantidadeParcelas.value).toBe(2);
+    pagina.selecionarModalidade('RECORRENTE');
+    expect(pagina.modalidade()).toBe('RECORRENTE');
+  });
+
   it('trocar receita por despesa invalida categoria anterior', () => {
     const pagina = TestBed.createComponent(LancamentoNovoPage).componentInstance;
     pagina.form.controls.categoriaId.setValue(10);

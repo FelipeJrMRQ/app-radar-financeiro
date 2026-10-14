@@ -74,3 +74,11 @@ h1 { margin:10px 0 8px; font-size:clamp(27px,5vw,36px); color:#122d43; letter-sp
   .field-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:17px; }
   .form-actions { flex-direction:row; justify-content:flex-end; }
 }
+
+.modality-group { border-top:1px solid #e7eef0; border-bottom:1px solid #e7eef0; margin:22px 0; padding:20px 0; }
+.modality-group > span { color:#264555; display:block; font-weight:750; font-size:13px; margin-bottom:12px; }
+.modality-group > small { display:block; color:#78909d; font-size:12px; line-height:1.6; margin-top:11px; }
+.modality-options { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
+.modality-options button { min-height:48px; min-width:0; border:1px solid #dce7e9; border-radius:10px; background:#f9fcfc; font:inherit; font-size:12px; font-weight:750; color:#486b79; cursor:pointer; padding:9px 4px; }
+.modality-options button.active { color:#087769; background:#e8f7f2; border-color:#179c88; }
+@media (min-width:620px) { .modality-options button { font-size:13px; } }
