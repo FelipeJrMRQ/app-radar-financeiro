@@ -97,3 +97,11 @@ h1 { margin:8px 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; col
   .stat-card { padding:14px 11px; }.stat-label { font-size:10px; }.stat-card > strong { font-size:16px; }
   .due-row { flex-wrap:wrap; }.due-value { margin-left:auto; }
 }
+
+/* Diagnóstico não bloqueante quando o backend ainda não publicou a rota do painel. */
+.dashboard-state.error { display:flex; flex-direction:column; align-items:flex-start; gap:12px; }
+.dashboard-state.error strong { font-size:15px; color:#9b3d46; }
+.dashboard-state.error p { margin:0; line-height:1.6; font-size:13px; }
+.dashboard-error-links { display:flex; flex-wrap:wrap; gap:10px; }
+.dashboard-error-links a { display:inline-flex; align-items:center; text-decoration:none; }
+.retry-action { margin-top:5px; }

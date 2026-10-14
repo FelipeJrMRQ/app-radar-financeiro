@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { AuthService } from '../../core/auth/auth.service';
 import { mensagemDeErro } from '../../core/http/api-error';
+import { interpretarErroDoPainel } from './painel-erro';
 import { dataLocalIso } from '../contas-financeiras/formatacao-contas';
 import { formatarDataLocal, formatarMoeda } from '../../shared/valor-monetario';
 import { FluxoCaixaConta, PainelFinanceiro, PendenciaPainel, TotalCategoria } from './painel-financeiro.model';
@@ -31,6 +32,7 @@ export class InicioPage implements OnInit {
     new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(this.mes()));
   readonly carregando = signal(true);
   readonly erro = signal<string | null>(null);
+  readonly rotaNaoEncontrada = signal(false);
   readonly painel = signal<PainelFinanceiro | null>(null);
   readonly contaGraficoId = signal<number | null>(null);
   readonly fluxo = signal<FluxoCaixaConta | null>(null);
@@ -69,6 +71,7 @@ export class InicioPage implements OnInit {
     this.versaoGrafico++;
     this.carregando.set(true);
     this.erro.set(null);
+    this.rotaNaoEncontrada.set(false);
     this.fluxo.set(null);
     this.categorias.set([]);
     const { inicio, fim } = this.datasPeriodo();
@@ -85,7 +88,9 @@ export class InicioPage implements OnInit {
     } catch (erro) {
       if (this.destruido || versao !== this.versao) return;
       this.painel.set(null);
-      this.erro.set(mensagemDeErro(erro));
+      const falha = interpretarErroDoPainel(erro);
+      this.rotaNaoEncontrada.set(falha.rotaNaoEncontrada);
+      this.erro.set(falha.mensagem);
     } finally {
       if (!this.destruido && versao === this.versao) this.carregando.set(false);
     }

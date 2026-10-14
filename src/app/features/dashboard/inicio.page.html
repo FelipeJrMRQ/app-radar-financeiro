@@ -16,8 +16,16 @@
     <div class="dashboard-state" role="status">Carregando informações financeiras…</div>
   } @else if (erro()) {
     <div class="dashboard-state error" role="alert">
+      <strong>Não foi possível carregar o painel financeiro.</strong>
       <p>{{ erro() }}</p>
-      <button type="button" class="secondary-action" (click)="carregar()">Tentar novamente</button>
+      @if (rotaNaoEncontrada()) {
+        <p>Os seus lançamentos continuam disponíveis. Não é necessário cadastrá-los novamente.</p>
+        <div class="dashboard-error-links">
+          <a routerLink="/lancamentos" class="secondary-action">Ver lançamentos</a>
+          <a routerLink="/contas" class="secondary-action">Ver contas</a>
+        </div>
+      }
+      <button type="button" class="secondary-action retry-action" (click)="carregar()">Tentar novamente</button>
     </div>
   } @else if (painel(); as dados) {
     <div class="stats-grid">
