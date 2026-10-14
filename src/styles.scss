@@ -35,3 +35,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .dashboard-state.error p { margin:0; }
 .dashboard-error-links { display:flex; flex-wrap:wrap; gap:10px; }
 .dashboard-error-links a { display:inline-flex; align-items:center; text-decoration:none; }
+
+/* Ações responsivas de personalização no cabeçalho do painel. */
+.dashboard-tools { display:flex; align-items:stretch; width:100%; flex-direction:column-reverse; gap:10px; }
+.panel-preferences-link { display:inline-flex; justify-content:center; align-items:center; text-decoration:none; background:#fff; white-space:nowrap; }
+@media (min-width:640px) { .dashboard-tools { width:auto; flex-direction:row; align-items:center; } }

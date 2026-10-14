@@ -10,6 +10,7 @@ import { formatarDataLocal, formatarMoeda } from '../../shared/valor-monetario';
 import { FluxoCaixaConta, PainelFinanceiro, PendenciaPainel, TotalCategoria } from './painel-financeiro.model';
 import { PainelFinanceiroService } from './painel-financeiro.service';
 import { criarPontosGrafico, largurasCategorias, pontosSvg } from './painel-visuais';
+import { PainelPreferenciasService } from './personalizacao/painel-preferencias.service';
 
 @Component({
   selector: 'app-inicio-page',
@@ -21,6 +22,7 @@ import { criarPontosGrafico, largurasCategorias, pontosSvg } from './painel-visu
 export class InicioPage implements OnInit {
   private readonly sessao = inject(AuthService);
   private readonly api = inject(PainelFinanceiroService);
+  readonly preferencias = inject(PainelPreferenciasService);
   private readonly destroyRef = inject(DestroyRef);
   private destruido = false;
   private versao = 0;
@@ -50,7 +52,12 @@ export class InicioPage implements OnInit {
 
   constructor() { this.destroyRef.onDestroy(() => { this.destruido = true; this.versao++; this.versaoGrafico++; }); }
 
-  ngOnInit(): void { void this.carregar(); }
+  ngOnInit(): void { void this.iniciar(); }
+
+  private async iniciar(): Promise<void> {
+    await this.preferencias.carregar();
+    if (!this.destruido) await this.carregar();
+  }
 
   mudarMes(passo: number): void {
     const anterior = this.mes();
@@ -83,8 +90,10 @@ export class InicioPage implements OnInit {
       if (!dados.contas.some(c => c.contaFinanceiraId === idAtual)) {
         this.contaGraficoId.set(dados.contas[0]?.contaFinanceiraId ?? null);
       }
-      void this.carregarFluxo();
-      void this.carregarCategorias(versao, inicio, fim);
+      if (this.preferencias.estaVisivel('FLUXO_CAIXA')) void this.carregarFluxo();
+      if (this.preferencias.estaVisivel('DESPESAS_CATEGORIA')) {
+        void this.carregarCategorias(versao, inicio, fim);
+      }
     } catch (erro) {
       if (this.destruido || versao !== this.versao) return;
       this.painel.set(null);

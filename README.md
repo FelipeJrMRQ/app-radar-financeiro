@@ -120,3 +120,21 @@ o novo contrato do painel nem o parcelamento em conta.
 compras de cartão e pagamentos de fatura precisam de integração contábil própria para não
 contabilizar o mesmo gasto duas vezes. Valores de pendências descontam realizações
 parciais pelo backend. O dashboard não recalcula saldos com JavaScript.
+
+## Preferências individuais do dashboard
+
+A personalização fica em `/configuracoes/painel` (menu desktop e atalho no dashboard mobile).
+Cada usuário pode:
+- Reordenar os cinco cards por arraste usando Pointer Events em mouse/touch, ou pelas setas acessíveis.
+- Exibir ou ocultar qualquer card, inclusive todos; os ocultos continuam no editor.
+- Salvar por JWT no backend, e restaurar a sequência/visibilidade padrão.
+
+**Backend requerido:** branch `chatgpt/preferencias-painel-usuario`, baseada em
+`chatgpt/painel-pendencias-obrigacoes`; Flyway cria `preferencias_painel_usuario`.
+Endpoints `GET/PUT/DELETE /usuarios/me/preferencias-painel`.
+Não há identificação do usuário na requisição, somente no token JWT.
+Componente de acesso rápido permanece sempre visível para que nenhuma configuração
+impeça recuperar o acesso às funcionalidades. Indicadores do topo associados aos cards
+também respeitam a visibilidade. O frontend não armazena preferências no navegador.
+
+A ordenação segue a sequência informada pela API em mobile (coluna) e desktop (grid).
