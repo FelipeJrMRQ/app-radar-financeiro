@@ -11,7 +11,10 @@
       @if (carregando()) {
         <p role="status">Carregando lançamento…</p>
       } @else if (atual(); as l) {
-        @if (!acao()) {
+        @if (!l.ativo) {
+          <p class="action-warning">Este lançamento está inativo.</p>
+          <button type="button" class="quiet" (click)="fechar()">Fechar</button>
+        } @else if (!acao()) {
           <strong class="actions-heading">{{ l.descricao }}</strong>
           <a class="action-link" [routerLink]="['/lancamentos', l.id, 'editar']">Editar</a>
           @if (l.situacao === 'PREVISTO') {
@@ -67,8 +70,17 @@
                 @for (item of r.realizacoes; track item.id) {
                   <div class="realizacao-item">
                     <span>{{ formatarData(item.dataRealizacao) }} · {{ moeda(item.valor) }}</span>
-                    <button type="button" class="destructive" [disabled]="salvando()"
-                            (click)="estornar(item.id)">Estornar</button>
+                    @if (aguardandoEstorno() === item.id) {
+                      <span class="estorno-buttons">
+                        <button type="button" class="destructive" [disabled]="salvando()"
+                                (click)="estornar(item.id)">Confirmar estorno</button>
+                        <button type="button" [disabled]="salvando()"
+                                (click)="aguardandoEstorno.set(null)">Cancelar</button>
+                      </span>
+                    } @else {
+                      <button type="button" class="destructive" [disabled]="salvando()"
+                              (click)="prepararEstorno(item.id)">Estornar</button>
+                    }
                   </div>
                 }
               }

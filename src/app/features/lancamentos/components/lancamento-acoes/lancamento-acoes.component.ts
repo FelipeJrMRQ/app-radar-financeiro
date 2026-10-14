@@ -35,6 +35,7 @@ export class LancamentoAcoesComponent {
   readonly salvando = signal(false);
   readonly erro = signal<string | null>(null);
   readonly mensagem = signal<string | null>(null);
+  readonly aguardandoEstorno = signal<number | null>(null);
   readonly atual = signal<Lancamento | null>(null);
   readonly resumo = signal<ResumoRealizacoesLancamento | null>(null);
   readonly acao = signal<Acao>(null);
@@ -55,6 +56,7 @@ export class LancamentoAcoesComponent {
     this.aberto.set(true);
     this.erro.set(null);
     this.mensagem.set(null);
+    this.aguardandoEstorno.set(null);
     this.carregando.set(true);
     try {
       const item = await firstValueFrom(this.api.buscar(this.lancamentoId()));
@@ -72,6 +74,7 @@ export class LancamentoAcoesComponent {
     this.acao.set(null);
     this.resumo.set(null);
     this.erro.set(null);
+    this.aguardandoEstorno.set(null);
   }
 
   escolher(acao: Exclude<Acao, null>): void {
@@ -81,6 +84,7 @@ export class LancamentoAcoesComponent {
     this.erro.set(null);
     this.mensagem.set(null);
     this.resumo.set(null);
+    this.aguardandoEstorno.set(null);
     this.valor.setValue('');
     this.data.setValue(dataHojeLocal());
     if (acao === 'REALIZACOES') void this.consultarRealizacoes();
@@ -141,7 +145,13 @@ export class LancamentoAcoesComponent {
     }
   }
 
+  prepararEstorno(realizacaoId: number): void {
+    this.aguardandoEstorno.set(realizacaoId);
+    this.erro.set(null);
+  }
+
   async estornar(realizacaoId: number): Promise<void> {
+    if (this.aguardandoEstorno() !== realizacaoId) return;
     if (this.salvando()) return;
     this.salvando.set(true);
     this.erro.set(null);
@@ -149,6 +159,7 @@ export class LancamentoAcoesComponent {
       await firstValueFrom(this.api.estornar(this.lancamentoId(), realizacaoId));
       if (this.destruido) return;
       this.mensagem.set('Realização estornada.');
+      this.aguardandoEstorno.set(null);
       await this.consultarRealizacoes();
       this.alterado.emit();
     } catch (e) {

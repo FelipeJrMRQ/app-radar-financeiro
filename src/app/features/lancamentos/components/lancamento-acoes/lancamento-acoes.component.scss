@@ -32,3 +32,12 @@
  border-top:1px solid #ebf1f2; padding:8px 0; font-size:12px; gap:8px; }
 .realizacao-item button { border:1px solid #eac9c9; padding:8px; border-radius:8px;
  background:#fff7f7; cursor:pointer; }
+
+.estorno-buttons { display:flex; align-items:center; gap:6px; }
+.estorno-buttons button { border:1px solid #dae5e7; padding:8px; border-radius:8px; background:white; cursor:pointer; }
+@media(max-width:859px) {
+  /* Bottom sheet fora das áreas cortadas dos cards e acima da barra de navegação. */
+  .actions-panel { position:fixed; top:auto; bottom:calc(72px + env(safe-area-inset-bottom));
+    left:12px; right:12px; width:auto; max-height:calc(100dvh - 120px); overflow-y:auto;
+    overscroll-behavior:contain; z-index:60; }
+}
