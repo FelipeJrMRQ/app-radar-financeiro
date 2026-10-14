@@ -17,3 +17,4 @@ describe('Regras visuais de escopo do lançamento', () => {
     expect(modalidadeLancamento({ ...l, parcelamentoLancamentoId: 3 })).toBe('PARCELADO');
     expect(modalidadeLancamento({ ...l, recorrenciaLancamentoId: null })).toBe('UNICO');
   });
+});
