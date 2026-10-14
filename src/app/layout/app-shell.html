@@ -5,48 +5,69 @@
       <span>radar<strong>financeiro</strong></span>
     </a>
 
-    <span class="sidebar-section-title">VISÃO GERAL</span>
-    <nav aria-label="Navegação principal">
-      <a routerLink="/" [routerLinkActiveOptions]="{ exact: true }"
-         routerLinkActive="active" class="sidebar-link">
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-             stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
-          <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
-        </svg>
-        Início
-      </a>
-      <a routerLink="/contas" routerLinkActive="active" class="sidebar-link">
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-             stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2.5" y="5" width="19" height="15" rx="2.5"/>
-          <path d="M2.5 9h19M16 15h2"/>
-        </svg>
-        Contas financeiras
-      </a>
-      <a routerLink="/lancamentos" routerLinkActive="active" class="sidebar-link">
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-             stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 4h12M8 10h12M8 16h12M4 4h.01M4 10h.01M4 16h.01" />
-        </svg>
-        Lançamentos
-      </a>
-      <a routerLink="/categorias" routerLinkActive="active" class="sidebar-link">
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-             stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 5h16v5H4zM4 14h9v5H4zM17 14h3v5h-3z" />
-        </svg>
-        Categorias
-      </a>
-      <a routerLink="/configuracoes/painel" routerLinkActive="active" class="sidebar-link">
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3"/>
-          <circle cx="12" cy="12" r="4"/>
-        </svg>
-        Personalizar painel
-      </a>
-    </nav>
+
+    <div class="sidebar-navigation">
+      <span class="sidebar-section-title">PRINCIPAL</span>
+      <nav aria-label="Navegação financeira">
+        <a routerLink="/" [routerLinkActiveOptions]="{ exact: true }"
+           routerLinkActive="active" class="sidebar-link">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+          </svg>
+          Início
+        </a>
+        <a routerLink="/lancamentos" routerLinkActive="active" class="sidebar-link">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 4h12M8 10h12M8 16h12M4 4h.01M4 10h.01M4 16h.01"/>
+          </svg>
+          Lançamentos
+        </a>
+      </nav>
+
+      <span class="sidebar-section-title grouped-title">GERENCIAMENTO</span>
+      <nav aria-label="Cadastros e configurações">
+        <details class="sidebar-group" open>
+          <summary class="sidebar-group-trigger">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="5" width="18" height="15" rx="2"/>
+              <path d="M3 10h18M8 15h8"/>
+            </svg>
+            <span>Cadastros</span>
+            <span class="group-chevron" aria-hidden="true">⌄</span>
+          </summary>
+          <div class="sidebar-subitems">
+            <a routerLink="/cadastros" [routerLinkActiveOptions]="{ exact: true }"
+               routerLinkActive="active" class="sidebar-sublink">Visão geral</a>
+            <a routerLink="/contas" routerLinkActive="active" class="sidebar-sublink">Contas financeiras</a>
+            <a routerLink="/categorias" routerLinkActive="active" class="sidebar-sublink">Categorias</a>
+            <span class="sidebar-sublink coming-soon">Cartões <small>Em breve</small></span>
+          </div>
+        </details>
+        <details class="sidebar-group" open>
+          <summary class="sidebar-group-trigger">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>
+              <circle cx="12" cy="12" r="4"/>
+            </svg>
+            <span>Configurações</span>
+            <span class="group-chevron" aria-hidden="true">⌄</span>
+          </summary>
+          <div class="sidebar-subitems">
+            <a routerLink="/configuracoes" [routerLinkActiveOptions]="{ exact: true }"
+               routerLinkActive="active" class="sidebar-sublink">Visão geral</a>
+            <a routerLink="/configuracoes/painel" routerLinkActive="active"
+               class="sidebar-sublink">Personalizar painel</a>
+            <a routerLink="/configuracoes/perfil" routerLinkActive="active"
+               class="sidebar-sublink">Meu perfil</a>
+          </div>
+        </details>
+      </nav>
+    </div>
 
     <div class="sidebar-footer">
       <div class="side-profile">
@@ -77,36 +98,34 @@
     <main class="page-content" id="conteudo"><router-outlet /></main>
   </div>
 
+
   <nav class="mobile-bottom-nav" aria-label="Navegação principal">
     <a routerLink="/" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="active">
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-           stroke-linecap="round" stroke-linejoin="round">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
         <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
-      </svg>
-      <span>Início</span>
-    </a>
-    <a routerLink="/contas" routerLinkActive="active">
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-           stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2.5" y="5" width="19" height="15" rx="2.5"/>
-        <path d="M2.5 9h19M16 15h2"/>
-      </svg>
-      <span>Contas</span>
+      </svg><span>Início</span>
     </a>
     <a routerLink="/lancamentos" routerLinkActive="active">
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-           stroke-linecap="round" stroke-linejoin="round">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M8 4h12M8 10h12M8 16h12M4 4h.01M4 10h.01M4 16h.01"/>
-      </svg>
-      <span>Lançamentos</span>
+      </svg><span>Lançamentos</span>
     </a>
-    <a routerLink="/categorias" routerLinkActive="active">
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-           stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 5h16v5H4zM4 14h9v5H4zM17 14h3v5h-3z" />
-      </svg>
-      <span>Categorias</span>
+    <a routerLink="/cadastros" routerLinkActive="active">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="15" rx="2"/>
+        <path d="M3 10h18M8 15h8"/>
+      </svg><span>Cadastros</span>
+    </a>
+    <a routerLink="/configuracoes" routerLinkActive="active">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>
+        <circle cx="12" cy="12" r="4"/>
+      </svg><span>Configurações</span>
     </a>
   </nav>
 </div>

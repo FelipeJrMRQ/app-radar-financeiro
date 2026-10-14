@@ -286,3 +286,31 @@ A arquitetura é um **conjunto de princípios estáveis**, não uma árvore de d
 - Manual de continuidade funcional/técnica: `Radar_Financeiro_Manual_Continuidade_2026-09-25.md`
 
 **Síntese:** organizar por funcionalidades; manter infraestrutura transversal pequena e bem definida; adotar Angular moderno sem excesso de camadas; construir mobile first; manter regras financeiras e segurança no backend; criar somente o que a etapa exigir; validar cada branch antes de qualquer merge.
+## 13. Organização dos menus da aplicação (14/10/2026)
+
+A navegação da área autenticada será organizada em grupos com responsabilidades distintas:
+
+- **Principal:** Início (dashboard) e Lançamentos (registro e consulta de receitas/despesas).
+- **Cadastros:** contas financeiras, categorias e, futuramente, cartões e outros cadastros de apoio. É uma **central de acesso a cadastros**, não uma nova implementação dessas funcionalidades.
+- **Configurações:** personalização do painel, perfil do usuário e futuros ajustes pessoais (segurança, notificações, exibição e preferências gerais).
+
+**Mobile first:** a navegação inferior mantém quatro destinos (Início, Lançamentos,
+Cadastros e Configurações). As duas centrais organizam seus links em cartões acessíveis
+e responsivos. No desktop, o menu lateral apresenta grupos expansíveis e seus links.
+
+**Regras de evolução:** manter as rotas financeiras existentes, sem migrar telas
+de features apenas por mudarem de grupo no menu. `cadastros/` e `configuracoes/`
+são responsáveis pelas suas próprias páginas/rotas; `layout/` continua responsável
+unicamente pela navegação. Não criar links clicáveis para funcionalidades não
+implementadas. O perfil inicial usa somente dados da sessão autenticada e é
+**somente leitura** até existir suporte seguro no backend para edição.
+
+O `EspacoFinanceiro` permanece interno e invisível ao usuário: a palavra
+"conta" em Cadastros indica uma **conta financeira**; em Configurações,
+"Minha conta" refere-se ao **perfil da pessoa autenticada**, nunca ao espaço
+financeiro técnico. Nenhum ajuste administrativo deve contornar isolamento
+por usuário ou validações da API.
+
+**Branch de implementação:** `chatgpt/menus-cadastros-configuracoes`, baseada
+na refatoração `chatgpt/refactor-organizacao-features`. Preservar o fluxo de PR
+em rascunho e não fazer merge na `main` sem aprovação explícita.
