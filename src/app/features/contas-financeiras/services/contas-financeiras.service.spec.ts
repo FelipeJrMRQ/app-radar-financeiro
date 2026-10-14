@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 
-import { AuthService } from '../..//auth.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { ContasFinanceirasService } from './contas-financeiras.service';
 
 describe('ContasFinanceirasService', () => {

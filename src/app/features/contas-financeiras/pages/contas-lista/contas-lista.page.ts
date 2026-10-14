@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { firstValueFrom, forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-import { mensagemDeErro } from '../../..//api-error';
+import { mensagemDeErro } from '../../../../core/http/api-error';
 import { ContaFinanceira, SaldoContaFinanceira, descricaoTipoConta } from '../../models/contas-financeiras.model';
 import { ContasFinanceirasService } from '../../services/contas-financeiras.service';
 import { exibirMoeda, valorNegativo } from '../../utils/formatacao-contas';

@@ -44,6 +44,8 @@ export class InicioPage implements OnInit {
   readonly fluxo = signal<FluxoCaixaConta | null>(null);
   readonly carregandoFluxo = signal(false);
   readonly erroFluxo = signal<string | null>(null);
+  readonly aReceber = computed(() => this.painel()?.proximosVencimentos.filter(p => p.tipo === 'RECEITA').slice(0, 8) ?? []);
+  readonly aPagar = computed(() => this.painel()?.proximosVencimentos.filter(p => p.tipo === 'DESPESA').slice(0, 8) ?? []);
   readonly categorias = signal<TotalCategoria[]>([]);
   readonly erroCategorias = signal<string | null>(null);
   readonly moeda = formatarMoeda;

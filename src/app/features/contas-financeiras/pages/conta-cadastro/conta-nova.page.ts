@@ -3,8 +3,8 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Va
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
-import { mensagemDeErro } from '../../..//api-error';
-import { MoedaBrInputDirective } from '../../../rectives/moeda-br-input.directive';
+import { mensagemDeErro } from '../../../../core/http/api-error';
+import { MoedaBrInputDirective } from '../../../../shared/directives/moeda-br-input.directive';
 import { TIPOS_CONTA, TipoContaFinanceira } from '../../models/contas-financeiras.model';
 import { ContasFinanceirasService } from '../../services/contas-financeiras.service';
 import { normalizarSaldoInicial } from '../../utils/formatacao-contas';

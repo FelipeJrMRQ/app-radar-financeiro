@@ -2,8 +2,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { AuthService } from '../..//auth.service';
-import { API_BASE_URL } from '../../ig/api.config';
+import { AuthService } from '../../../core/auth/auth.service';
+import { API_BASE_URL } from '../../../core/config/api.config';
 import {
   ContaFinanceira,
   CriarContaFinanceira,

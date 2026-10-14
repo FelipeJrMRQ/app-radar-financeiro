@@ -2,7 +2,7 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom, forkJoin } from 'rxjs';
 
-import { mensagemDeErro } from '../../..//api-error';
+import { mensagemDeErro } from '../../../../core/http/api-error';
 import {
   ContaFinanceira,
   ExtratoContaFinanceira,
