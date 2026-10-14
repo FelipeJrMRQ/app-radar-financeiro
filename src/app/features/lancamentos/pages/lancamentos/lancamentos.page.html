@@ -51,6 +51,12 @@
     </section>
   }
 
+  @if (avisoResumo(); as aviso) {
+    <div class="state-card" role="status">
+      <p>{{ aviso }}</p>
+    </div>
+  }
+
   @if (carregando()) {
     <div class="state-card" role="status">Carregando lançamentos…</div>
   } @else if (erro()) {
