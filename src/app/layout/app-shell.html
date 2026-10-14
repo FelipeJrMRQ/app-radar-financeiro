@@ -24,6 +24,20 @@
         </svg>
         Contas financeiras
       </a>
+      <a routerLink="/lancamentos" routerLinkActive="active" class="sidebar-link">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 4h12M8 10h12M8 16h12M4 4h.01M4 10h.01M4 16h.01" />
+        </svg>
+        Lançamentos
+      </a>
+      <a routerLink="/categorias" routerLinkActive="active" class="sidebar-link">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 5h16v5H4zM4 14h9v5H4zM17 14h3v5h-3z" />
+        </svg>
+        Categorias
+      </a>
     </nav>
 
     <div class="sidebar-footer">
@@ -48,7 +62,7 @@
     </header>
 
     <header class="desktop-header">
-      <div><span class="header-kicker">SEU PAINEL</span><span class="header-title">Visão geral</span></div>
+      <div><span class="header-kicker">SEU PAINEL</span><span class="header-title">Radar Financeiro</span></div>
       <span class="header-user">{{ sessao.usuario()?.email }}</span>
     </header>
 
@@ -71,6 +85,20 @@
         <path d="M2.5 9h19M16 15h2"/>
       </svg>
       <span>Contas</span>
+    </a>
+    <a routerLink="/lancamentos" routerLinkActive="active">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 4h12M8 10h12M8 16h12M4 4h.01M4 10h.01M4 16h.01"/>
+      </svg>
+      <span>Lançamentos</span>
+    </a>
+    <a routerLink="/categorias" routerLinkActive="active">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 5h16v5H4zM4 14h9v5H4zM17 14h3v5h-3z" />
+      </svg>
+      <span>Categorias</span>
     </a>
   </nav>
 </div>

@@ -1,0 +1,83 @@
+<section class="categorias-page">
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">ORGANIZAÇÃO FINANCEIRA</span>
+      <h1>Categorias</h1>
+      <p>Organize suas receitas e despesas com categorias prontas ou personalizadas.</p>
+    </div>
+    <button class="button-primary" type="button" (click)="abrirFormulario()"
+            [disabled]="exibindoFormulario()">+ Nova categoria</button>
+  </div>
+
+  @if (exibindoFormulario()) {
+    <section class="form-card" aria-labelledby="titulo-nova-categoria">
+      <h2 id="titulo-nova-categoria">Criar categoria</h2>
+      <p>As categorias personalizadas ficam disponíveis para seus lançamentos.</p>
+      @if (erroFormulario()) {
+        <p role="alert" class="error-message">{{ erroFormulario() }}</p>
+      }
+      <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+        <div class="field">
+          <label for="nome-categoria">Nome</label>
+          <input id="nome-categoria" formControlName="nome" maxlength="150"
+                 placeholder="Ex.: Supermercado"
+                 [attr.aria-invalid]="form.controls.nome.touched && form.controls.nome.invalid" />
+          @if (form.controls.nome.touched && (form.controls.nome.invalid || !form.controls.nome.value.trim())) {
+            <small class="field-error">Informe um nome de até 150 caracteres.</small>
+          }
+        </div>
+        <div class="field">
+          <label for="tipo-categoria">Tipo</label>
+          <select id="tipo-categoria" formControlName="tipo">
+            <option value="DESPESA">Despesa</option>
+            <option value="RECEITA">Receita</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="button-secondary" (click)="cancelar()" [disabled]="salvando()">Cancelar</button>
+          <button type="submit" class="button-primary" [disabled]="salvando()">
+            {{ salvando() ? 'Salvando…' : 'Salvar categoria' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  @if (sucesso()) { <p class="success-message" role="status">{{ sucesso() }}</p> }
+
+  <div class="filter-bar" role="group" aria-label="Filtrar categorias por tipo">
+    <button type="button" [class.selected]="filtro() === 'TODAS'" [attr.aria-pressed]="filtro() === 'TODAS'"
+            (click)="filtro.set('TODAS')">Todas</button>
+    <button type="button" [class.selected]="filtro() === 'DESPESA'" [attr.aria-pressed]="filtro() === 'DESPESA'"
+            (click)="filtro.set('DESPESA')">Despesas</button>
+    <button type="button" [class.selected]="filtro() === 'RECEITA'" [attr.aria-pressed]="filtro() === 'RECEITA'"
+            (click)="filtro.set('RECEITA')">Receitas</button>
+  </div>
+
+  @if (carregando()) {
+    <div class="state-card" role="status">Carregando categorias…</div>
+  } @else if (erro()) {
+    <div class="state-card" role="alert">{{ erro() }}
+      <button class="button-secondary" type="button" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else if (filtradas().length === 0) {
+    <div class="state-card">Nenhuma categoria encontrada para este filtro.</div>
+  } @else {
+    <div class="category-grid">
+      @for (categoria of filtradas(); track categoria.id) {
+        <article class="category-card">
+          <span class="category-icon" [class.receita]="categoria.tipo === 'RECEITA'" aria-hidden="true">
+            {{ categoria.tipo === 'RECEITA' ? '↗' : '↙' }}
+          </span>
+          <div class="category-description">
+            <h2>{{ categoria.nome }}</h2>
+            <span>{{ categoria.tipo === 'RECEITA' ? 'Receita' : 'Despesa' }}</span>
+          </div>
+          <span class="scope" [class.custom]="categoria.escopo === 'ESPACO'">
+            {{ categoria.escopo === 'SISTEMA' ? 'Padrão' : 'Personalizada' }}
+          </span>
+        </article>
+      }
+    </div>
+  }
+</section>

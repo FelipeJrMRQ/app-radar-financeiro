@@ -93,3 +93,14 @@
 @media (min-width: 860px) {
   .sidebar-brand .sidebar-symbol { width: 43px; height: 43px; }
 }
+
+/* Mobile-first: 4 destinos acessíveis inclusive em largura de 320px. */
+.mobile-bottom-nav a {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: 3px;
+  font-size: 10px;
+}
+@media (max-width: 359px) {
+  .mobile-bottom-nav a { font-size: 9px; }
+}

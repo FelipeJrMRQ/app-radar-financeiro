@@ -27,6 +27,24 @@ export const routes: Routes = [
           import('./features/dashboard/inicio.page').then((m) => m.InicioPage),
       },
       {
+        path: 'categorias',
+        title: 'Categorias | Radar Financeiro',
+        loadComponent: () =>
+          import('./features/categorias/categorias.page').then(m => m.CategoriasPage),
+      },
+      {
+        path: 'lancamentos',
+        title: 'Lançamentos | Radar Financeiro',
+        loadComponent: () =>
+          import('./features/lancamentos/lancamentos.page').then(m => m.LancamentosPage),
+      },
+      {
+        path: 'lancamentos/novo',
+        title: 'Novo lançamento | Radar Financeiro',
+        loadComponent: () =>
+          import('./features/lancamentos/lancamento-novo.page').then(m => m.LancamentoNovoPage),
+      },
+      {
         path: 'contas',
         title: 'Contas financeiras | Radar Financeiro',
         loadComponent: () =>
