@@ -1,0 +1,108 @@
+<div class="actions-root">
+  <button type="button" class="more-button" [class.active]="aberto()" [attr.aria-expanded]="aberto()"
+          [attr.aria-label]="'Ações do lançamento ' + lancamentoId()"
+          (click)="alternarMenu()" title="Ações do lançamento">
+    <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true">
+      <circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/>
+    </svg>
+  </button>
+  @if (aberto()) {
+    <div class="actions-panel">
+      @if (carregando()) {
+        <p role="status">Carregando lançamento…</p>
+      } @else if (atual(); as l) {
+        @if (!l.ativo) {
+          <p class="action-warning">Este lançamento está inativo.</p>
+          <button type="button" class="quiet" (click)="fechar()">Fechar</button>
+        } @else if (!acao()) {
+          <strong class="actions-heading">{{ l.descricao }}</strong>
+          <a class="action-link" [routerLink]="['/lancamentos', l.id, 'editar']">Editar</a>
+          @if (l.situacao === 'PREVISTO') {
+            @if (!possuiRealizacoes()) {
+              <button type="button" (click)="escolher('CONFIRMAR')">
+                {{ l.tipo === 'RECEITA' ? 'Confirmar recebimento' : 'Confirmar pagamento' }}
+              </button>
+            }
+            <button type="button" (click)="escolher('PARCIAL')">
+              {{ l.tipo === 'RECEITA' ? 'Recebimento parcial' : 'Pagamento parcial' }}
+            </button>
+          }
+          <button type="button" (click)="escolher('REALIZACOES')">Ver realizações</button>
+          <button type="button" class="destructive" (click)="escolher('EXCLUIR')">Excluir</button>
+          <button type="button" class="quiet" (click)="fechar()">Fechar</button>
+        } @else {
+          <strong class="actions-heading">
+            {{ acao() === 'EXCLUIR' ? 'Excluir lançamento' :
+               acao() === 'CONFIRMAR' ? 'Confirmar lançamento' :
+               acao() === 'PARCIAL' ? 'Realização parcial' : 'Realizações financeiras' }}
+          </strong>
+          <p class="action-help">{{ l.descricao }} · {{ formatarData(l.dataLancamento) }}</p>
+          @if (acao() === 'EXCLUIR') {
+            <p class="action-warning">
+              Esta exclusão retira o lançamento dos saldos e relatórios. Registros com realizações ativas
+              são protegidos pela API.
+            </p>
+            @if (podeSequencia()) {
+              <fieldset class="action-scope">
+                <legend>Abrangência</legend>
+                <label><input type="radio" [checked]="escopo() === 'ATUAL'"
+                      name="scope-{{ l.id }}" (change)="definirEscopo('ATUAL')"> Somente este</label>
+                <label><input type="radio" [checked]="escopo() === 'SEGUINTES'"
+                      name="scope-{{ l.id }}" (change)="definirEscopo('SEGUINTES')"> Este e os próximos</label>
+              </fieldset>
+            } @else if (l.recorrenciaLancamentoId || l.parcelamentoLancamentoId) {
+              <p class="action-help">Lançamentos antigos só podem ser excluídos individualmente.</p>
+            }
+          } @else if (acao() === 'CONFIRMAR' || acao() === 'PARCIAL') {
+            <label class="action-field">Valor realizado (R$)
+              <input type="text" inputmode="decimal" rfMoedaBr [formControl]="valor"
+                     placeholder="R$ 0,00" />
+            </label>
+            <label class="action-field">Data efetiva
+              <input type="date" [formControl]="data"/>
+            </label>
+            <p class="action-help">A confirmação afeta exclusivamente este lançamento.</p>
+          } @else if (acao() === 'REALIZACOES') {
+            @if (resumo(); as r) {
+              <p class="action-help">Realizado: {{ moeda(r.totalRealizado) }}
+                · Restante: {{ moeda(r.saldoRestante) }}</p>
+              @if (r.realizacoes.length === 0) {
+                <p class="action-help">Nenhuma realização parcial registrada.</p>
+              } @else {
+                @for (item of r.realizacoes; track item.id) {
+                  <div class="realizacao-item">
+                    <span>{{ formatarData(item.dataRealizacao) }} · {{ moeda(item.valor) }}</span>
+                    @if (aguardandoEstorno() === item.id) {
+                      <span class="estorno-buttons">
+                        <button type="button" class="destructive" [disabled]="salvando()"
+                                (click)="estornar(item.id)">Confirmar estorno</button>
+                        <button type="button" [disabled]="salvando()"
+                                (click)="aguardandoEstorno.set(null)">Cancelar</button>
+                      </span>
+                    } @else {
+                      <button type="button" class="destructive" [disabled]="salvando()"
+                              (click)="prepararEstorno(item.id)">Estornar</button>
+                    }
+                  </div>
+                }
+              }
+            }
+          }
+          @if (acao() === 'EXCLUIR' || acao() === 'CONFIRMAR' || acao() === 'PARCIAL') {
+            <button type="button" class="commit-action" [disabled]="salvando()" (click)="executar()">
+              {{ salvando() ? 'Processando…' : acao() === 'EXCLUIR' ? 'Confirmar exclusão' : 'Confirmar operação' }}
+            </button>
+          }
+          <button class="quiet" type="button" [disabled]="salvando()" (click)="escolher('REALIZACOES')"
+                  [style.display]="acao() === 'REALIZACOES' ? 'none' : null">Ver realizações</button>
+          <button class="quiet" type="button" [disabled]="salvando()" (click)="escolher('REALIZACOES')"
+                  [style.display]="acao() !== 'REALIZACOES' ? 'none' : null">Atualizar realizações</button>
+          <button class="quiet" type="button" [disabled]="salvando()"
+                  (click)="acao.set(null)">Voltar às opções</button>
+        }
+      }
+      @if (erro()) { <p role="alert" class="action-error">{{ erro() }}</p> }
+      @if (mensagem()) { <p role="status" class="action-help">{{ mensagem() }}</p> }
+    </div>
+  }
+</div>

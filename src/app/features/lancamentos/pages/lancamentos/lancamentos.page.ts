@@ -10,13 +10,14 @@ import { dataLocalIso } from '../../../contas-financeiras/utils/formatacao-conta
 import { TipoCategoria } from '../../../categorias/models/categoria.model';
 import { Lancamento, FiltroLancamentosPeriodo, ResumoLancamentosPeriodo } from '../../models/lancamento.model';
 import { LancamentosService } from '../../services/lancamentos.service';
+import { LancamentoAcoesComponent } from '../../components/lancamento-acoes/lancamento-acoes.component';
 
 type FiltroTipo = 'TODOS' | TipoCategoria;
 
 @Component({
   selector: 'app-lancamentos-page',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, LancamentoAcoesComponent],
   templateUrl: './lancamentos.page.html',
   styleUrl: './lancamentos.page.scss',
 })

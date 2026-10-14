@@ -6,6 +6,7 @@ import { API_BASE_URL } from '../../../core/config/api.config';
 import {
   CriarLancamento, Lancamento, CriarRecorrenciaLancamento, CriarParcelamentoLancamento,
   FiltroLancamentosPeriodo, ResumoLancamentosPeriodo,
+  AtualizarLancamento, ConfirmacaoLancamento, ResumoRealizacoesLancamento,
 } from '../models/lancamento.model';
 
 @Injectable({ providedIn: 'root' })
@@ -54,6 +55,42 @@ export class LancamentosService {
 
   criarParcelamento(dados: CriarParcelamentoLancamento) {
     return this.http.post(this.endpoint().replace(/\/lancamentos$/, '/parcelamentos-lancamentos'), dados);
+  }
+
+  buscar(id: number) {
+    return this.http.get<Lancamento>(this.endpoint() + '/' + id);
+  }
+
+  editar(id: number, dados: AtualizarLancamento, escopo: 'ATUAL' | 'SEGUINTES' = 'ATUAL',
+      parcelado = false) {
+    const sufixo = escopo === 'SEGUINTES'
+      ? parcelado ? '/parcelas-restantes' : '/esta-e-proximas' : '';
+    return this.http.put<Lancamento>(this.endpoint() + '/' + id + sufixo, dados);
+  }
+
+  excluir(id: number, escopo: 'ATUAL' | 'SEGUINTES' = 'ATUAL', parcelado = false) {
+    const sufixo = escopo === 'SEGUINTES'
+      ? parcelado ? '/parcelas-restantes' : '/esta-e-proximas' : '';
+    return this.http.delete<void>(this.endpoint() + '/' + id + sufixo);
+  }
+
+  confirmar(id: number, dados: ConfirmacaoLancamento) {
+    return this.http.post<Lancamento>(this.endpoint() + '/' + id + '/confirmacao', dados);
+  }
+
+  realizarParcialmente(id: number, dados: ConfirmacaoLancamento) {
+    return this.http.post<ResumoRealizacoesLancamento>(
+      this.endpoint() + '/' + id + '/realizacoes', dados);
+  }
+
+  realizacoes(id: number) {
+    return this.http.get<ResumoRealizacoesLancamento>(
+      this.endpoint() + '/' + id + '/realizacoes');
+  }
+
+  estornar(id: number, realizacaoId: number) {
+    return this.http.delete<void>(
+      this.endpoint() + '/' + id + '/realizacoes/' + realizacaoId);
   }
 
   criar(dados: CriarLancamento) {

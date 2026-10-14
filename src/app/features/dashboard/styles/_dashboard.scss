@@ -22,7 +22,7 @@ h1 { margin:8px 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; col
 .income-text { color:#078468 !important; }.expense-text { color:#bc4854 !important; }.warning-text { color:#a46a28 !important; }
 .small-divider { color:#aebdc4; }
 .dashboard-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:17px; }
-.panel { display:flex; flex-direction:column; min-width:0; border:1px solid #e1e9ec; border-radius:16px; background:#fff; overflow:hidden; }
+.panel { display:flex; flex-direction:column; min-width:0; border:1px solid #e1e9ec; border-radius:16px; background:#fff; overflow:visible; }
 .panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:21px 20px 17px; }
 .panel-head h2 { margin:7px 0 0; font-size:17px; letter-spacing:-.4px; color:#1b374a; }
 .panel-link { font-size:11px; color:#13746b; font-weight:800; white-space:nowrap; text-decoration:none; padding-top:10px; }
@@ -183,4 +183,12 @@ h1 { margin:8px 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; col
   .due-value { font-size: 13px; max-width: 113px; }
 }
 
+}
+
+/* Menu de ações com popover dentro do painel, sem cortar o conteúdo. */
+.due-row { position:relative; }
+.due-row app-lancamento-acoes { margin-left:3px; }
+@media (max-width:639px) {
+  .due-row { grid-template-columns:40px minmax(0,1fr) auto 38px; gap:6px; }
+  .due-value { max-width:105px; }
 }

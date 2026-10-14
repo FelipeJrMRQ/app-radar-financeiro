@@ -87,6 +87,71 @@ describe('LancamentosService', () => {
     await result;
   });
 
+
+  it('consulta dados e encaminha edição individual do registro retroativo', async () => {
+    const dados = {
+      contaFinanceiraId: 2, categoriaId: 3, descricao: 'Mercado corrigido',
+      valor: '81.2500', dataLancamento: '2026-09-02', observacao: null,
+    };
+    const resposta = firstValueFrom(api.editar(17, dados));
+    const req = http.expectOne('/api/espacos-financeiros/7/lancamentos/17');
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual(dados);
+    expect(req.request.body.valor).toBe('81.2500');
+    req.flush({ id: 17 });
+    expect((await resposta).id).toBe(17);
+  });
+
+  it('dirige edição e exclusão em sequência à rota correta conforme modalidade', async () => {
+    const dados = {
+      contaFinanceiraId: 2, categoriaId: 3, descricao: 'Prestação',
+      valor: '200.0000', dataLancamento: '2026-11-15', observacao: null,
+    };
+    const recorrente = firstValueFrom(api.editar(8, dados, 'SEGUINTES', false));
+    const reqRec = http.expectOne('/api/espacos-financeiros/7/lancamentos/8/esta-e-proximas');
+    expect(reqRec.request.method).toBe('PUT');
+    reqRec.flush({ id: 8 });
+    await recorrente;
+
+    const parcelado = firstValueFrom(api.editar(8, dados, 'SEGUINTES', true));
+    const reqPar = http.expectOne('/api/espacos-financeiros/7/lancamentos/8/parcelas-restantes');
+    expect(reqPar.request.method).toBe('PUT');
+    reqPar.flush({ id: 8 });
+    await parcelado;
+
+    const excluir = firstValueFrom(api.excluir(8, 'SEGUINTES', true));
+    const reqEx = http.expectOne('/api/espacos-financeiros/7/lancamentos/8/parcelas-restantes');
+    expect(reqEx.request.method).toBe('DELETE');
+    reqEx.flush(null);
+    await excluir;
+  });
+
+  it('confirma apenas o lançamento selecionado e aceita valor efetivo textual', async () => {
+    const dados = { valorEfetivo: '1050.5678', dataEfetiva: '2026-10-14' };
+    const result = firstValueFrom(api.confirmar(12, dados));
+    const req = http.expectOne('/api/espacos-financeiros/7/lancamentos/12/confirmacao');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(dados);
+    req.flush({ id: 12, situacao: 'CONFIRMADO' });
+    expect((await result).situacao).toBe('CONFIRMADO');
+  });
+
+  it('realiza parcialmente e permite estornar só a realização selecionada', async () => {
+    const parc = firstValueFrom(api.realizarParcialmente(11, {
+      valorEfetivo: '25.7500', dataEfetiva: '2026-10-14',
+    }));
+    const r = http.expectOne('/api/espacos-financeiros/7/lancamentos/11/realizacoes');
+    expect(r.request.method).toBe('POST');
+    r.flush({ lancamentoId: 11, saldoRestante: '74.25', realizacoes: [] });
+    expect((await parc).saldoRestante).toBe('74.25');
+
+    const estorno = firstValueFrom(api.estornar(11, 6));
+    const del = http.expectOne('/api/espacos-financeiros/7/lancamentos/11/realizacoes/6');
+    expect(del.request.method).toBe('DELETE');
+    del.flush(null);
+    await estorno;
+  });
+
   it('cria lançamento usando string decimal exata', async () => {
     const retorno = firstValueFrom(api.criar({
       contaFinanceiraId: 11, categoriaId: 3, descricao: 'Mercado',
