@@ -10,6 +10,11 @@
   @if (paginaCriada) {
     <p class="success-message" role="status">Lançamento cadastrado com sucesso.</p>
   }
+  <div class="periodo-selector" aria-label="Mês dos lançamentos">
+    <button type="button" (click)="mudarMes(-1)" aria-label="Mês anterior">‹</button>
+    <strong aria-live="polite">{{ mesDescricao() }}</strong>
+    <button type="button" (click)="mudarMes(1)" aria-label="Próximo mês">›</button>
+  </div>
 
   <div class="filter-panel">
     <div class="filters" role="group" aria-label="Filtrar por tipo">
@@ -33,6 +38,18 @@
       </select>
     </div>
   </div>
+
+  @if (resumo(); as dados) {
+    <section class="total-periodo" aria-label="Total dos lançamentos no período">
+      <div class="total-periodo-label">
+        <strong>{{ rotuloTotal() }}</strong>
+        <small>Valores cadastrados no mês: previstos e confirmados</small>
+      </div>
+      <strong class="total-periodo-valor" [class.despesa]="filtroTipo() === 'DESPESA'">
+        {{ moeda(dados.totalLancado) }}
+      </strong>
+    </section>
+  }
 
   @if (carregando()) {
     <div class="state-card" role="status">Carregando lançamentos…</div>

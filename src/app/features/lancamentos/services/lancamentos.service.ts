@@ -5,6 +5,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { API_BASE_URL } from '../../../core/config/api.config';
 import {
   CriarLancamento, Lancamento, CriarRecorrenciaLancamento, CriarParcelamentoLancamento,
+  FiltroLancamentosPeriodo, ResumoLancamentosPeriodo,
 } from '../models/lancamento.model';
 
 @Injectable({ providedIn: 'root' })
@@ -25,6 +26,27 @@ export class LancamentosService {
     return this.http.get<Lancamento[]>(this.endpoint(), options);
   }
 
+
+  /** Consulta o mesmo recorte utilizado no total, sem cálculos monetários no cliente. */
+  listarPeriodo(filtro: FiltroLancamentosPeriodo) {
+    return this.http.get<Lancamento[]>(this.endpoint(), {params: this.parametrosPeriodo(filtro)});
+  }
+
+  resumirPeriodo(filtro: FiltroLancamentosPeriodo) {
+    return this.http.get<ResumoLancamentosPeriodo>(this.endpoint() + '/resumo-periodo',
+      {params: this.parametrosPeriodo(filtro)});
+  }
+
+  private parametrosPeriodo(filtro: FiltroLancamentosPeriodo): HttpParams {
+    let params = new HttpParams()
+      .set('dataInicio', filtro.dataInicio)
+      .set('dataFim', filtro.dataFim);
+    if (filtro.tipo) params = params.set('tipo', filtro.tipo);
+    if (filtro.contaFinanceiraId !== null) {
+      params = params.set('contaFinanceiraId', String(filtro.contaFinanceiraId));
+    }
+    return params;
+  }
 
   criarRecorrencia(dados: CriarRecorrenciaLancamento) {
     return this.http.post(this.endpoint().replace(/\/lancamentos$/, '/recorrencias-lancamentos'), dados);

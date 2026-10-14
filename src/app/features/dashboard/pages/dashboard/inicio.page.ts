@@ -34,6 +34,7 @@ export class InicioPage implements OnInit {
 
   readonly primeiroNome = computed(() => this.sessao.usuario()?.nome.trim().split(/\s+/)[0] || 'você');
   readonly mes = signal(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  readonly mesReferencia = computed(() => dataLocalIso(this.mes()).slice(0, 7));
   readonly mesDescricao = computed(() =>
     new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(this.mes()));
   readonly carregando = signal(true);
@@ -44,8 +45,8 @@ export class InicioPage implements OnInit {
   readonly fluxo = signal<FluxoCaixaConta | null>(null);
   readonly carregandoFluxo = signal(false);
   readonly erroFluxo = signal<string | null>(null);
-  readonly aReceber = computed(() => this.painel()?.proximosVencimentos.filter(p => p.tipo === 'RECEITA').slice(0, 8) ?? []);
-  readonly aPagar = computed(() => this.painel()?.proximosVencimentos.filter(p => p.tipo === 'DESPESA').slice(0, 8) ?? []);
+  readonly aReceber = computed(() => this.painel()?.proximosVencimentos.filter(p => p.tipo === 'RECEITA').slice(0, 5) ?? []);
+  readonly aPagar = computed(() => this.painel()?.proximosVencimentos.filter(p => p.tipo === 'DESPESA').slice(0, 5) ?? []);
   readonly categorias = signal<TotalCategoria[]>([]);
   readonly erroCategorias = signal<string | null>(null);
   readonly moeda = formatarMoeda;

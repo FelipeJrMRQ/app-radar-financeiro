@@ -1,11 +1,11 @@
 <section class="panel due-panel" aria-labelledby="titulo-pagar">
                 <div class="panel-head"><div><span class="eyebrow">COMPROMISSOS</span><h2 id="titulo-pagar">Contas a pagar</h2></div>
-                  <a routerLink="/lancamentos" class="panel-link">Ver lançamentos →</a></div>
+                  <a routerLink="/lancamentos" class="panel-link"
+                     [queryParams]="{ tipo: 'DESPESA', mes: mesReferencia() }">Ver lançamentos →</a></div>
                 @if (itens().length === 0) {
                   <p class="empty-data">Nenhum pagamento pendente neste período.</p>
                 } @else {
-                  <div class="due-list" tabindex="0"
-                       aria-label="Lista de contas a pagar">
+                  <div class="due-list">
                     @for (item of itens(); track item.lancamentoId) {
                       <div class="due-row">
                         <time class="date-block" [attr.datetime]="item.vencimento"
@@ -22,5 +22,5 @@
                     }
                   </div>
                 }
-                <footer class="panel-total"><span>Total no período</span><strong class="expense-text">{{ moeda(total()) }}</strong></footer>
+                
               </section>
