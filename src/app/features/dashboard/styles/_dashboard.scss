@@ -100,4 +100,118 @@ h1 { margin:8px 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; col
 }
 
 
+
+/*
+ * Leitura em celulares reais. Todas as listas longas rolam dentro do card,
+ * preservando o título e o total; os valores permanecem os retornados pela API.
+ */
+.panel {
+  max-height: min(480px, 78dvh);
+}
+.panel-head, .panel-total, .account-head-row, .chart-footer {
+  flex-shrink: 0;
+}
+.due-list, .account-list, .category-bars, .chart-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #a5bbb9 #f2f7f7;
+  -webkit-overflow-scrolling: touch;
+}
+.due-list:focus-visible, .account-list:focus-visible,
+.category-bars:focus-visible, .chart-body:focus-visible {
+  outline: 2px solid #198f7a;
+  outline-offset: -2px;
+}
+.chart-body { padding-bottom: 10px; }
+.panel-head h2 { font-size: 19px; line-height: 1.3; }
+.panel-link { font-size: 13px; line-height: 1.4; }
+.due-description strong { font-size: 15px; line-height: 1.45; }
+.due-description small { font-size: 13px; line-height: 1.45; }
+.date-block { font-size: 13px; }
+.due-value { font-size: 15px; line-height: 1.4; }
+.panel-total, .chart-footer { font-size: 14px; }
+.panel-total strong, .chart-footer strong { font-size: 16px; }
+.account-head-row { font-size: 12px; }
+.account-row, .account-name, .account-row strong { font-size: 14px; }
+.account-footer, .account-footer strong { font-size: 15px; }
+.account-value-label { display: none; }
+.chart-select-label, .chart-legend, .category-label { font-size: 13px; }
+.chart-select-label select { font-size: 14px; min-height: 44px; }
+.category-label strong { font-size: 14px; }
+.empty-data { font-size: 14px; line-height: 1.5; }
+.late-label { font-size: 12px; }
+.eyebrow { font-size: 11px; }
+.stat-label { font-size: 13px; }
+.stat-card > strong { font-size: clamp(20px, 3vw, 26px); line-height: 1.25; }
+.stat-card > small { font-size: 12px; line-height: 1.5; }
+
+@media (max-width: 639px) {
+  .panel { max-height: min(460px, 76dvh); }
+  .panel-head { flex-wrap: wrap; gap: 10px; padding: 19px 16px 15px; }
+  .panel-link { padding-top: 0; }
+  .due-list { padding: 0 15px 8px; }
+  .due-row {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 9px;
+    padding: 16px 0;
+  }
+  .due-row .date-block { min-width: 0; white-space: nowrap; font-size: 13px; }
+  .due-description strong { font-size: 15px; }
+  .due-description small { font-size: 12px; }
+  .due-value { max-width: 125px; font-size: 15px; overflow-wrap: anywhere; }
+  .panel-total { padding: 16px; }
+  .account-panel, .chart-panel, .category-panel { min-height: 0; }
+  .account-head-row { display: none; }
+  .account-row {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 12px 8px;
+    padding: 16px;
+    text-align: left;
+  }
+  .account-row .account-name { grid-column: 1 / -1; font-size: 15px; }
+  .account-row .account-value,
+  .account-footer .account-value {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    font-size: 15px;
+    overflow-wrap: anywhere;
+  }
+  .account-value-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: #667f8b;
+  }
+  .account-footer {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 11px 8px;
+    text-align: left;
+    padding: 16px;
+  }
+  .account-footer-label {
+    grid-column: 1 / -1;
+    font-size: 14px;
+  }
+  .stat-card { padding: 17px 13px; }
+  .stat-card > strong { font-size: clamp(18px, 5vw, 23px); }
+  .stat-label { font-size: 12px; line-height: 1.4; }
+  .stat-card > small { font-size: 12px; }
+  .category-bars { padding: 4px 16px 16px; }
+  .category-label { font-size: 14px; }
+}
+@media (max-width: 370px) {
+  /* Sobrepõe as antigas reduções de fonte sem sacrificar o layout em 320 px. */
+  .stat-label { font-size: 12px; }
+  .stat-card > strong { font-size: 18px; }
+  .due-row { grid-template-columns: 40px minmax(0,1fr) auto; gap: 8px; }
+  .due-value { font-size: 14px; max-width: 113px; }
+}
+
 }

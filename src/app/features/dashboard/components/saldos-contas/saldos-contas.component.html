@@ -4,17 +4,19 @@
                 @if (contas().length === 0) {
                   <div class="empty-data">Nenhuma conta cadastrada. <a routerLink="/contas/nova">Criar conta</a></div>
                 } @else {
-                  <div class="account-list">
+                  <div class="account-list" tabindex="0" aria-label="Saldos por conta financeira">
                     @for (conta of contas(); track conta.contaFinanceiraId) {
                       <div class="account-row">
                         <span class="account-name"><span class="account-indicator" aria-hidden="true"></span>{{ conta.nome }}</span>
-                        <strong>{{ moeda(conta.saldoConfirmado) }}</strong>
-                        <strong>{{ moeda(conta.saldoProjetado) }}</strong>
+                        <strong class="account-value"><span class="account-value-label">Confirmado</span>{{ moeda(conta.saldoConfirmado) }}</strong>
+                        <strong class="account-value"><span class="account-value-label">Projetado</span>{{ moeda(conta.saldoProjetado) }}</strong>
                       </div>
                     }
                   </div>
                 }
                 <footer class="panel-total account-footer">
-                  <span>Total</span><strong>{{ moeda(saldoConfirmado()) }}</strong><strong>{{ moeda(saldoProjetado()) }}</strong>
+                  <span class="account-footer-label">Total</span>
+                  <strong class="account-value"><span class="account-value-label">Confirmado</span>{{ moeda(saldoConfirmado()) }}</strong>
+                  <strong class="account-value"><span class="account-value-label">Projetado</span>{{ moeda(saldoProjetado()) }}</strong>
                 </footer>
               </section>

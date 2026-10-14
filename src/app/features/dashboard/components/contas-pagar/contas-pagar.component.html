@@ -4,10 +4,15 @@
                 @if (itens().length === 0) {
                   <p class="empty-data">Nenhum pagamento pendente neste período.</p>
                 } @else {
-                  <div class="due-list">
+                  <div class="due-list" tabindex="0"
+                       aria-label="Lista de contas a pagar">
                     @for (item of itens(); track item.lancamentoId) {
                       <div class="due-row">
-                        <span class="date-block">{{ data(item.vencimento) }}</span>
+                        <time class="date-block" [attr.datetime]="item.vencimento"
+                          [attr.title]="dataCompleta(item.vencimento)"
+                          [attr.aria-label]="'Vencimento: ' + dataCompleta(item.vencimento)">
+                          {{ data(item.vencimento) }}
+                        </time>
                         <div class="due-description">
                           <strong>{{ item.descricao }}</strong>
                           <small>{{ item.contaFinanceiraNome }} · {{ item.categoriaNome }}</small>

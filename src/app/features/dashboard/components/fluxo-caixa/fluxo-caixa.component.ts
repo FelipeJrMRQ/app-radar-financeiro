@@ -1,5 +1,5 @@
 import { Component, computed, EventEmitter, input, Output } from '@angular/core';
-import { formatarDataLocal, formatarMoeda } from '../../../../shared/valor-monetario';
+import { formatarDiaMes, formatarDataLocal, formatarMoeda } from '../../../../shared/valor-monetario';
 import { FluxoCaixaConta, SaldoContaPainel } from '../../models/painel-financeiro.model';
 import { criarPontosGrafico, pontosSvg } from '../../utils/painel-visuais';
 
@@ -15,7 +15,8 @@ export class FluxoCaixaCardComponent {
   readonly saldoConfirmadoSvg = computed(() => pontosSvg(criarPontosGrafico(this.fluxo()?.pontos ?? [], 'saldoConfirmado')));
   readonly saldoProjetadoSvg = computed(() => pontosSvg(criarPontosGrafico(this.fluxo()?.pontos ?? [], 'saldoProjetado')));
   readonly moeda = formatarMoeda;
-  readonly data = formatarDataLocal;
+  readonly data = formatarDiaMes;
+  readonly dataCompleta = formatarDataLocal;
   alterarConta(event: Event): void {
     const id = Number((event.target as HTMLSelectElement).value);
     this.contaAlterada.emit(Number.isSafeInteger(id) && id > 0 ? id : null);
