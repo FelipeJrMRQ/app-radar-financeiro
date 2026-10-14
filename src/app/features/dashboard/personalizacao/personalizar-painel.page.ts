@@ -17,7 +17,7 @@ import { PainelPreferenciasService } from './painel-preferencias.service';
 })
 export class PersonalizarPainelPage implements OnInit {
   private readonly service = inject(PainelPreferenciasService);
-  private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly host = inject(ElementRef) as ElementRef<HTMLElement>;
   readonly carregando = this.service.carregando;
   readonly erroCarregamento = this.service.erro;
   readonly salvando = signal(false);

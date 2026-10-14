@@ -31,12 +31,14 @@ export function preferenciasPadrao(): PreferenciaComponentePainel[] {
 export function normalizarPreferencias(
   recebidas: ReadonlyArray<PreferenciaComponentePainel>,
 ): PreferenciaComponentePainel[] {
-  const ordem = new Map(CODIGOS_COMPONENTES.map((codigo, i) => [codigo, i]));
+  const conhecidos = new Set<CodigoComponentePainel>(CODIGOS_COMPONENTES);
   const vistas = new Set<CodigoComponentePainel>();
-  const validas = [...recebidas]
-    .filter(item => ordem.has(item.codigoComponente) && !vistas.has(item.codigoComponente)
-      && vistas.add(item.codigoComponente))
-    .sort((a, b) => a.ordemExibicao - b.ordemExibicao);
+
+  const validas = [...recebidas].filter(item => {
+    if (!conhecidos.has(item.codigoComponente) || vistas.has(item.codigoComponente)) return false;
+    vistas.add(item.codigoComponente);
+    return true;
+  }).sort((a, b) => a.ordemExibicao - b.ordemExibicao);
   const faltantes = CODIGOS_COMPONENTES
     .filter(codigo => !vistas.has(codigo))
     .map(codigoComponente => ({ codigoComponente, ordemExibicao: 0, visivel: true }));
