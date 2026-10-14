@@ -37,7 +37,12 @@ export class LoginPage {
     this.erro.set(null);
     try {
       await this.sessao.entrar(this.formulario.getRawValue());
-      await this.router.navigateByUrl('/');
+      const retorno = this.route.snapshot.queryParamMap.get('retorno');
+      // Aceitar somente rotas internas e impedir redirecionamento externo.
+      const destino = retorno?.startsWith('/') && !retorno.startsWith('//') &&
+        !retorno.startsWith('/\\') && !retorno.startsWith('/entrar')
+          ? retorno : '/';
+      await this.router.navigateByUrl(destino);
     } catch (erro) {
       this.erro.set(mensagemDeErro(erro));
     } finally {
