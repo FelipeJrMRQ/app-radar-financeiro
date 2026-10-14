@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, isDevMode, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, firstValueFrom, forkJoin, map, of } from 'rxjs';
 
@@ -144,10 +144,10 @@ export class LancamentosPage implements OnInit {
       this.resumo.set(resultado.resumo.dados);
       if (resultado.resumo.falha) {
         this.avisoResumo.set(
-          'Não foi possível consultar o total do período. ' +
-          'Confira se o backend em execução possui a rota ' +
-          '/lancamentos/resumo-periodo (branch chatgpt/resumo-periodo-lancamentos). ' +
-          'A lista continua disponível; o total não será estimado pelo navegador.',
+          'O total do período está indisponível no momento. ' +
+          'A lista continua acessível, sem estimar valores financeiros.' +
+          (isDevMode() ? ' No ambiente de desenvolvimento, confira se a API ' +
+            'foi atualizada para a branch chatgpt/resumo-periodo-lancamentos.' : ''),
         );
       }
     } catch (erro) {
