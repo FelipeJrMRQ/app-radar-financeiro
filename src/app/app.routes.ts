@@ -27,6 +27,13 @@ export const routes: Routes = [
           import('./features/dashboard/inicio.page').then((m) => m.InicioPage),
       },
       {
+        path: 'configuracoes/painel',
+        title: 'Personalizar painel | Radar Financeiro',
+        loadComponent: () =>
+          import('./features/dashboard/personalizacao/personalizar-painel.page')
+            .then(m => m.PersonalizarPainelPage),
+      },
+      {
         path: 'categorias',
         title: 'Categorias | Radar Financeiro',
         loadComponent: () =>
