@@ -87,9 +87,10 @@ export class LancamentosPage implements OnInit {
 
   private filtrosAtuais(): FiltroLancamentosPeriodo {
     const mes = this.mes();
+    const tipo = this.filtroTipo();
     return {
       contaFinanceiraId: this.contaSelecionada(),
-      tipo: this.filtroTipo() === 'TODOS' ? null : this.filtroTipo(),
+      tipo: tipo === 'TODOS' ? null : tipo,
       dataInicio: dataLocalIso(new Date(mes.getFullYear(), mes.getMonth(), 1)),
       dataFim: dataLocalIso(new Date(mes.getFullYear(), mes.getMonth() + 1, 0)),
     };
