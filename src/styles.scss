@@ -29,3 +29,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+/* Diagnóstico contextual do painel em caso de indisponibilidade da API. */
+.dashboard-state.error { display:grid; gap:12px; }
+.dashboard-state.error p { margin:0; }
+.dashboard-error-links { display:flex; flex-wrap:wrap; gap:10px; }
+.dashboard-error-links a { display:inline-flex; align-items:center; text-decoration:none; }
