@@ -202,3 +202,27 @@ vertical própria quando o conteúdo ultrapassa a altura disponível. O
 título e, quando aplicável, o rodapé de total permanecem visíveis.
 As áreas roláveis aceitam foco de teclado e rolagem por toque. Nenhuma
 consulta, cálculo financeiro ou valor da API foi alterado.
+
+## Recuperação da sessão após F5
+
+A autenticação é JWT Bearer com expiração de 3600 segundos definida pelo backend.
+O Angular conserva o JWT em memória e grava **apenas o token e o instante
+absoluto de expiração** em \`sessionStorage\` da aba atual. Senhas, dados de usuário
+e contexto financeiro não são persistidos no armazenamento do navegador.
+
+Ao atualizar qualquer rota protegida, o \`authGuard\` aguarda
+\`AuthService.restaurarSessao()\`: valida a expiração local e refaz as consultas
+\`GET /usuarios/me\` e \`GET /espacos-financeiros/atual\` antes de permitir
+a navegação. Requisições simultâneas compartilham a mesma restauração.
+O logout e as falhas de autorização (401) removem a credencial armazenada.
+Token ausente, corrompido ou expirado exige novo login; após autenticar,
+o usuário retorna à rota interna que tentava abrir.
+
+**Nota de segurança:** \`sessionStorage\` resolve F5 na aba, **não** oferece a
+mesma proteção que um cookie \`HttpOnly\` contra scripts maliciosos/XSS,
+nem renova o JWT expirado. A aplicação deve manter proteção contra XSS,
+não armazenar senhas no navegador e, antes de um SaaS em produção, evoluir
+o backend para refresh tokens revogáveis em cookie \`HttpOnly\`, \`Secure\`,
+\`SameSite\` e proteção CSRF adequada. Fechar a aba encerra a persistência
+daquela aba. Em ambientes que bloqueiem \`sessionStorage\`, o login continua
+funcionando em memória e F5 exigirá novo login.

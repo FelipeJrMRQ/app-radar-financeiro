@@ -3,8 +3,9 @@ import { CanActivateFn, Router } from '@angular/router';
 
 import { AuthService } from './auth.service';
 
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = async (_rota, estado) => {
   const sessao = inject(AuthService);
   const router = inject(Router);
-  return sessao.sessaoAtiva() ? true : router.createUrlTree(['/entrar']);
+  if (await sessao.restaurarSessao()) return true;
+  return router.createUrlTree(['/entrar'], { queryParams: { retorno: estado.url } });
 };
