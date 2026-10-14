@@ -1,0 +1,40 @@
+.auth-form { width: 100%; }
+.eyebrow { color: #16877b; font-size: 11px; letter-spacing: 2px; font-weight: 800; }
+h2 { color: #14283f; letter-spacing: -1.25px; font-size: clamp(30px, 5vw, 39px); line-height: 1.14; margin: 14px 0 12px; }
+.subtitle { color: #66798b; font-size: 15px; line-height: 1.65; margin: 0 0 34px; }
+.field { margin: 0 0 19px; }
+label { display: block; font-size: 13px; font-weight: 700; color: #22374d; margin-bottom: 8px; }
+input {
+  width: 100%; min-width: 0; height: 52px; padding: 0 15px; border: 1px solid #d7e0e7;
+  background: white; color: #16344a; border-radius: 11px; font: inherit;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+}
+input::placeholder { color: #94a2af; }
+input:focus-visible { border-color: #1c9488; box-shadow: 0 0 0 3px rgba(28,148,136,.12); }
+input[aria-invalid="true"] { border-color: #ca4f54; }
+.field-error { display: block; color: #ae3c43; margin-top: 6px; font-size: 12px; }
+.password-field { position: relative; }
+.password-field input { padding-right: 85px; }
+.show-password {
+  position: absolute; right: 6px; top: 5px; height: 42px; padding: 0 10px;
+  background: transparent; color: #187b73; border: none; border-radius: 7px;
+  cursor: pointer; font: inherit; font-size: 12px; font-weight: 700;
+}
+.show-password:focus-visible { outline: 2px solid #148a80; outline-offset: 0; }
+.primary-button {
+  width: 100%; min-height: 54px; margin-top: 12px; padding: 12px 18px;
+  display: flex; gap: 10px; align-items: center; justify-content: center;
+  border: 0; border-radius: 11px; background: #136e69; color: white; cursor: pointer;
+  font: inherit; font-weight: 750; font-size: 14px; transition: background .2s, transform .2s;
+}
+.primary-button:hover:not(:disabled) { background: #0e5554; }
+.primary-button:active:not(:disabled) { transform: translateY(1px); }
+.primary-button:disabled { opacity: .64; cursor: wait; }
+.primary-button span { font-size: 19px; }
+.form-footer { text-align: center; margin-top: 31px; font-size: 13px; color: #718193; }
+.form-footer a { color: #12756f; font-weight: 750; text-decoration: none; }
+.form-footer a:hover { text-decoration: underline; }
+.form-error, .form-success { border-radius: 10px; font-size: 13px; line-height: 1.5; padding: 12px 14px; margin: 0 0 22px; }
+.form-error { color: #9a2e34; background: #fff0f0; border: 1px solid #f2c6c6; }
+.form-success { color: #086a58; background: #e3f6ef; border: 1px solid #b9e7d5; }
+@media (min-width: 850px) { .subtitle { margin-bottom: 38px; } }

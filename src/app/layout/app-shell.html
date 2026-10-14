@@ -1,0 +1,60 @@
+<div class="app-layout">
+  <aside class="sidebar" aria-label="Menu principal">
+    <a class="sidebar-brand" routerLink="/">
+      <span class="sidebar-symbol" aria-hidden="true">R<span>.</span></span>
+      <span>radar<strong>financeiro</strong></span>
+    </a>
+
+    <span class="sidebar-section-title">VISÃO GERAL</span>
+    <nav aria-label="Navegação principal">
+      <a routerLink="/" [routerLinkActiveOptions]="{ exact: true }"
+         routerLinkActive="active" class="sidebar-link">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+             stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+        </svg>
+        Início
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="side-profile">
+        <span class="avatar" aria-hidden="true">{{ (sessao.usuario()?.nome || 'U').charAt(0).toUpperCase() }}</span>
+        <div class="profile-text">
+          <strong>{{ sessao.usuario()?.nome }}</strong>
+          <span>{{ sessao.usuario()?.email }}</span>
+        </div>
+      </div>
+      <button type="button" class="side-logout" (click)="sair()">Sair da conta <span aria-hidden="true">↗</span></button>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="mobile-header">
+      <a class="mobile-logo" routerLink="/" aria-label="Radar Financeiro - início">
+        <span class="mobile-symbol" aria-hidden="true">R<span>.</span></span>
+        <span>radar<strong>financeiro</strong></span>
+      </a>
+      <button type="button" class="mobile-logout" (click)="sair()">Sair</button>
+    </header>
+
+    <header class="desktop-header">
+      <div><span class="header-kicker">SEU PAINEL</span><span class="header-title">Visão geral</span></div>
+      <span class="header-user">{{ sessao.usuario()?.email }}</span>
+    </header>
+
+    <main class="page-content" id="conteudo"><router-outlet /></main>
+  </div>
+
+  <nav class="mobile-bottom-nav" aria-label="Navegação principal">
+    <a routerLink="/" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="active">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+      <span>Início</span>
+    </a>
+  </nav>
+</div>

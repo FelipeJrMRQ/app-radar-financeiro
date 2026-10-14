@@ -1,59 +1,46 @@
-# AppRadarFinanceiro
+# Radar Financeiro — Angular
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.8.
+Frontend web **mobile first**, Angular 20, TypeScript e SCSS. Este projeto utiliza arquitetura por funcionalidades (Feature-Based) e consome a API Spring Boot do Radar Financeiro. O backend continua responsável por saldos, lançamentos e autorização.
 
-## Development server
+## Pré-requisitos
 
-To start a local development server, run:
+- Node.js 22 LTS e npm.
+- API `radar-financeiro-api` em execução em `http://localhost:8080`.
+- Para cadastro automático e consulta do contexto do usuário, executar a **branch `chatgpt/espaco-automatico-cadastro` da API (PR #21)** enquanto ela não estiver integrada na main.
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Desenvolvimento local
 
 ```bash
-ng generate component component-name
+npm ci
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Acesse `http://localhost:4200`. O proxy do Angular recebe chamadas em `/api/*` e encaminha ao backend em `http://localhost:8080/*`. O proxy fica em `proxy.conf.json`, referenciado pelo `angular.json`. Em produção, o servidor HTTPS deve realizar o mesmo encaminhamento para `/api`, removendo o prefixo.
+
+## Primeira entrega
+
+- Cadastro `POST /usuarios`.
+- Login JWT `POST /auth/login`.
+- Perfil `GET /usuarios/me`.
+- Contexto interno `GET /espacos-financeiros/atual` sem expor gerenciamento de espaços.
+- Rotas protegidas, interceptador HTTP, mensagens de erro e layout responsivo.
+- Dashboard inicial sem valores financeiros simulados. Contas, extrato e demais funcionalidades virão nas próximas etapas.
+
+**Sessão web provisória:** o JWT fica apenas em memória e é eliminado ao sair, expirar ou receber 401. Recarregar o navegador exige novo login. Essa decisão evita persistência insegura em `localStorage`/ `sessionStorage` enquanto não houver estratégia de autenticação web revisada. Antes da produção, revisar proteção contra XSS, CSP, renovação de sessão, políticas de cookies/HTTPS e a experiência de recarregamento.
+
+## Qualidade
 
 ```bash
-ng generate --help
+npm run build
+npm test -- --watch=false --browsers=ChromeHeadless
 ```
 
-## Building
+Validar visualmente em larguras **360 px, 768 px e desktop**. Não avançar sem aprovação; não fazer merge diretamente na `main`.
 
-To build the project run:
+## Documentação de referência
 
-```bash
-ng build
-```
+- `Radar_Financeiro_Direcionamento_Angular_2026-10-13.md`
+- `Radar_Financeiro_Diretrizes_Arquitetura_Frontend_Angular_2026-10-14.md`
+- `Radar_Financeiro_Manual_Continuidade_2026-09-25.md`
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Os documentos são mantidos nas fontes do projeto ChatGPT Radar Financeiro.
