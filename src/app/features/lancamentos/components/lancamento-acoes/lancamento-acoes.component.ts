@@ -1,4 +1,4 @@
-import { Component, DestroyRef, EventEmitter, inject, Injector, input, Output, signal } from '@angular/core';
+import { Component, computed, DestroyRef, ElementRef, EventEmitter, HostListener, inject, Injector, input, Output, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { catchError, firstValueFrom, forkJoin, of } from 'rxjs';
@@ -11,6 +11,7 @@ import {
 } from '../../models/lancamento.model';
 import { LancamentosService } from '../../services/lancamentos.service';
 import { FeedbackOperacoesService } from '../../../../core/feedback/feedback-operacoes.service';
+import { MenuLancamentosService } from '../../services/menu-lancamentos.service';
 
 type Acao = 'EXCLUIR' | 'ESTORNAR_CONFIRMACAO' | 'PARCIAL' | 'REALIZACOES' | null;
 
@@ -23,6 +24,8 @@ type Acao = 'EXCLUIR' | 'ESTORNAR_CONFIRMACAO' | 'PARCIAL' | 'REALIZACOES' | nul
 })
 export class LancamentoAcoesComponent {
   private readonly injector = inject(Injector);
+  private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly menu = inject(MenuLancamentosService);
   private get api(): LancamentosService { return this.injector.get(LancamentosService); }
   private readonly destroy = inject(DestroyRef);
   private readonly feedback = inject(FeedbackOperacoesService);
@@ -32,7 +35,7 @@ export class LancamentoAcoesComponent {
   readonly escuro = input(false);
   @Output() readonly alterado = new EventEmitter<void>();
 
-  readonly aberto = signal(false);
+  readonly aberto = computed(() => this.menu.ativo() === this.lancamentoId());
   readonly carregando = signal(false);
   readonly salvando = signal(false);
   readonly erro = signal<string | null>(null);
@@ -52,11 +55,24 @@ export class LancamentoAcoesComponent {
     return !!l && permiteSequencia(l, dataHojeLocal());
   };
 
-  constructor() { this.destroy.onDestroy(() => { this.destruido = true; }); }
+  constructor() {
+    this.destroy.onDestroy(() => {
+      this.destruido = true;
+      if (this.aberto()) this.menu.fechar(this.lancamentoId());
+    });
+  }
+
+  @HostListener('document:keydown.escape')
+  fecharComEscape(): void { if (this.aberto()) this.fechar(); }
+
+  @HostListener('document:pointerdown', ['$event'])
+  fecharFora(evento: PointerEvent): void {
+    if (this.aberto() && !this.host.nativeElement.contains(evento.target as Node)) this.fechar();
+  }
 
   async alternarMenu(): Promise<void> {
     if (this.aberto()) { this.fechar(); return; }
-    this.aberto.set(true);
+    this.menu.abrir(this.lancamentoId());
     this.erro.set(null);
     this.mensagem.set(null);
     this.aguardandoEstorno.set(null);
@@ -67,7 +83,7 @@ export class LancamentoAcoesComponent {
         item: this.api.buscar(this.lancamentoId()),
         resumo: this.api.realizacoes(this.lancamentoId()).pipe(catchError(() => of(null))),
       }));
-      if (!this.destruido) {
+      if (!this.destruido && this.aberto()) {
         this.atual.set(resultado.item);
         this.possuiRealizacoes.set(!!resultado.resumo?.realizacoes.length);
       }
@@ -80,7 +96,7 @@ export class LancamentoAcoesComponent {
 
   fechar(): void {
     if (this.salvando()) return;
-    this.aberto.set(false);
+    this.menu.fechar(this.lancamentoId());
     this.acao.set(null);
     this.resumo.set(null);
     this.erro.set(null);
@@ -104,18 +120,19 @@ export class LancamentoAcoesComponent {
   async confirmarIntegral(): Promise<void> {
     const l = this.atual();
     if (!l || !l.ativo || l.situacao !== 'PREVISTO' ||
-        this.possuiRealizacoes() || this.carregando() || this.salvando()) return;
+        this.carregando() || this.salvando()) return;
     this.salvando.set(true);
     this.erro.set(null);
     this.feedback.limpar();
     try {
       await firstValueFrom(this.api.confirmarAutomaticamente(l.id));
       if (this.destruido) return;
-      this.aberto.set(false);
+      this.menu.fechar(this.lancamentoId());
       this.acao.set(null);
       this.atual.set({ ...l, situacao: 'CONFIRMADO' });
       this.feedback.mostrar((l.tipo === 'DESPESA' ? 'Pagamento' : 'Recebimento') +
-        ' confirmado com sucesso: ' + formatarMoeda(l.valor) + '.');
+        ' confirmado com sucesso' +
+        (this.possuiRealizacoes() ? ' (saldo restante quitado)' : '') + '.');
       this.alterado.emit();
     } catch (e) {
       if (!this.destruido) this.erro.set(mensagemDeErro(e));
@@ -168,7 +185,7 @@ export class LancamentoAcoesComponent {
       }
       if (this.destruido) return;
       this.acao.set(null);
-      this.aberto.set(false);
+      this.menu.fechar(this.lancamentoId());
       this.mensagem.set(null);
       this.feedback.mostrar(acao === 'EXCLUIR' ? 'Lançamento excluído com sucesso.'
         : acao === 'ESTORNAR_CONFIRMACAO' ? 'Confirmação desfeita com sucesso.'

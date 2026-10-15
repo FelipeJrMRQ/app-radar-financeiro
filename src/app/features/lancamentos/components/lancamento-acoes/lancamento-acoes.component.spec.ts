@@ -134,8 +134,8 @@ describe('Menu de ações dos lançamentos', () => {
     expect(estornar).toHaveBeenCalledOnceWith(7, 88);
   });
 
-  it('não permite confirmar integralmente se houver realizações parciais', async () => {
-    buscar.and.returnValue(of(registro('2026-12-10')));
+  it('permite quitar antecipadamente o saldo de lançamento futuro parcialmente realizado', async () => {
+    buscar.and.returnValue(of(registro('2099-12-10')));
     realizacoes.and.returnValue(of({
       totalRealizado: '10', saldoRestante: '90',
       realizacoes: [{ id: 88, valor: '10', dataRealizacao: '2026-10-10', criadoEm: '' }],
@@ -144,8 +144,39 @@ describe('Menu de ações dos lançamentos', () => {
     fixture.componentRef.setInput('lancamentoId', 7);
     fixture.detectChanges();
     await fixture.componentInstance.alternarMenu();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.possuiRealizacoes()).toBeTrue();
+    expect(fixture.nativeElement.textContent).toContain('Quitar saldo restante');
     await fixture.componentInstance.confirmarIntegral();
-    expect(confirmarAutomaticamente).not.toHaveBeenCalled();
+    expect(confirmarAutomaticamente).toHaveBeenCalledOnceWith(7);
+    expect(fixture.componentInstance.aberto()).toBeFalse();
+  });
+
+  it('mantém apenas um menu aberto entre diferentes lançamentos e fecha fora', async () => {
+    buscar.and.callFake((id: number) => of({ ...registro('2099-12-10'), id }));
+    const primeiro = TestBed.createComponent(LancamentoAcoesComponent);
+    primeiro.componentRef.setInput('lancamentoId', 7);
+    primeiro.detectChanges();
+    const segundo = TestBed.createComponent(LancamentoAcoesComponent);
+    segundo.componentRef.setInput('lancamentoId', 8);
+    segundo.detectChanges();
+
+    await primeiro.componentInstance.alternarMenu();
+    primeiro.detectChanges();
+    expect(primeiro.componentInstance.aberto()).toBeTrue();
+    await segundo.componentInstance.alternarMenu();
+    primeiro.detectChanges();
+    segundo.detectChanges();
+    expect(primeiro.componentInstance.aberto()).toBeFalse();
+    expect(segundo.componentInstance.aberto()).toBeTrue();
+    expect(primeiro.nativeElement.querySelector('.actions-panel')).toBeNull();
+    expect(segundo.nativeElement.querySelectorAll('.actions-panel').length).toBe(1);
+
+    segundo.componentInstance.fecharFora(new PointerEvent('pointerdown', {
+      bubbles: true,
+    }));
+    segundo.detectChanges();
+    expect(segundo.componentInstance.aberto()).toBeFalse();
   });
 
 });
