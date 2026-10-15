@@ -19,6 +19,13 @@
 .action-help { font-size:12px; line-height:1.5; color:#65808e; margin:4px 6px 10px; }
 .action-warning { padding:10px; border-radius:8px; background:#fff2ed; color:#97433e;
  font-size:12px; line-height:1.5; margin:5px; }
+.action-warning strong { display:block; font-size:13px; color:#89382f; }
+.action-warning p { margin:7px 0 0; }
+.actions-panel > button.review-action {
+  justify-content:center; font-weight:750; color:#086c60;
+  border:1px solid #badfd7; background:#e9f6f2;
+}
+.actions-panel > button.review-action:hover { background:#d9eee8; }
 .action-error { padding:10px; border-radius:8px; color:#a42e3b; background:#fff0f1; font-size:12px; }
 .action-scope { border:1px solid #dbe8e9; padding:12px; border-radius:9px;
  display:flex; flex-direction:column; gap:11px; }
