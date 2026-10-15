@@ -10,8 +10,9 @@ import {
   EscopoSequencia, Lancamento, permiteSequencia, ResumoRealizacoesLancamento,
 } from '../../models/lancamento.model';
 import { LancamentosService } from '../../services/lancamentos.service';
+import { FeedbackOperacoesService } from '../../../../core/feedback/feedback-operacoes.service';
 
-type Acao = 'EXCLUIR' | 'CONFIRMAR' | 'PARCIAL' | 'REALIZACOES' | null;
+type Acao = 'EXCLUIR' | 'ESTORNAR_CONFIRMACAO' | 'PARCIAL' | 'REALIZACOES' | null;
 
 @Component({
   selector: 'app-lancamento-acoes',
@@ -24,6 +25,7 @@ export class LancamentoAcoesComponent {
   private readonly injector = inject(Injector);
   private get api(): LancamentosService { return this.injector.get(LancamentosService); }
   private readonly destroy = inject(DestroyRef);
+  private readonly feedback = inject(FeedbackOperacoesService);
   private destruido = false;
 
   readonly lancamentoId = input.required<number>();
@@ -98,6 +100,30 @@ export class LancamentoAcoesComponent {
     if (acao === 'REALIZACOES') void this.consultarRealizacoes();
   }
 
+  /** Uma ação confirma integralmente o registro selecionado, pelo valor do backend. */
+  async confirmarIntegral(): Promise<void> {
+    const l = this.atual();
+    if (!l || !l.ativo || l.situacao !== 'PREVISTO' ||
+        this.possuiRealizacoes() || this.carregando() || this.salvando()) return;
+    this.salvando.set(true);
+    this.erro.set(null);
+    this.feedback.limpar();
+    try {
+      await firstValueFrom(this.api.confirmarAutomaticamente(l.id));
+      if (this.destruido) return;
+      this.aberto.set(false);
+      this.acao.set(null);
+      this.atual.set({ ...l, situacao: 'CONFIRMADO' });
+      this.feedback.mostrar((l.tipo === 'DESPESA' ? 'Pagamento' : 'Recebimento') +
+        ' confirmado com sucesso: ' + formatarMoeda(l.valor) + '.');
+      this.alterado.emit();
+    } catch (e) {
+      if (!this.destruido) this.erro.set(mensagemDeErro(e));
+    } finally {
+      if (!this.destruido) this.salvando.set(false);
+    }
+  }
+
   async consultarRealizacoes(): Promise<void> {
     this.carregando.set(true);
     try {
@@ -124,8 +150,8 @@ export class LancamentoAcoesComponent {
       this.erro.set('A edição ou exclusão de sequência só é permitida a partir de datas atuais ou futuras.');
       return;
     }
-    const valor = acao === 'EXCLUIR' ? null : decimalPositivo(this.valor.value);
-    if (acao !== 'EXCLUIR' && (!valor || !this.data.value || this.data.value > dataHojeLocal())) {
+    const valor = acao === 'PARCIAL' ? decimalPositivo(this.valor.value) : null;
+    if (acao === 'PARCIAL' && (!valor || !this.data.value || this.data.value > dataHojeLocal())) {
       this.erro.set('Informe um valor positivo e uma data efetiva que não seja futura.');
       return;
     }
@@ -134,10 +160,9 @@ export class LancamentoAcoesComponent {
     try {
       if (acao === 'EXCLUIR') {
         await firstValueFrom(this.api.excluir(l.id, this.escopo(), l.parcelamentoLancamentoId != null));
-      } else if (acao === 'CONFIRMAR') {
-        await firstValueFrom(this.api.confirmar(l.id,
-          { valorEfetivo: valor!, dataEfetiva: this.data.value }));
-      } else {
+      } else if (acao === 'ESTORNAR_CONFIRMACAO') {
+        await firstValueFrom(this.api.desfazerConfirmacao(l.id));
+      } else if (acao === 'PARCIAL') {
         await firstValueFrom(this.api.realizarParcialmente(l.id,
           { valorEfetivo: valor!, dataEfetiva: this.data.value }));
       }
@@ -145,6 +170,9 @@ export class LancamentoAcoesComponent {
       this.acao.set(null);
       this.aberto.set(false);
       this.mensagem.set(null);
+      this.feedback.mostrar(acao === 'EXCLUIR' ? 'Lançamento excluído com sucesso.'
+        : acao === 'ESTORNAR_CONFIRMACAO' ? 'Confirmação desfeita com sucesso.'
+        : 'Realização parcial registrada com sucesso.');
       this.alterado.emit();
     } catch (e) {
       if (!this.destruido) this.erro.set(mensagemDeErro(e));
@@ -167,6 +195,7 @@ export class LancamentoAcoesComponent {
       await firstValueFrom(this.api.estornar(this.lancamentoId(), realizacaoId));
       if (this.destruido) return;
       this.mensagem.set('Realização estornada.');
+      this.feedback.mostrar('Realização financeira estornada com sucesso.');
       this.aguardandoEstorno.set(null);
       await this.consultarRealizacoes();
       this.alterado.emit();

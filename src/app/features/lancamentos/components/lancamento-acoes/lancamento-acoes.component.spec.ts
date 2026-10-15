@@ -5,26 +5,37 @@ import { of } from 'rxjs';
 import { dataHojeLocal } from '../../../../shared/valor-monetario';
 import { Lancamento } from '../../models/lancamento.model';
 import { LancamentosService } from '../../services/lancamentos.service';
+import { FeedbackOperacoesService } from '../../../../core/feedback/feedback-operacoes.service';
 import { LancamentoAcoesComponent } from './lancamento-acoes.component';
 
 describe('Menu de ações dos lançamentos', () => {
   let buscar: jasmine.Spy;
   let excluir: jasmine.Spy;
-  let confirmar: jasmine.Spy;
+  let confirmarAutomaticamente: jasmine.Spy;
+  let desfazerConfirmacao: jasmine.Spy;
+  let realizacoes: jasmine.Spy;
+  let estornar: jasmine.Spy;
   let realizarParcialmente: jasmine.Spy;
 
   beforeEach(async () => {
     buscar = jasmine.createSpy('buscar');
     excluir = jasmine.createSpy('excluir').and.returnValue(of(null));
-    confirmar = jasmine.createSpy('confirmar').and.returnValue(of({ id: 7 }));
+    confirmarAutomaticamente = jasmine.createSpy('confirmarAutomaticamente')
+      .and.returnValue(of({ id: 7, situacao: 'CONFIRMADO' }));
+    desfazerConfirmacao = jasmine.createSpy('desfazerConfirmacao')
+      .and.returnValue(of({ id: 7, situacao: 'PREVISTO' }));
+    realizacoes = jasmine.createSpy('realizacoes').and.returnValue(of({
+      totalRealizado: '0', saldoRestante: '100', realizacoes: [],
+    }));
+    estornar = jasmine.createSpy('estornar').and.returnValue(of(null));
     realizarParcialmente = jasmine.createSpy('realizarParcialmente').and.returnValue(of({}));
     await TestBed.configureTestingModule({
       imports: [LancamentoAcoesComponent],
       providers: [
         provideRouter([]),
         { provide: LancamentosService, useValue: {
-          buscar, excluir, confirmar, realizarParcialmente,
-          realizacoes: () => of({ totalRealizado: '0', saldoRestante: '100', realizacoes: [] }),
+          buscar, excluir, confirmarAutomaticamente, desfazerConfirmacao, realizarParcialmente,
+          realizacoes, estornar,
         } },
       ],
     }).compileComponents();
@@ -79,14 +90,62 @@ describe('Menu de ações dos lançamentos', () => {
     fixture.componentRef.setInput('lancamentoId', 7);
     fixture.detectChanges();
     await fixture.componentInstance.alternarMenu();
-    fixture.componentInstance.escolher('CONFIRMAR');
-    fixture.componentInstance.valor.setValue('98,5678');
-    fixture.componentInstance.data.setValue(dataHojeLocal());
-    await fixture.componentInstance.executar();
-    expect(confirmar).toHaveBeenCalledWith(7, {
-      valorEfetivo: '98.5678', dataEfetiva: dataHojeLocal(),
-    });
+    const feedback = TestBed.inject(FeedbackOperacoesService);
+    feedback.limpar();
+    await fixture.componentInstance.confirmarIntegral();
+    expect(confirmarAutomaticamente).toHaveBeenCalledOnceWith(7);
+    expect(fixture.componentInstance.aberto()).toBeFalse();
+    expect(feedback.mensagem()).toContain('Pagamento confirmado com sucesso');
     expect(excluir).not.toHaveBeenCalled();
     expect(realizarParcialmente).not.toHaveBeenCalled();
+    feedback.limpar();
   });
+
+  it('permite desfazer confirmação direta após confirmação adicional', async () => {
+    const l = { ...registro('2025-10-10'), situacao: 'CONFIRMADO' as const };
+    buscar.and.returnValue(of(l));
+    const fixture = TestBed.createComponent(LancamentoAcoesComponent);
+    fixture.componentRef.setInput('lancamentoId', 7);
+    fixture.detectChanges();
+    await fixture.componentInstance.alternarMenu();
+    fixture.componentInstance.escolher('ESTORNAR_CONFIRMACAO');
+    expect(desfazerConfirmacao).not.toHaveBeenCalled();
+    await fixture.componentInstance.executar();
+    expect(desfazerConfirmacao).toHaveBeenCalledOnceWith(7);
+  });
+
+  it('estorna uma realização parcial somente após confirmação individual', async () => {
+    buscar.and.returnValue(of(registro('2025-10-10')));
+    realizacoes.and.returnValue(of({
+      totalRealizado: '40', saldoRestante: '60',
+      realizacoes: [{ id: 88, valor: '40', dataRealizacao: '2025-10-10', criadoEm: '' }],
+    }));
+    const fixture = TestBed.createComponent(LancamentoAcoesComponent);
+    fixture.componentRef.setInput('lancamentoId', 7);
+    fixture.detectChanges();
+    await fixture.componentInstance.alternarMenu();
+    expect(fixture.componentInstance.possuiRealizacoes()).toBeTrue();
+    fixture.componentInstance.escolher('REALIZACOES');
+    await fixture.componentInstance.consultarRealizacoes();
+    await fixture.componentInstance.estornar(88);
+    expect(estornar).not.toHaveBeenCalled();
+    fixture.componentInstance.prepararEstorno(88);
+    await fixture.componentInstance.estornar(88);
+    expect(estornar).toHaveBeenCalledOnceWith(7, 88);
+  });
+
+  it('não permite confirmar integralmente se houver realizações parciais', async () => {
+    buscar.and.returnValue(of(registro('2026-12-10')));
+    realizacoes.and.returnValue(of({
+      totalRealizado: '10', saldoRestante: '90',
+      realizacoes: [{ id: 88, valor: '10', dataRealizacao: '2026-10-10', criadoEm: '' }],
+    }));
+    const fixture = TestBed.createComponent(LancamentoAcoesComponent);
+    fixture.componentRef.setInput('lancamentoId', 7);
+    fixture.detectChanges();
+    await fixture.componentInstance.alternarMenu();
+    await fixture.componentInstance.confirmarIntegral();
+    expect(confirmarAutomaticamente).not.toHaveBeenCalled();
+  });
+
 });

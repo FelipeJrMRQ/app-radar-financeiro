@@ -32,6 +32,8 @@ describe('Card de contas a receber', () => {
     expect(data?.getAttribute('title')).toBe('20/10/2026');
     expect(data?.getAttribute('aria-label')).toBe('Vencimento: 20/10/2026');
     expect(card.querySelectorAll('.due-row').length).toBe(1);
+    expect(card.querySelector('.due-end .due-value')).not.toBeNull();
+    expect(card.querySelector('.due-end app-lancamento-acoes')).not.toBeNull();
     expect(card.querySelector('.panel-total')).toBeNull();
     // Informações detalhadas pertencem à listagem de Lançamentos, não ao resumo.
     expect(card.querySelector('.due-description')?.textContent).toContain('Salário');

@@ -300,3 +300,32 @@ não a descrição, para selecionar os endpoints.
 `chatgpt/gestao-lancamentos-sequencias`. O backend tem os endpoints
 `/parcelas-restantes` e os metadados de parcelas no DTO.
 Sem ele, não testar operações em lote de parcelamentos.
+
+
+## Correção mobile e confirmação integral sem digitação
+
+Nos cards **Contas a receber** e **Contas a pagar**, os elementos de cada
+linha são agrupados em três regiões: data, descrição e `due-end`
+(valor + menu de três pontos). O menu não cria uma quarta coluna nem desce
+sozinho no mobile (320–639 px). A rolagem permanece na página.
+
+**Confirmar pagamento/recebimento** executa imediatamente a confirmação
+integral do registro selecionado. O valor é obtido pelo backend sob lock e a
+data efetiva é a data atual do `Clock` configurado na API. Não há formulário
+de valor nem confirmação em lote. Um feedback acessível, no app shell, informa
+o sucesso mesmo que o registro desapareça do dashboard de pendências.
+
+**Pagamento/recebimento parcial** continua solicitando valor e data.
+O menu **Ver realizações** exibe o histórico de pagamentos parciais e permite
+estornar cada realização com uma segunda confirmação. Após confirmação
+integral direta, o menu da lista de Lançamentos exibe **Desfazer confirmação**,
+também com confirmação explícita; isso não serve para quitar/estornar parcelas
+já realizadas parcialmente.
+
+**Atualize o backend para a branch `chatgpt/confirmacao-rapida-estorno`**
+antes de testar. Endpoints necessários:
+- `POST /espacos-financeiros/{espacoId}/lancamentos/{id}/confirmacao-automatica`
+- `POST /espacos-financeiros/{espacoId}/lancamentos/{id}/estorno-confirmacao`
+
+A API permanece responsável pela integridade e pelos valores financeiros;
+a interface não calcula baixas ou ajustes de saldo.

@@ -30,6 +30,8 @@ describe('Card de contas a pagar', () => {
     expect(card.querySelector('.due-description')?.textContent).toContain('Conta de luz');
     expect(card.querySelector('.late-label')?.textContent).toContain('Atrasado');
     expect(card.querySelector('.due-value')?.textContent).toContain('120,00');
+    expect(card.querySelector('.due-end .due-value')).not.toBeNull();
+    expect(card.querySelector('.due-end app-lancamento-acoes')).not.toBeNull();
     expect(card.textContent).not.toContain('Itaú');
     expect(card.textContent).not.toContain('Moradia');
     expect(card.querySelector('.due-description small')).toBeNull();

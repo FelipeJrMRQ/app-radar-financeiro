@@ -78,6 +78,16 @@ export class LancamentosService {
     return this.http.post<Lancamento>(this.endpoint() + '/' + id + '/confirmacao', dados);
   }
 
+  /** Confirma o valor integral existente na API sem enviar valores financeiros pelo navegador. */
+  confirmarAutomaticamente(id: number) {
+    return this.http.post<Lancamento>(this.endpoint() + '/' + id + '/confirmacao-automatica', null);
+  }
+
+  /** Reabre uma confirmação direta; realizações parciais possuem fluxo próprio de estorno. */
+  desfazerConfirmacao(id: number) {
+    return this.http.post<Lancamento>(this.endpoint() + '/' + id + '/estorno-confirmacao', null);
+  }
+
   realizarParcialmente(id: number, dados: ConfirmacaoLancamento) {
     return this.http.post<ResumoRealizacoesLancamento>(
       this.endpoint() + '/' + id + '/realizacoes', dados);
