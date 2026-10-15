@@ -19,6 +19,7 @@
                         </div>
                         <div class="due-end"><strong class="due-value expense-text">{{ moeda(item.valorRestante) }}</strong>
                         <app-lancamento-acoes [lancamentoId]="item.lancamentoId" (alterado)="alterado.emit()" />
+                        </div>
                       </div>
                     }
                   </div>
