@@ -376,3 +376,38 @@ Depende da branch backend `chatgpt/confirmacao-antecipada-painel`.
 - Dependência do backend: branch `chatgpt/gestao-contas-edicao-exclusao` (endpoints `/uso`, `/definitiva`, `/reativar`, `?incluirInativas=true`). Execute as duas branches correspondentes para testar.
 
 Cenários de aceite: correção apenas do nome; correção do saldo com confirmação; excluir conta recém-criada sem vínculo; inativar conta com histórico; localizar a conta na aba Inativas, consultar extrato e reativar; recusa da API quando surge vínculo antes da exclusão.
+
+## Instalação PWA em tela cheia
+
+O Radar Financeiro possui `public/manifest.webmanifest` com `display: "fullscreen"`,
+ícones PNG de 192 px e 512 px, identidade visual e URL de inicialização `/`.
+O Chrome/Android aplica a apresentação em tela cheia a aplicativos **instalados** quando compatível.
+No iPhone/iPad, o sistema limita a apresentação ao modo standalone com barra de status.
+
+Para testar a configuração com comportamento semelhante à produção:
+
+```bash
+npm ci
+npm run build
+npm run test:pwa
+```
+
+Publique o conteúdo de `dist/app-radar-financeiro/browser/` sob **HTTPS** na raiz da aplicação.
+O servidor precisa devolver HTTP 200 e os tipos apropriados para:
+`/manifest.webmanifest`, `/sw.js` e `/icons/icon-192.png` / `icon-512.png`.
+Rotas Angular continuam exigindo fallback para `index.html`, mas os arquivos do PWA devem
+ser servidos diretamente (não substituídos pelo HTML). Em dispositivos Android remotos,
+`http://192.168.x.x:4200` não é um contexto seguro para instalação; use HTTPS.
+
+Após publicar, remova o atalho/PWA antigo e **instale novamente** pelo Chrome para verificar
+se o novo modo `fullscreen` foi aplicado. Instalações existentes podem preservar dados da
+instalação anterior até reinstalação. A visualização no navegador normal permanece inalterada.
+No desenvolvimento, `ng serve` disponibiliza o manifesto mas propositalmente **não registra
+o Service Worker** para não interferir na atualização automática de código.
+
+O Service Worker funciona apenas na compilação de produção e armazena exclusivamente o
+shell e recursos estáticos. Ele não intercepta `/api`, não armazena respostas autenticadas
+e **não habilita operações financeiras offline**; para utilizar saldos e lançamentos a API
+precisa estar acessível. Para conferir o modo na depuração:
+`window.matchMedia('(display-mode: fullscreen)').matches`.
+
