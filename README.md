@@ -349,3 +349,20 @@ Valores existentes com três ou quatro casas decimais (suportados pelo backend
 DECIMAL(19,4)) continuam sendo exibidos e salvos sem arredondamento automático.
 Ao substituir integralmente o campo, vale a digitação de dois centavos.
 O backend mantém a responsabilidade por cálculos e precisão financeira.
+
+
+## Menus exclusivos e quitação antecipada no dashboard
+
+Uma instância global de `MenuLancamentosService` mantém somente um menu
+`⋮` aberto por vez nos cards e na lista de Lançamentos. Outro menu,
+clique fora, tecla Esc ou navegação para Editar encerram o menu anterior.
+O painel móvel ganha fundo de sobreposição para distinguir a única janela.
+
+Todo lançamento `PREVISTO` e ativo pode ser confirmado, **inclusive com
+vencimento futuro**. Na ausência de realizações, a ação é
+`Confirmar pagamento/recebimento`; se houve realização parcial, exibe
+`Quitar saldo restante`. A requisição é sem valor ou data no payload:
+o backend calcula o saldo exato e usa a data efetiva atual, preservando
+o vencimento cadastrado. O dashboard recarrega após a mutação.
+
+Depende da branch backend `chatgpt/confirmacao-antecipada-painel`.
