@@ -91,3 +91,69 @@
 
 .movement { position:relative; }
 .movement app-lancamento-acoes { margin-left:auto; }
+
+/*
+ * Lista compacta no celular: o detalhe e o menu ficam na primeira linha;
+ * valor e situação compartilham a segunda, sem forçar uma terceira linha
+ * reservada exclusivamente para o botão de ações.
+ * A apresentação desktop permanece inalterada.
+ */
+@media (max-width:619px) {
+  .movement {
+    display:grid;
+    grid-template-columns:36px minmax(0,1fr) 44px;
+    align-items:start;
+    column-gap:10px;
+    row-gap:9px;
+    padding:14px 12px;
+  }
+
+  .movement-icon {
+    grid-column:1;
+    grid-row:1 / span 2;
+    width:36px;
+    height:36px;
+    border-radius:10px;
+    font-size:18px;
+  }
+
+  .movement-detail {
+    grid-column:2;
+    grid-row:1;
+    min-width:0;
+    gap:4px;
+  }
+
+  .movement-detail strong { line-height:1.35; }
+  .movement-detail span,
+  .movement-detail small {
+    color:#61798a;
+    font-size:12px;
+    line-height:1.35;
+  }
+
+  .movement-value {
+    grid-column:2 / -1;
+    grid-row:2;
+    width:auto;
+    padding-left:0;
+    flex-direction:row;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  .movement-value strong { font-size:15px; }
+  .movement-value > span {
+    margin-left:auto;
+    font-size:11px;
+  }
+
+  .movement app-lancamento-acoes {
+    grid-column:3;
+    grid-row:1;
+    margin-left:0;
+    justify-self:end;
+    align-self:start;
+  }
+}
