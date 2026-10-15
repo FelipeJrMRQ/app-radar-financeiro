@@ -1,4 +1,5 @@
 import { Component, computed, DestroyRef, ElementRef, EventEmitter, HostListener, inject, Injector, input, Output, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { catchError, firstValueFrom, forkJoin, of } from 'rxjs';
@@ -41,7 +42,13 @@ export class LancamentoAcoesComponent {
   readonly erro = signal<string | null>(null);
   readonly mensagem = signal<string | null>(null);
   readonly aguardandoEstorno = signal<number | null>(null);
-  readonly possuiRealizacoes = signal(false);
+  // O resumo da API é a fonte de verdade para habilitar a exclusão.
+  // Se a consulta falhar, a ação permanece bloqueada por segurança.
+  readonly resumoAbertura = signal<ResumoRealizacoesLancamento | null>(null);
+  readonly exclusaoRecusada = signal(false);
+  readonly possuiRealizacoes = computed(() => (this.resumoAbertura()?.realizacoes.length ?? 0) > 0);
+  readonly podeExcluir = computed(() => this.resumoAbertura() !== null
+    && !this.possuiRealizacoes() && !this.exclusaoRecusada());
   readonly atual = signal<Lancamento | null>(null);
   readonly resumo = signal<ResumoRealizacoesLancamento | null>(null);
   readonly acao = signal<Acao>(null);
@@ -76,7 +83,11 @@ export class LancamentoAcoesComponent {
     this.erro.set(null);
     this.mensagem.set(null);
     this.aguardandoEstorno.set(null);
-    this.possuiRealizacoes.set(false);
+    this.resumoAbertura.set(null);
+    this.exclusaoRecusada.set(false);
+    this.acao.set(null);
+    this.resumo.set(null);
+    this.atual.set(null);
     this.carregando.set(true);
     try {
       const resultado = await firstValueFrom(forkJoin({
@@ -85,7 +96,7 @@ export class LancamentoAcoesComponent {
       }));
       if (!this.destruido && this.aberto()) {
         this.atual.set(resultado.item);
-        this.possuiRealizacoes.set(!!resultado.resumo?.realizacoes.length);
+        this.resumoAbertura.set(resultado.resumo);
       }
     } catch (e) {
       if (!this.destruido) this.erro.set(mensagemDeErro(e));
@@ -142,12 +153,20 @@ export class LancamentoAcoesComponent {
   }
 
   async consultarRealizacoes(): Promise<void> {
+    this.erro.set(null);
     this.carregando.set(true);
     try {
       const r = await firstValueFrom(this.api.realizacoes(this.lancamentoId()));
-      if (!this.destruido) this.resumo.set(r);
+      if (!this.destruido && this.aberto()) {
+        this.resumo.set(r);
+        this.resumoAbertura.set(r);
+        this.exclusaoRecusada.set(false);
+      }
     } catch (e) {
-      if (!this.destruido) this.erro.set(mensagemDeErro(e));
+      if (!this.destruido && this.aberto()) {
+        this.resumoAbertura.set(null);
+        this.erro.set('Não foi possível consultar as realizações. ' + mensagemDeErro(e));
+      }
     } finally {
       if (!this.destruido) this.carregando.set(false);
     }
@@ -155,6 +174,10 @@ export class LancamentoAcoesComponent {
 
   definirEscopo(valor: EscopoSequencia): void {
     if (valor === 'SEGUINTES' && !this.podeSequencia()) return;
+    if (valor !== this.escopo()) {
+      this.exclusaoRecusada.set(false);
+      this.erro.set(null);
+    }
     this.escopo.set(valor);
   }
 
@@ -170,6 +193,14 @@ export class LancamentoAcoesComponent {
     const valor = acao === 'PARCIAL' ? decimalPositivo(this.valor.value) : null;
     if (acao === 'PARCIAL' && (!valor || !this.data.value || this.data.value > dataHojeLocal())) {
       this.erro.set('Informe um valor positivo e uma data efetiva que não seja futura.');
+      return;
+    }
+    if (acao === 'EXCLUIR' && !this.podeExcluir()) {
+      this.erro.set(this.possuiRealizacoes()
+        ? 'Este lançamento possui pagamentos ou recebimentos registrados. Consulte as realizações antes de excluir.'
+        : this.resumoAbertura() === null
+          ? 'Não foi possível verificar as realizações financeiras. A exclusão está indisponível até a consulta funcionar.'
+          : 'A exclusão foi recusada pela API. Revise as realizações e verifique novamente.');
       return;
     }
     this.salvando.set(true);
@@ -192,10 +223,33 @@ export class LancamentoAcoesComponent {
         : 'Realização parcial registrada com sucesso.');
       this.alterado.emit();
     } catch (e) {
-      if (!this.destruido) this.erro.set(mensagemDeErro(e));
+      if (!this.destruido) {
+        if (acao === 'EXCLUIR' && e instanceof HttpErrorResponse && e.status === 422) {
+          this.exclusaoRecusada.set(true);
+          this.erro.set(this.mensagemExclusaoRecusada(mensagemDeErro(e)));
+        } else {
+          this.erro.set(mensagemDeErro(e));
+        }
+      }
     } finally {
       if (!this.destruido) this.salvando.set(false);
     }
+  }
+
+  private mensagemExclusaoRecusada(mensagem: string): string {
+    const detalhe = mensagem.toLocaleLowerCase('pt-BR');
+    if (detalhe.includes('parcelas inativas, retroativas ou realizadas')) {
+      return 'Não foi possível excluir as parcelas restantes: uma ou mais estão inativas, '
+        + 'possuem data passada ou têm movimentações registradas. Revise cada parcela individualmente.';
+    }
+    if (detalhe.includes('realização financeira') || detalhe.includes('realizações financeiras')) {
+      return this.escopo() === 'SEGUINTES'
+        ? 'Não foi possível excluir a sequência: outra ocorrência pode ter pagamentos ou recebimentos '
+          + 'registrados. Revise cada ocorrência e estorne somente registros feitos por engano.'
+        : 'Este lançamento tem pagamentos ou recebimentos registrados e não pode ser excluído. '
+          + 'Consulte as realizações e estorne somente registros feitos por engano.';
+    }
+    return mensagem;
   }
 
   prepararEstorno(realizacaoId: number): void {
