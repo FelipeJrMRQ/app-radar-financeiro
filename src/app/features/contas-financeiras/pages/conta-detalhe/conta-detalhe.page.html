@@ -1,5 +1,8 @@
 <section class="contas-page">
   <a routerLink="/contas" class="back-link">← Voltar para contas</a>
+  @if (avisoSucesso) {
+    <div class="feedback-card success" role="status">{{ avisoSucesso }}</div>
+  }
   @if (carregandoConta()) {
     <div class="feedback-card" role="status">Carregando os dados da conta…</div>
   } @else if (erroConta()) {
@@ -14,7 +17,10 @@
         <h1>{{ contaAtual.nome }}</h1>
         <p class="page-description">Informações e movimentações desta conta.</p>
       </div>
-      <button type="button" class="secondary-action" (click)="carregarConta()">Atualizar saldo</button>
+      <div class="account-heading-actions">
+        <a [routerLink]="['/contas', contaAtual.id, 'editar']" class="primary-action">Editar conta</a>
+        <button type="button" class="secondary-action" (click)="carregarConta()">Atualizar saldo</button>
+      </div>
     </div>
 
     @if (saldo(); as saldoAtual) {
@@ -31,6 +37,84 @@
         </div>
       </div>
     }
+    <section class="manage-account" aria-labelledby="titulo-gestao-conta">
+      <div class="manage-heading">
+        <div>
+          <p class="section-label">GERENCIAMENTO</p>
+          <h2 id="titulo-gestao-conta">Gerenciar conta</h2>
+        </div>
+        <span class="account-status" [class.inactive]="!contaAtual.ativo">
+          {{ contaAtual.ativo ? 'Ativa' : 'Inativa' }}
+        </span>
+      </div>
+
+      @if (carregandoUso()) {
+        <p class="manage-help" role="status">Verificando vínculos e histórico financeiro…</p>
+      } @else if (erroUso()) {
+        <div class="inline-manage-error" role="alert">
+          <p>Não foi possível verificar o uso da conta: {{ erroUso() }}</p>
+          <button type="button" class="secondary-action" (click)="carregarUso()">Tentar novamente</button>
+        </div>
+      } @else if (uso(); as situacao) {
+        @if (situacao.utilizada) {
+          <p class="manage-help">
+            Esta conta já possui lançamentos ou outros vínculos financeiros, inclusive históricos.
+            Ela não pode ser excluída definitivamente. Você pode inativá-la para impedir novas operações,
+            mantendo os registros, saldos e extratos disponíveis.
+          </p>
+        } @else {
+          <p class="manage-help">
+            Esta conta não possui lançamentos, transferências, pagamentos, recorrências nem parcelamentos
+            vinculados. Ela pode ser excluída definitivamente.
+          </p>
+        }
+
+        <div class="manage-actions">
+          @if (contaAtual.ativo && situacao.utilizada) {
+            <button type="button" class="secondary-action" (click)="escolherAcao('INATIVAR')"
+                    [disabled]="executandoAcao()">Inativar conta</button>
+          }
+          @if (!contaAtual.ativo) {
+            <button type="button" class="primary-action" (click)="escolherAcao('REATIVAR')"
+                    [disabled]="executandoAcao()">Reativar conta</button>
+          }
+          @if (situacao.podeExcluirDefinitivamente) {
+            <button type="button" class="danger-action" (click)="escolherAcao('EXCLUIR')"
+                    [disabled]="executandoAcao()">Excluir definitivamente</button>
+          }
+        </div>
+
+        @if (acaoPendente(); as acao) {
+          <div class="account-confirmation" role="group" aria-label="Confirmação da operação">
+            <strong>
+              {{ acao === 'EXCLUIR' ? 'Excluir conta definitivamente?'
+                : acao === 'INATIVAR' ? 'Inativar esta conta?' : 'Reativar esta conta?' }}
+            </strong>
+            <p>
+              {{ acao === 'EXCLUIR'
+                ? 'A conta será removida permanentemente. Esta ação não poderá ser desfeita.'
+                : acao === 'INATIVAR'
+                  ? 'O histórico será preservado. Novos lançamentos, transferências e pagamentos não poderão usar esta conta enquanto estiver inativa. Movimentações previstas já existentes não serão apagadas.'
+                  : 'A conta voltará a estar disponível para novos lançamentos e transferências.' }}
+            </p>
+            <div class="confirmation-actions">
+              <button type="button" class="secondary-action" [disabled]="executandoAcao()"
+                      (click)="acaoPendente.set(null)">Cancelar</button>
+              <button type="button" [class.danger-action]="acao === 'EXCLUIR'"
+                      [class.primary-action]="acao !== 'EXCLUIR'"
+                      [disabled]="executandoAcao()" (click)="executarAcao()">
+                {{ executandoAcao() ? 'Processando…'
+                  : acao === 'EXCLUIR' ? 'Confirmar exclusão'
+                    : acao === 'INATIVAR' ? 'Confirmar inativação' : 'Confirmar reativação' }}
+              </button>
+            </div>
+          </div>
+        }
+        @if (erroAcao()) {
+          <div class="inline-manage-error" role="alert">{{ erroAcao() }}</div>
+        }
+      }
+    </section>
     <section aria-labelledby="titulo-extrato" class="statement-section">
       <div class="statement-heading">
         <div>
