@@ -32,6 +32,7 @@ export class AppShell {
   }
 
   sair(): void {
+    this.feedbackOperacoes.limpar();
     this.sessao.sair();
     void this.router.navigateByUrl('/entrar');
   }
