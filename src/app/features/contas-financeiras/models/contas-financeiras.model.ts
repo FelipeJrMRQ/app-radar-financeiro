@@ -34,6 +34,15 @@ export interface CriarContaFinanceira {
   saldoInicial: string;
 }
 
+/** A API verifica inclusive vínculos financeiros inativos ou históricos. */
+export interface UsoContaFinanceira {
+  utilizada: boolean;
+  podeExcluirDefinitivamente: boolean;
+}
+
+/** A edição utiliza o mesmo contrato financeiro exato do cadastro. */
+export type AtualizarContaFinanceira = CriarContaFinanceira;
+
 export interface SaldoContaFinanceira {
   contaFinanceiraId: number;
   contaFinanceiraNome: string;
