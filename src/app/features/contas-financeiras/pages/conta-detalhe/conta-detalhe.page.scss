@@ -83,3 +83,46 @@
 @media (min-width: 580px) {
 .movement-value { align-items: flex-end; text-align: right; }
 }
+
+.account-heading-actions { display:flex; flex-wrap:wrap; gap:9px; }
+.feedback-card.success {
+  border-color:#cbe6d9; background:#e9f8ef; color:#126247;
+  margin-bottom:18px; padding:13px 16px;
+}
+.manage-account {
+  background:#fff; border:1px solid #dde8ed; border-radius:14px;
+  padding:20px; margin:0 0 28px; min-width:0;
+}
+.manage-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+.manage-heading h2 { margin:0; font-size:19px; color:#18394d; }
+.account-status {
+  flex-shrink:0; font-size:11px; border-radius:20px; padding:5px 10px;
+  font-weight:800; background:#e4f5ec; color:#137059;
+}
+.account-status.inactive { background:#f0f0f0; color:#667482; }
+.manage-help { color:#627b89; line-height:1.6; font-size:13px; margin:14px 0; }
+.manage-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+.danger-action {
+  display:inline-flex; align-items:center; justify-content:center; border:1px solid #b7434a;
+  background:#fff1f1; color:#9e3039; font:inherit; font-size:13px;
+  font-weight:750; min-height:44px; padding:10px 15px;
+  border-radius:9px; cursor:pointer;
+}
+.danger-action:hover { background:#ffe4e5; }
+.danger-action:disabled { opacity:.5; cursor:wait; }
+.account-confirmation {
+  padding:16px; border-radius:11px; border:1px solid #e8d6ae;
+  background:#fff9ed; color:#694f25; margin-top:18px; font-size:13px;
+}
+.account-confirmation strong { display:block; font-size:14px; }
+.account-confirmation p { line-height:1.6; margin:9px 0 15px; }
+.confirmation-actions { display:flex; flex-wrap:wrap; gap:9px; }
+.inline-manage-error {
+  background:#fff1f1; color:#9d3841; border:1px solid #f0c7c7;
+  padding:13px; margin-top:14px; border-radius:10px; font-size:13px; line-height:1.5;
+}
+.inline-manage-error p { margin:0 0 10px; }
+@media (max-width:420px) {
+  .account-heading-actions, .manage-actions, .confirmation-actions { width:100%; }
+  .account-heading-actions > *, .confirmation-actions > * { flex:1 1 auto; }
+}
