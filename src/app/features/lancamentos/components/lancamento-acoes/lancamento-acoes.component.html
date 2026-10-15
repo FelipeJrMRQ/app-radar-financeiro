@@ -29,7 +29,7 @@
               {{ l.tipo === 'RECEITA' ? 'Recebimento parcial' : 'Pagamento parcial' }}
             </button>
           }
-          @if (l.situacao === 'CONFIRMADO' && !possuiRealizacoes()) {
+          @if (l.situacao === 'CONFIRMADO' && resumoAbertura() !== null && !possuiRealizacoes()) {
             <button type="button" (click)="escolher('ESTORNAR_CONFIRMACAO')">Desfazer confirmação</button>
           }
           <button type="button" (click)="escolher('REALIZACOES')">Ver realizações</button>
@@ -68,7 +68,7 @@
             } @else {
               <p class="action-warning">
                 A exclusão retira este lançamento dos saldos e relatórios.
-                Pagamentos e recebimentos registrados impedem a operação.
+                Realizações financeiras ativas impedem a operação.
               </p>
               @if (podeSequencia()) {
                 <fieldset class="action-scope">
