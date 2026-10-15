@@ -126,6 +126,23 @@ describe('LancamentosService', () => {
     await excluir;
   });
 
+
+  it('confirma integralmente sem enviar valor e permite desfazer confirmação direta', async () => {
+    const promise = firstValueFrom(api.confirmarAutomaticamente(21));
+    const req = http.expectOne('/api/espacos-financeiros/7/lancamentos/21/confirmacao-automatica');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toBeNull();
+    req.flush({ id: 21, situacao: 'CONFIRMADO', valorEfetivo: '100.0000' });
+    expect((await promise).situacao).toBe('CONFIRMADO');
+
+    const estorno = firstValueFrom(api.desfazerConfirmacao(21));
+    const del = http.expectOne('/api/espacos-financeiros/7/lancamentos/21/estorno-confirmacao');
+    expect(del.request.method).toBe('POST');
+    expect(del.request.body).toBeNull();
+    del.flush({ id: 21, situacao: 'PREVISTO' });
+    expect((await estorno).situacao).toBe('PREVISTO');
+  });
+
   it('confirma apenas o lançamento selecionado e aceita valor efetivo textual', async () => {
     const dados = { valorEfetivo: '1050.5678', dataEfetiva: '2026-10-14' };
     const result = firstValueFrom(api.confirmar(12, dados));

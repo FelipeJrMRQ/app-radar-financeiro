@@ -99,6 +99,13 @@
   </div>
 
 
+  @if (feedbackLancamentos.mensagem(); as mensagem) {
+    <div class="feedback-lancamento" role="status" aria-live="polite">
+      <span>{{ mensagem }}</span>
+      <button type="button" (click)="feedbackLancamentos.limpar()" aria-label="Fechar mensagem">×</button>
+    </div>
+  }
+
   @if (!cadastroLancamentoAtivo()) {
     <a routerLink="/lancamentos/novo" class="mobile-fab"
        aria-label="Novo lançamento" title="Novo lançamento">
