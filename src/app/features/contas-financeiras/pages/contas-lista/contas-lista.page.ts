@@ -1,5 +1,5 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom, forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -23,11 +23,23 @@ interface ContaComSaldo {
 })
 export class ContasListaPage implements OnInit {
   private readonly api = inject(ContasFinanceirasService);
+  private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private destruido = false;
   readonly carregando = signal(true);
   readonly erro = signal<string | null>(null);
   readonly contas = signal<ContaComSaldo[]>([]);
+  readonly mostrarInativas = signal(this.route.snapshot.queryParamMap.get('visualizar') === 'inativas');
+  readonly visiveis = computed(() => this.contas().filter(item =>
+    item.conta.ativo !== this.mostrarInativas()));
+  readonly resultado = ({
+    criada: 'Conta cadastrada com sucesso.',
+    atualizada: 'Conta atualizada com sucesso.',
+    excluida: 'Conta sem movimentações excluída definitivamente.',
+    inativada: 'Conta inativada. O histórico financeiro permanece disponível.',
+    reativada: 'Conta reativada com sucesso.',
+  } as Record<string, string>)[this.route.snapshot.queryParamMap.get('resultado') ?? ''] ?? null;
+
 
   readonly moeda = exibirMoeda;
   readonly negativo = valorNegativo;
@@ -45,7 +57,7 @@ export class ContasListaPage implements OnInit {
     this.carregando.set(true);
     this.erro.set(null);
     try {
-      const contas = await firstValueFrom(this.api.listar());
+      const contas = await firstValueFrom(this.api.listar(true));
       if (this.destruido) return;
       if (contas.length === 0) {
         this.contas.set([]);
