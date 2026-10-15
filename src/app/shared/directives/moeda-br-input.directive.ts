@@ -4,8 +4,9 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 /**
  * Apenas máscara de entrada, sem operações monetárias em ponto flutuante.
  *
- * O FormControl recebe, por exemplo, "1.250,50", enquanto o input apresenta
- * "R$ 1.250,50". A validação de DECIMAL(19,4) permanece no formulário/backend.
+ * A digitação ocorre por centavos: 9000 -> R$ 90,00; 105035 -> R$ 1.050,35.
+ * O FormControl guarda a representação pt-BR e a API recebe decimal textual.
+ * Valores anteriores com 3–4 decimais, aceitos pela API, são preservados ao carregar.
  */
 export function formatarMoedaEmEdicao(entrada: string, permiteNegativo = false): string {
   const semSimbolo = entrada.replace(/^\s*R\$\s*/i, '').trim();
@@ -25,6 +26,21 @@ export function formatarMoedaEmEdicao(entrada: string, permiteNegativo = false):
   const inteiro = (inteiroOriginal.replace(/^0+(?=\d)/, '') || '0').slice(0, 15);
   const milhar = inteiro.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   return (negativo ? '-' : '') + milhar + (temVirgula ? ',' + fracao : '');
+}
+
+/**
+ * Converte as teclas numéricas diretamente em centavos, sem Number/parseFloat.
+ * Ex.: 1 -> 0,01; 9000 -> 90,00; 105035 -> 1.050,35.
+ * null indica estouro de 15 dígitos inteiros; o componente mantém o último valor válido.
+ */
+export function formatarCentavosDigitados(entrada: string, permiteNegativo = false): string | null {
+  const negativo = permiteNegativo && entrada.replace(/^\s*R\$\s*/i, '').trimStart().startsWith('-');
+  const digitos = entrada.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+  if (!digitos) return negativo ? '-' : '';
+  const inteira = (digitos.slice(0, -2) || '0').replace(/^0+(?=\d)/, '');
+  if (inteira.length > 15) return null;
+  const centavos = digitos.slice(-2).padStart(2, '0');
+  return (negativo ? '-' : '') + inteira.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + centavos;
 }
 
 /** Completa os centavos quando o usuário termina de editar o campo. */
@@ -56,7 +72,8 @@ export class MoedaBrInputDirective implements ControlValueAccessor {
   @Input() rfMoedaBrPermiteNegativo = false;
 
   writeValue(valor: string | null | undefined): void {
-    this.valor = formatarMoedaEmEdicao(String(valor ?? ''), this.rfMoedaBrPermiteNegativo);
+    this.valor = finalizarMoedaEmEdicao(
+      formatarMoedaEmEdicao(String(valor ?? ''), this.rfMoedaBrPermiteNegativo));
     this.exibir();
   }
 
@@ -77,24 +94,45 @@ export class MoedaBrInputDirective implements ControlValueAccessor {
     this.focado = true;
     this.elemento.placeholder = '';
     this.exibir();
-    // No campo ainda vazio, o símbolo aparece sem impor um valor ao formulário.
-    if (!this.valor) this.elemento.setSelectionRange(this.elemento.value.length, this.elemento.value.length);
+    // Digitação sempre no fim: o usuário altera algarismos, nunca o separador.
+    const final = this.elemento.value.length;
+    this.elemento.setSelectionRange(final, final);
+  }
+
+  @HostListener('keydown', ['$event'])
+  aoTeclar(evento: KeyboardEvent): void {
+    // Permite apagar até o último centavo sem prender o campo em R$ 0,00.
+    if (evento.key === 'Backspace' && (this.valor === '0,00' || this.valor === '-0,00')
+        && this.elemento.selectionStart === this.elemento.selectionEnd
+        && this.elemento.selectionEnd === this.elemento.value.length) {
+      evento.preventDefault();
+      this.valor = '';
+      this.exibir();
+      this.mudou('');
+    }
   }
 
   @HostListener('input')
   aoDigitar(): void {
     const entrada = this.elemento.value;
-    const indiceCursor = this.elemento.selectionStart ?? entrada.length;
-    const caracteresAntes = (entrada.slice(0, indiceCursor).replace(/^\s*R\$\s*/i, '').match(/[\d,-]/g) ?? []).length;
+    // Registros históricos com até quatro decimais são preservados ao carregar
+    // e quando editados nesse formato. Para substituí-los, selecione tudo e digite
+    // os novos algarismos em centavos.
+    const precisaoAnterior = /,\d{3,4}$/.test(this.valor);
+    const edicaoLegada = precisaoAnterior && /^\s*R\$\s*-?[\d.]+,\d+\s*$/.test(entrada);
+    const proximo = edicaoLegada
+      ? formatarMoedaEmEdicao(entrada, this.rfMoedaBrPermiteNegativo)
+      : formatarCentavosDigitados(entrada, this.rfMoedaBrPermiteNegativo);
 
-    this.valor = formatarMoedaEmEdicao(entrada, this.rfMoedaBrPermiteNegativo);
+    if (proximo !== null) {
+      this.valor = proximo;
+      this.mudou(this.valor);
+    }
     this.exibir();
-    this.mudou(this.valor);
-
-    // Preserva o ponto lógico de edição ao inserir separadores de milhar.
-    const exibido = this.elemento.value;
-    const cursor = this.posicaoPorCaracteres(exibido, caracteresAntes);
-    this.elemento.setSelectionRange(cursor, cursor);
+    // Teclado de centavos: a inserção e o Backspace atuam sempre no final.
+    // Evita que o usuário altere acidentalmente pontos e vírgula da máscara.
+    const final = this.elemento.value.length;
+    this.elemento.setSelectionRange(final, final);
   }
 
   @HostListener('blur')
@@ -114,13 +152,4 @@ export class MoedaBrInputDirective implements ControlValueAccessor {
     this.elemento.value = this.valor || this.focado ? 'R$ ' + this.valor : '';
   }
 
-  private posicaoPorCaracteres(texto: string, quantidade: number): number {
-    if (quantidade <= 0) return Math.min(3, texto.length);
-    let encontrados = 0;
-    for (let i = 3; i < texto.length; i++) {
-      if (/[\d,-]/.test(texto[i])) encontrados++;
-      if (encontrados === quantidade) return i + 1;
-    }
-    return texto.length;
-  }
 }

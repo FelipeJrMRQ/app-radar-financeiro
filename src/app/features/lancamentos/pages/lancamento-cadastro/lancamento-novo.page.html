@@ -98,10 +98,10 @@
         <div class="field-grid">
           <div class="field">
             <label for="valor">{{ modalidade() === 'PARCELADO' ? 'Valor total (R$)' : 'Valor (R$)' }}</label>
-            <input id="valor" type="text" inputmode="decimal" rfMoedaBr formControlName="valor"
+            <input id="valor" type="text" inputmode="numeric" rfMoedaBr formControlName="valor"
                    placeholder="R$ 0,00" aria-describedby="ajuda-valor"
                    [attr.aria-invalid]="form.controls.valor.touched && form.controls.valor.invalid" />
-            <small id="ajuda-valor" class="field-hint">Digite o valor positivo em reais (ex.: R$ 1.250,50).</small>
+            <small id="ajuda-valor" class="field-hint">Digite somente os números: 9000 = R$ 90,00; 105035 = R$ 1.050,35.</small>
             @if (form.controls.valor.touched && form.controls.valor.invalid) {
               <small class="field-error">Informe um valor maior que zero, com até 4 casas decimais.</small>
             }

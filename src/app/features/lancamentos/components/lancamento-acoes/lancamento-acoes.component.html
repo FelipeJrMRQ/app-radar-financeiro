@@ -65,7 +65,7 @@
             </p>
           } @else if (acao() === 'PARCIAL') {
             <label class="action-field">Valor realizado (R$)
-              <input type="text" inputmode="decimal" rfMoedaBr [formControl]="valor"
+              <input type="text" inputmode="numeric" rfMoedaBr [formControl]="valor"
                      placeholder="R$ 0,00" />
             </label>
             <label class="action-field">Data efetiva

@@ -329,3 +329,23 @@ antes de testar. Endpoints necessários:
 
 A API permanece responsável pela integridade e pelos valores financeiros;
 a interface não calcula baixas ou ajustes de saldo.
+
+## Máscara monetária com centavos em tempo real
+
+A diretiva compartilhada `rfMoedaBr` agora utiliza entrada numérica em centavos,
+em qualquer campo monetário que a utiliza:
+
+- Digitar `1` mostra `R$ 0,01`; `100` mostra `R$ 1,00`.
+- Digitar `9000` mostra `R$ 90,00`.
+- Digitar `105035` mostra `R$ 1.050,35`.
+
+O placeholder some ao focar, os separadores são atualizados a cada tecla,
+Backspace remove centavos da direita para a esquerda, e o campo pode ficar vazio.
+É possível colar um valor monetário já formatado; o controle guarda o texto em
+pt-BR e a normalização para decimal com ponto só ocorre ao salvar, sem Number.
+Os saldos negativos continuam disponíveis no cadastro de contas.
+
+Valores existentes com três ou quatro casas decimais (suportados pelo backend
+DECIMAL(19,4)) continuam sendo exibidos e salvos sem arredondamento automático.
+Ao substituir integralmente o campo, vale a digitação de dois centavos.
+O backend mantém a responsabilidade por cálculos e precisão financeira.
