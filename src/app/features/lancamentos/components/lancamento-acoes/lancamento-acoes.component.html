@@ -7,7 +7,9 @@
     </svg>
   </button>
   @if (aberto()) {
-    <div class="actions-panel">
+    <button type="button" class="actions-backdrop" tabindex="-1"
+            aria-label="Fechar ações" (click)="fechar()"></button>
+    <div class="actions-panel" role="dialog" [attr.aria-label]="'Ações de ' + (atual()?.descricao || 'lançamento')">
       @if (carregando()) {
         <p role="status">Carregando lançamento…</p>
       } @else if (atual(); as l) {
@@ -16,13 +18,13 @@
           <button type="button" class="quiet" (click)="fechar()">Fechar</button>
         } @else if (!acao()) {
           <strong class="actions-heading">{{ l.descricao }}</strong>
-          <a class="action-link" [routerLink]="['/lancamentos', l.id, 'editar']">Editar</a>
+          <a class="action-link" [routerLink]="['/lancamentos', l.id, 'editar']"
+             (click)="fechar()">Editar</a>
           @if (l.situacao === 'PREVISTO') {
-            @if (!possuiRealizacoes()) {
-              <button type="button" [disabled]="salvando()" (click)="confirmarIntegral()">
-                {{ l.tipo === 'RECEITA' ? 'Confirmar recebimento' : 'Confirmar pagamento' }}
-              </button>
-            }
+            <button type="button" [disabled]="salvando()" (click)="confirmarIntegral()">
+              {{ possuiRealizacoes() ? 'Quitar saldo restante'
+                : l.tipo === 'RECEITA' ? 'Confirmar recebimento' : 'Confirmar pagamento' }}
+            </button>
             <button type="button" [disabled]="salvando()" (click)="escolher('PARCIAL')">
               {{ l.tipo === 'RECEITA' ? 'Recebimento parcial' : 'Pagamento parcial' }}
             </button>
