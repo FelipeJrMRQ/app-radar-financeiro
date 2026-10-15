@@ -46,8 +46,8 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       fetch(request).then(async response => {
         if (response.ok && response.headers.get('content-type')?.includes('text/html')) {
-          const cache = await caches.open(PAGE_CACHE);
-          await cache.put('/', response.clone());
+          const copia = response.clone();
+          event.waitUntil(caches.open(PAGE_CACHE).then(cache => cache.put('/', copia)).catch(() => {}));
         }
         return response;
       }).catch(async () => (await caches.match('/')) ?? Response.error()),
@@ -55,8 +55,11 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  const type = request.destination;
-  const staticAsset = ['script', 'style', 'image', 'font', 'manifest'].includes(type);
+  // Só recursos de apresentação (nunca anexos nem imagens privadas).
+  const staticAsset = url.pathname.startsWith('/assets/')
+    || url.pathname.startsWith('/icons/')
+    || /^\/(?:favicon\.ico|manifest\.webmanifest)$/.test(url.pathname)
+    || /\.(?:js|css|woff2?)$/.test(url.pathname);
   if (!staticAsset) return;
 
   // Arquivos Angular em produção possuem nomes hash; assets públicos ficam
@@ -66,7 +69,7 @@ self.addEventListener('fetch', event => {
     if (cached) return cached;
     const response = await fetch(request);
     if (response.ok && response.type === 'basic') {
-      await cache.put(request, response.clone());
+      await cache.put(request, response.clone()).catch(() => {});
     }
     return response;
   }));
