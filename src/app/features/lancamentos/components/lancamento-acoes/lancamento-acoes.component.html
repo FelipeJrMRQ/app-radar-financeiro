@@ -29,7 +29,7 @@
               {{ l.tipo === 'RECEITA' ? 'Recebimento parcial' : 'Pagamento parcial' }}
             </button>
           }
-          @if (l.situacao === 'CONFIRMADO' && !possuiRealizacoes()) {
+          @if (l.situacao === 'CONFIRMADO' && resumoAbertura() !== null && !possuiRealizacoes()) {
             <button type="button" (click)="escolher('ESTORNAR_CONFIRMACAO')">Desfazer confirmação</button>
           }
           <button type="button" (click)="escolher('REALIZACOES')">Ver realizações</button>
@@ -45,20 +45,45 @@
           </strong>
           <p class="action-help">{{ l.descricao }} · {{ formatarData(l.dataLancamento) }}</p>
           @if (acao() === 'EXCLUIR') {
-            <p class="action-warning">
-              Esta exclusão retira o lançamento dos saldos e relatórios. Registros com realizações ativas
-              são protegidos pela API.
-            </p>
-            @if (podeSequencia()) {
-              <fieldset class="action-scope">
-                <legend>Abrangência</legend>
-                <label><input type="radio" [checked]="escopo() === 'ATUAL'"
-                      name="scope-{{ l.id }}" (change)="definirEscopo('ATUAL')"> Somente este</label>
-                <label><input type="radio" [checked]="escopo() === 'SEGUINTES'"
-                      name="scope-{{ l.id }}" (change)="definirEscopo('SEGUINTES')"> Este e os próximos</label>
-              </fieldset>
-            } @else if (l.recorrenciaLancamentoId || l.parcelamentoLancamentoId) {
-              <p class="action-help">Lançamentos antigos só podem ser excluídos individualmente.</p>
+            @if (resumoAbertura() === null) {
+              <div class="action-warning" role="alert">
+                <strong>Exclusão temporariamente indisponível</strong>
+                <p>Não foi possível verificar se existem pagamentos ou recebimentos vinculados.
+                  Por segurança, a exclusão está bloqueada até confirmar o histórico.</p>
+              </div>
+              <button type="button" class="quiet" [disabled]="carregando()"
+                      (click)="consultarRealizacoes()">Tentar consulta novamente</button>
+            } @else if (possuiRealizacoes()) {
+              @if (resumoAbertura(); as r) {
+                <div class="action-warning" role="status">
+                  <strong>Não é possível excluir este lançamento</strong>
+                  <p>Ele já possui {{ l.tipo === 'RECEITA' ? 'recebimentos' : 'pagamentos' }} registrados.</p>
+                  <p>{{ l.tipo === 'RECEITA' ? 'Recebido' : 'Pago' }}: {{ moeda(r.totalRealizado) }}
+                    · Saldo restante: {{ moeda(r.saldoRestante) }}</p>
+                  <p>O histórico financeiro deve ser preservado. Se algum registro foi feito por engano,
+                    consulte as realizações e estorne somente o registro incorreto.
+                    Não estorne valores reais apenas para excluir a obrigação.</p>
+                </div>
+              }
+            } @else {
+              <p class="action-warning">
+                A exclusão retira este lançamento dos saldos e relatórios.
+                Realizações financeiras ativas impedem a operação.
+              </p>
+              @if (podeSequencia()) {
+                <fieldset class="action-scope">
+                  <legend>Abrangência</legend>
+                  <label><input type="radio" [checked]="escopo() === 'ATUAL'"
+                        name="scope-{{ l.id }}" (change)="definirEscopo('ATUAL')"> Somente este</label>
+                  <label><input type="radio" [checked]="escopo() === 'SEGUINTES'"
+                        name="scope-{{ l.id }}" (change)="definirEscopo('SEGUINTES')"> Este e os próximos</label>
+                </fieldset>
+                @if (escopo() === 'SEGUINTES') {
+                  <p class="action-help">A API também verificará as demais ocorrências da sequência.</p>
+                }
+              } @else if (l.recorrenciaLancamentoId || l.parcelamentoLancamentoId) {
+                <p class="action-help">Lançamentos antigos só podem ser excluídos individualmente.</p>
+              }
             }
           } @else if (acao() === 'ESTORNAR_CONFIRMACAO') {
             <p class="action-warning">
@@ -100,13 +125,19 @@
               }
             }
           }
-          @if (acao() === 'EXCLUIR' || acao() === 'ESTORNAR_CONFIRMACAO' || acao() === 'PARCIAL') {
+          @if ((acao() === 'EXCLUIR' && podeExcluir()) ||
+               acao() === 'ESTORNAR_CONFIRMACAO' || acao() === 'PARCIAL') {
             <button type="button" class="commit-action" [disabled]="salvando()" (click)="executar()">
               {{ salvando() ? 'Processando…' : acao() === 'EXCLUIR' ? 'Confirmar exclusão' : acao() === 'ESTORNAR_CONFIRMACAO' ? 'Desfazer confirmação' : 'Registrar realização' }}
             </button>
           }
           <button class="quiet" type="button" [disabled]="salvando()" (click)="escolher('REALIZACOES')"
-                  [style.display]="acao() === 'REALIZACOES' ? 'none' : null">Ver realizações</button>
+                  [class.review-action]="acao() === 'EXCLUIR' && !podeExcluir()"
+                  [style.display]="acao() === 'REALIZACOES' ? 'none' : null">
+            {{ acao() === 'EXCLUIR' && !podeExcluir()
+              ? (l.tipo === 'RECEITA' ? 'Ver recebimentos e estornos' : 'Ver pagamentos e estornos')
+              : 'Ver realizações' }}
+          </button>
           <button class="quiet" type="button" [disabled]="salvando()" (click)="escolher('REALIZACOES')"
                   [style.display]="acao() !== 'REALIZACOES' ? 'none' : null">Atualizar realizações</button>
           <button class="quiet" type="button" [disabled]="salvando()"
