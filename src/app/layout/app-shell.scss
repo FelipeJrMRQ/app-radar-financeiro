@@ -177,21 +177,3 @@
 @media(min-width:860px) {
   .feedback-lancamento { left:auto; right:26px; bottom:26px; width:min(420px,calc(100vw - 52px)); }
 }
-
-/* Fullscreen PWA: áreas seguras para notch, barra de gestos e tela horizontal. */
-@media (max-width: 859px) {
-  .mobile-header {
-    height: calc(72px + env(safe-area-inset-top, 0px));
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-right: calc(20px + env(safe-area-inset-right, 0px));
-    padding-left: calc(20px + env(safe-area-inset-left, 0px));
-  }
-  .page-content {
-    padding-right: calc(18px + env(safe-area-inset-right, 0px));
-    padding-left: calc(18px + env(safe-area-inset-left, 0px));
-  }
-  .mobile-bottom-nav {
-    padding-right: env(safe-area-inset-right, 0px);
-    padding-left: env(safe-area-inset-left, 0px);
-  }
-}
