@@ -5,7 +5,7 @@ import { of } from 'rxjs';
 import { dataHojeLocal } from '../../../../shared/valor-monetario';
 import { Lancamento } from '../../models/lancamento.model';
 import { LancamentosService } from '../../services/lancamentos.service';
-import { FeedbackLancamentosService } from '../../services/feedback-lancamentos.service';
+import { FeedbackOperacoesService } from '../../../../core/feedback/feedback-operacoes.service';
 import { LancamentoAcoesComponent } from './lancamento-acoes.component';
 
 describe('Menu de ações dos lançamentos', () => {
@@ -90,7 +90,7 @@ describe('Menu de ações dos lançamentos', () => {
     fixture.componentRef.setInput('lancamentoId', 7);
     fixture.detectChanges();
     await fixture.componentInstance.alternarMenu();
-    const feedback = TestBed.inject(FeedbackLancamentosService);
+    const feedback = TestBed.inject(FeedbackOperacoesService);
     feedback.limpar();
     await fixture.componentInstance.confirmarIntegral();
     expect(confirmarAutomaticamente).toHaveBeenCalledOnceWith(7);

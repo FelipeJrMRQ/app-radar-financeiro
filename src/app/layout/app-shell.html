@@ -99,10 +99,10 @@
   </div>
 
 
-  @if (feedbackLancamentos.mensagem(); as mensagem) {
+  @if (feedbackOperacoes.mensagem(); as mensagem) {
     <div class="feedback-lancamento" role="status" aria-live="polite">
       <span>{{ mensagem }}</span>
-      <button type="button" (click)="feedbackLancamentos.limpar()" aria-label="Fechar mensagem">×</button>
+      <button type="button" (click)="feedbackOperacoes.limpar()" aria-label="Fechar mensagem">×</button>
     </div>
   }
 

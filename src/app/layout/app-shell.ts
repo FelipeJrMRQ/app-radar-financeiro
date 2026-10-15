@@ -4,7 +4,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { filter } from 'rxjs';
 
 import { AuthService } from '../core/auth/auth.service';
-import { FeedbackLancamentosService } from '../features/lancamentos/services/feedback-lancamentos.service';
+import { FeedbackOperacoesService } from '../core/feedback/feedback-operacoes.service';
 import { grupoNavegacao } from './navegacao-grupos';
 
 @Component({
@@ -16,7 +16,7 @@ import { grupoNavegacao } from './navegacao-grupos';
 })
 export class AppShell {
   readonly sessao = inject(AuthService);
-  readonly feedbackLancamentos = inject(FeedbackLancamentosService);
+  readonly feedbackOperacoes = inject(FeedbackOperacoesService);
   private readonly router = inject(Router);
   private readonly rotaAtual = signal(this.router.url);
   readonly cadastrosAtivo = computed(() => grupoNavegacao(this.rotaAtual()) === 'cadastros');

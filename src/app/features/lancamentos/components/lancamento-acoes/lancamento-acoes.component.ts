@@ -10,7 +10,7 @@ import {
   EscopoSequencia, Lancamento, permiteSequencia, ResumoRealizacoesLancamento,
 } from '../../models/lancamento.model';
 import { LancamentosService } from '../../services/lancamentos.service';
-import { FeedbackLancamentosService } from '../../services/feedback-lancamentos.service';
+import { FeedbackOperacoesService } from '../../../../core/feedback/feedback-operacoes.service';
 
 type Acao = 'EXCLUIR' | 'ESTORNAR_CONFIRMACAO' | 'PARCIAL' | 'REALIZACOES' | null;
 
@@ -25,7 +25,7 @@ export class LancamentoAcoesComponent {
   private readonly injector = inject(Injector);
   private get api(): LancamentosService { return this.injector.get(LancamentosService); }
   private readonly destroy = inject(DestroyRef);
-  private readonly feedback = inject(FeedbackLancamentosService);
+  private readonly feedback = inject(FeedbackOperacoesService);
   private destruido = false;
 
   readonly lancamentoId = input.required<number>();
