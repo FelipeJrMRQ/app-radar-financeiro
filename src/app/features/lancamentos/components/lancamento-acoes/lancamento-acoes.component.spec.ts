@@ -312,4 +312,46 @@ describe('Menu de ações dos lançamentos', () => {
     expect(fixture.componentInstance.erro()).toContain('Revise cada parcela individualmente');
   });
 
+  it('permite excluir após estorno de todos os pagamentos indevidos confirmado pela API', async () => {
+    buscar.and.returnValue(of(registro('2026-10-15')));
+    let estornado = false;
+    realizacoes.and.callFake(() => of(estornado
+      ? { totalRealizado: '0', saldoRestante: '100', realizacoes: [] }
+      : {
+          totalRealizado: '40', saldoRestante: '60',
+          realizacoes: [{ id: 88, valor: '40', dataRealizacao: '2026-10-15', criadoEm: '' }],
+        }));
+    const fixture = TestBed.createComponent(LancamentoAcoesComponent);
+    fixture.componentRef.setInput('lancamentoId', 7);
+    fixture.detectChanges();
+    await fixture.componentInstance.alternarMenu();
+    expect(fixture.componentInstance.podeExcluir()).toBeFalse();
+
+    fixture.componentInstance.escolher('REALIZACOES');
+    await fixture.whenStable();
+    fixture.componentInstance.prepararEstorno(88);
+    estornado = true;
+    await fixture.componentInstance.estornar(88);
+    expect(estornar).toHaveBeenCalledOnceWith(7, 88);
+    expect(fixture.componentInstance.possuiRealizacoes()).toBeFalse();
+
+    fixture.componentInstance.escolher('EXCLUIR');
+    expect(fixture.componentInstance.podeExcluir()).toBeTrue();
+    await fixture.componentInstance.executar();
+    expect(excluir).toHaveBeenCalledOnceWith(7, 'ATUAL', false);
+  });
+
+  it('não oferece desfazer confirmação se o histórico financeiro não pode ser consultado', async () => {
+    buscar.and.returnValue(of({ ...registro('2026-10-15'), situacao: 'CONFIRMADO' }));
+    realizacoes.and.returnValue(throwError(() => new HttpErrorResponse({ status: 503 })));
+    const fixture = TestBed.createComponent(LancamentoAcoesComponent);
+    fixture.componentRef.setInput('lancamentoId', 7);
+    fixture.detectChanges();
+    await fixture.componentInstance.alternarMenu();
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).not.toContain('Desfazer confirmação');
+    expect(fixture.componentInstance.podeExcluir()).toBeFalse();
+  });
+
 });
