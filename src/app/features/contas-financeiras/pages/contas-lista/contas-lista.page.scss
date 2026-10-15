@@ -38,3 +38,19 @@
 
 /* Ícone da marca: visual decorativo; rótulo textual da conta permanece no cartão. */
 .account-icon img { display: block; width: 39px; height: 39px; object-fit: contain; }
+
+.account-filters { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 20px; }
+.account-filters button {
+  min-height:44px; padding:10px 19px; border-radius:99px; cursor:pointer;
+  border:1px solid #d6e5e8; background:#fff; color:#547381; font:inherit; font-size:13px; font-weight:750;
+}
+.account-filters button.selected { background:#125f60; color:#fff; border-color:#125f60; }
+.account-card.inactive { background:#f9fbfb; border-color:#d8e3e8; }
+.inactive-label {
+  align-self:flex-start; border-radius:99px; padding:4px 9px; background:#eaeef1;
+  color:#526a77; font-size:11px; font-weight:750; margin-top:-13px; margin-bottom:16px;
+}
+.accounts-success {
+  padding:13px 16px; border-radius:10px; border:1px solid #cbe6d9;
+  background:#e9f8ef; color:#126247; font-size:13px; margin-bottom:18px;
+}

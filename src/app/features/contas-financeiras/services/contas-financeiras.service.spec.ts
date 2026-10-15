@@ -74,4 +74,57 @@ describe('ContasFinanceirasService', () => {
     });
     expect((await request).movimentos).toEqual([]);
   });
+  it('consulta contas inativas apenas quando solicitado', async () => {
+    const request = firstValueFrom(api.listar(true));
+    const chamada = http.expectOne((req) =>
+      req.url === '/api/espacos-financeiros/42/contas-financeiras'
+      && req.params.get('incluirInativas') === 'true');
+    expect(chamada.request.method).toBe('GET');
+    chamada.flush([]);
+    expect(await request).toEqual([]);
+  });
+
+  it('edita conta com saldo inicial decimal enviado como texto', async () => {
+    const request = firstValueFrom(api.atualizar(9, {
+      nome: 'Conta corrigida', tipo: 'POUPANCA', saldoInicial: '-321.5678',
+    }));
+    const chamada = http.expectOne('/api/espacos-financeiros/42/contas-financeiras/9');
+    expect(chamada.request.method).toBe('PUT');
+    expect(chamada.request.body).toEqual({
+      nome: 'Conta corrigida', tipo: 'POUPANCA', saldoInicial: '-321.5678',
+    });
+    chamada.flush({ id: 9, nome: 'Conta corrigida', tipo: 'POUPANCA', saldoInicial: -321.5678,
+      ativo: true, criadoEm: '', atualizadoEm: '' });
+    expect((await request).nome).toBe('Conta corrigida');
+  });
+
+  it('consulta uso no backend sem deduzir por saldo zerado', async () => {
+    const request = firstValueFrom(api.consultarUso(9));
+    const chamada = http.expectOne('/api/espacos-financeiros/42/contas-financeiras/9/uso');
+    expect(chamada.request.method).toBe('GET');
+    chamada.flush({ utilizada: true, podeExcluirDefinitivamente: false });
+    expect((await request).utilizada).toBeTrue();
+  });
+
+  it('distingue exclusão definitiva de inativação e reativação', async () => {
+    const exclusao = firstValueFrom(api.excluirDefinitivamente(9));
+    const del = http.expectOne('/api/espacos-financeiros/42/contas-financeiras/9/definitiva');
+    expect(del.request.method).toBe('DELETE');
+    del.flush(null);
+    await exclusao;
+
+    const inativacao = firstValueFrom(api.inativar(9));
+    const inativa = http.expectOne('/api/espacos-financeiros/42/contas-financeiras/9');
+    expect(inativa.request.method).toBe('DELETE');
+    inativa.flush(null);
+    await inativacao;
+
+    const reativacao = firstValueFrom(api.reativar(9));
+    const reativa = http.expectOne('/api/espacos-financeiros/42/contas-financeiras/9/reativar');
+    expect(reativa.request.method).toBe('POST');
+    reativa.flush({ id: 9, nome: 'Conta', tipo: 'CARTEIRA', saldoInicial: 0,
+      ativo: true, criadoEm: '', atualizadoEm: '' });
+    expect((await reativacao).ativo).toBeTrue();
+  });
+
 });

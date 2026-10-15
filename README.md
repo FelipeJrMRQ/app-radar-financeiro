@@ -366,3 +366,13 @@ o backend calcula o saldo exato e usa a data efetiva atual, preservando
 o vencimento cadastrado. O dashboard recarrega após a mutação.
 
 Depende da branch backend `chatgpt/confirmacao-antecipada-painel`.
+
+## Gestão de contas financeiras — edição e ciclo de vida
+
+- Em **Cadastros → Contas financeiras**, a aba Ativas exibe as contas em operação e a aba Inativas permite consultar e reativar o histórico.
+- Na página de detalhes da conta, **Editar conta** reutiliza o formulário de cadastro para corrigir nome, tipo e saldo inicial. Alterar o saldo inicial requer confirmação explícita porque a base de saldos e extratos históricos mudará. Nenhum saldo financeiro é recalculado no Angular.
+- A API informa se há vínculos financeiros. Uma conta sem vínculos pode ser **excluída definitivamente**; uma conta que já foi usada pode apenas ser **inativada**, com preservação de histórico. É possível reativá-la depois.
+- Antes de qualquer exclusão a API revalida os vínculos na transação, inclusive registros inativos/estornados; a tela não considera saldo zero como permissão de exclusão.
+- Dependência do backend: branch `chatgpt/gestao-contas-edicao-exclusao` (endpoints `/uso`, `/definitiva`, `/reativar`, `?incluirInativas=true`). Execute as duas branches correspondentes para testar.
+
+Cenários de aceite: correção apenas do nome; correção do saldo com confirmação; excluir conta recém-criada sem vínculo; inativar conta com histórico; localizar a conta na aba Inativas, consultar extrato e reativar; recusa da API quando surge vínculo antes da exclusão.

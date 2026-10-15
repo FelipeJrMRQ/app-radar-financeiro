@@ -7,6 +7,8 @@ import { API_BASE_URL } from '../../../core/config/api.config';
 import {
   ContaFinanceira,
   CriarContaFinanceira,
+  AtualizarContaFinanceira,
+  UsoContaFinanceira,
   ExtratoContaFinanceira,
   SaldoContaFinanceira,
 } from '../models/contas-financeiras.model';
@@ -22,8 +24,11 @@ export class ContasFinanceirasService {
     return API_BASE_URL + '/espacos-financeiros/' + espacoId + '/contas-financeiras';
   }
 
-  listar(): Observable<ContaFinanceira[]> {
-    return this.http.get<ContaFinanceira[]>(this.caminho());
+  listar(incluirInativas = false): Observable<ContaFinanceira[]> {
+    const options = incluirInativas
+      ? { params: new HttpParams().set('incluirInativas', 'true') }
+      : {};
+    return this.http.get<ContaFinanceira[]>(this.caminho(), options);
   }
 
   buscar(id: number): Observable<ContaFinanceira> {
@@ -32,6 +37,27 @@ export class ContasFinanceirasService {
 
   criar(dados: CriarContaFinanceira): Observable<ContaFinanceira> {
     return this.http.post<ContaFinanceira>(this.caminho(), dados);
+  }
+
+  atualizar(id: number, dados: AtualizarContaFinanceira): Observable<ContaFinanceira> {
+    return this.http.put<ContaFinanceira>(this.caminho() + '/' + id, dados);
+  }
+
+  consultarUso(id: number): Observable<UsoContaFinanceira> {
+    return this.http.get<UsoContaFinanceira>(this.caminho() + '/' + id + '/uso');
+  }
+
+  /** DELETE legado inativa sem remover lançamentos vinculados. */
+  inativar(id: number): Observable<void> {
+    return this.http.delete<void>(this.caminho() + '/' + id);
+  }
+
+  excluirDefinitivamente(id: number): Observable<void> {
+    return this.http.delete<void>(this.caminho() + '/' + id + '/definitiva');
+  }
+
+  reativar(id: number): Observable<ContaFinanceira> {
+    return this.http.post<ContaFinanceira>(this.caminho() + '/' + id + '/reativar', null);
   }
 
   consultarSaldo(id: number): Observable<SaldoContaFinanceira> {

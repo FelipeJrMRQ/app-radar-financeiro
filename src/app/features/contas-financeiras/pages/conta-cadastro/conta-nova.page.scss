@@ -27,3 +27,19 @@
 @media (min-width: 580px) {
 .form-actions { flex-direction: row; justify-content: flex-end; }
 }
+
+.state-hint {
+  border:1px solid #cce2ea; background:#eff8fa; color:#315c6d;
+  border-radius:10px; padding:13px 14px; font-size:13px; line-height:1.55; margin:0 0 20px;
+}
+.saldo-warning {
+  border:1px solid #ebd6a5; background:#fff9eb; border-radius:11px;
+  padding:16px; margin:4px 0 18px; color:#72551b;
+}
+.saldo-warning strong { font-size:14px; }
+.saldo-warning p { font-size:12px; line-height:1.6; margin:7px 0 14px; }
+.confirm-checkbox {
+  display:flex; align-items:flex-start; gap:11px;
+  font-size:13px; line-height:1.5; cursor:pointer;
+}
+.confirm-checkbox input { flex:0 0 19px; width:19px; height:19px; min-height:0; margin:2px 0 0; accent-color:#087d73; }
