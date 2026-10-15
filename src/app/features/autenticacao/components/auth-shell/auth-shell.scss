@@ -76,3 +76,13 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .01ms !important; }
 }
+
+/* Protege a tela de login do recorte e das barras gestuais em PWAs instalados. */
+@media (max-width: 849px) {
+  .auth-main {
+    padding-top: calc(18px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    padding-left: calc(20px + env(safe-area-inset-left, 0px));
+    padding-right: calc(20px + env(safe-area-inset-right, 0px));
+  }
+}
