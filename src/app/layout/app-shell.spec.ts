@@ -66,7 +66,7 @@ describe('Ação flutuante no layout mobile', () => {
     expect(raiz.querySelectorAll('.sidebar-group-trigger fa-icon.group-chevron').length)
       .toBe(2);
     expect(raiz.querySelector('.side-logout fa-icon svg')?.getAttribute('data-icon'))
-      .toBe('right-from-bracket');
+      .toBe('arrow-right-from-bracket');
     expect(raiz.querySelectorAll('.mobile-bottom-nav a').length).toBe(4);
   });
 
