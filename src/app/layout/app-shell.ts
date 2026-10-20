@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, HostListener, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, ElementRef, HostListener, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
@@ -37,18 +37,31 @@ export class AppShell {
   readonly iconeDespesa = faArrowUp;
   readonly iconeTransferencia = faArrowRightArrowLeft;
   readonly menuLancamentoAberto = signal(false);
+  private readonly atrasoFechamentoMs = 1000;
+  private temporizadorFechamento: ReturnType<typeof setTimeout> | null = null;
+  private readonly destruir = inject(DestroyRef);
   private readonly areaAcoes = viewChild<ElementRef<HTMLElement>>('areaAcoes');
   private readonly botaoAcoes = viewChild<ElementRef<HTMLButtonElement>>('botaoAcoes');
 
+  private cancelarFechamentoPendente(): void {
+    if (this.temporizadorFechamento !== null) {
+      clearTimeout(this.temporizadorFechamento);
+      this.temporizadorFechamento = null;
+    }
+  }
+
   abrirMenuLancamento(): void {
+    this.cancelarFechamentoPendente();
     this.menuLancamentoAberto.set(true);
   }
 
   alternarMenuLancamento(): void {
+    this.cancelarFechamentoPendente();
     this.menuLancamentoAberto.update(valor => !valor);
   }
 
   fecharMenuLancamento(): void {
+    this.cancelarFechamentoPendente();
     this.menuLancamentoAberto.set(false);
   }
 
@@ -57,7 +70,13 @@ export class AppShell {
   }
 
   aoSairPonteiro(evento: PointerEvent): void {
-    if (evento.pointerType === 'mouse') this.fecharMenuLancamento();
+    if (evento.pointerType !== 'mouse' || !this.menuLancamentoAberto()) return;
+    this.cancelarFechamentoPendente();
+    // Tempo para percorrer o espaço entre o botão e as opções sem perder o menu.
+    this.temporizadorFechamento = setTimeout(() => {
+      this.temporizadorFechamento = null;
+      this.menuLancamentoAberto.set(false);
+    }, this.atrasoFechamentoMs);
   }
 
   aoPerderFoco(evento: FocusEvent): void {
@@ -91,6 +110,7 @@ export class AppShell {
     this.rotaAtual().split(/[?#]/, 1)[0] === '/lancamentos/novo');
 
   constructor() {
+    this.destruir.onDestroy(() => this.cancelarFechamentoPendente());
     this.router.events.pipe(
       filter((evento): evento is NavigationEnd => evento instanceof NavigationEnd),
       takeUntilDestroyed(),

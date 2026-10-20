@@ -112,7 +112,8 @@
 
   @if (!cadastroLancamentoAtivo()) {
     <div #areaAcoes class="lancamento-speed-dial" [class.aberto]="menuLancamentoAberto()"
-         (pointerleave)="aoSairPonteiro($event)" (focusout)="aoPerderFoco($event)">
+         (pointerenter)="aoEntrarPonteiro($event)" (pointerleave)="aoSairPonteiro($event)"
+         (focusout)="aoPerderFoco($event)">
       <button #botaoAcoes class="lancamento-fab" type="button"
         aria-label="Ações rápidas financeiras"
         aria-controls="acoes-rapidas-lancamento"
@@ -123,7 +124,8 @@
       </button>
       @if (menuLancamentoAberto()) {
         <div class="lancamento-speed-opcoes" id="acoes-rapidas-lancamento"
-             aria-label="Ações rápidas financeiras">
+             aria-label="Ações rápidas financeiras"
+             (pointerenter)="aoEntrarPonteiro($event)">
           <a class="lancamento-speed-opcao" routerLink="/lancamentos/novo"
              [queryParams]="{ tipo: 'RECEITA' }"
              aria-label="Nova receita" (click)="fecharMenuLancamento()">

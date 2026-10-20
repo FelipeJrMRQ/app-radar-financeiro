@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
 import { AuthService } from '../core/auth/auth.service';
@@ -70,7 +70,7 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
     expect(raiz.querySelectorAll('.mobile-bottom-nav a').length).toBe(4);
   });
 
-  it('abre o menu no hover e fecha ao retirar o mouse', () => {
+  it('aguarda um segundo antes de fechar ao retirar o mouse', fakeAsync(() => {
     const fixture = TestBed.createComponent(AppShell);
     fixture.detectChanges();
     const raiz = fixture.nativeElement as HTMLElement;
@@ -89,8 +89,57 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
       new PointerEvent('pointerleave', { pointerType:'mouse' }),
     );
     fixture.detectChanges();
+    expect(botao?.getAttribute('aria-expanded')).toBe('true');
+    tick(999);
+    fixture.detectChanges();
+    expect(botao?.getAttribute('aria-expanded')).toBe('true');
+    tick(1);
+    fixture.detectChanges();
     expect(botao?.getAttribute('aria-expanded')).toBe('false');
-  });
+    fixture.destroy();
+  }));
+
+  it('cancela fechamento quando o ponteiro retorna às opções', fakeAsync(() => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+    const raiz = fixture.nativeElement as HTMLElement;
+    const botao = raiz.querySelector<HTMLButtonElement>('.lancamento-fab');
+    const area = raiz.querySelector<HTMLElement>('.lancamento-speed-dial');
+    botao?.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
+    fixture.detectChanges();
+    area?.dispatchEvent(new PointerEvent('pointerleave', { pointerType: 'mouse' }));
+    tick(700);
+    const opcoes = raiz.querySelector<HTMLElement>('.lancamento-speed-opcoes');
+    opcoes?.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
+    tick(500);
+    fixture.detectChanges();
+    expect(botao?.getAttribute('aria-expanded')).toBe('true');
+
+    area?.dispatchEvent(new PointerEvent('pointerleave', { pointerType: 'mouse' }));
+    tick(1000);
+    fixture.detectChanges();
+    expect(botao?.getAttribute('aria-expanded')).toBe('false');
+    fixture.destroy();
+  }));
+
+  it('fecha imediatamente por clique fora mesmo com fechamento pendente', fakeAsync(() => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+    const raiz = fixture.nativeElement as HTMLElement;
+    const botao = raiz.querySelector<HTMLButtonElement>('.lancamento-fab');
+    botao?.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
+    fixture.detectChanges();
+    raiz.querySelector('.lancamento-speed-dial')?.dispatchEvent(
+      new PointerEvent('pointerleave', { pointerType: 'mouse' }),
+    );
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    fixture.detectChanges();
+    expect(botao?.getAttribute('aria-expanded')).toBe('false');
+    tick(1100);
+    fixture.detectChanges();
+    expect(botao?.getAttribute('aria-expanded')).toBe('false');
+    fixture.destroy();
+  }));
 
   it('abre com clique no celular, fecha fora e com Escape', () => {
     const fixture = TestBed.createComponent(AppShell);
