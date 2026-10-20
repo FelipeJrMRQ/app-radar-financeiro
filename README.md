@@ -416,9 +416,11 @@ precisa estar acessível. Para conferir o modo na depuração:
 O cartão **Fluxo de caixa consolidado** substitui as duas linhas SVG por uma única curva diária. `chart.js` é carregado de maneira lazy quando há dados; nenhuma soma monetária é realizada no navegador.
 
 - Seleção de contas por checkbox (por padrão, todas as contas ativas); atualizar a seleção consulta a API novamente. Desmarcar todas **não** consulta API e exibe o estado vazio.
-- Exibe o saldo confirmado hoje, o valor projetado ao final do período e a lista de contas com seus respectivos saldos atuais. Valores negativos reduzem a curva, cujo trecho abaixo de zero fica vermelho.
+- A linha utiliza o saldo realizado até hoje e a projeção futura das contas selecionadas; não repete totais nem valores por conta, que já têm widgets próprios. Valores negativos reduzem a curva, cujo trecho abaixo de zero fica vermelho.
 - Tooltip exibe dia e valor fornecido pelo backend, com etiqueta **Realizado** ou **Projetado**. Pontos intermediários introduzidos unicamente para mudar a cor no cruzamento do eixo zero não representam transações e não mostram tooltip.
 - Uma linha tracejada indica a previsão depois do dia atual; hoje é marcado no gráfico quando está dentro do período selecionado.
+- A faixa superior mostra **Saldo confirmado** e **Saldo ao fim do período** (no lugar de **Em atraso**), ambos globais para todas as contas ativas. O saldo final usa diretamente `painel.saldoProjetado` da API para `dataFim`, independentemente do filtro de contas aplicado apenas ao gráfico. Valores negativos são destacados visualmente em vermelho.
+- Os subtítulos decorativos dos widgets foram retirados, mantendo somente os títulos principais. A lista de contas no fluxo serve exclusivamente como filtro de seleção.
 - O cartão permanece em **uma das duas colunas do dashboard no desktop** (como os demais widgets) e ocupa a largura disponível no celular/PWA. O tema é **claro**, alinhado à identidade visual atual; o tema escuro será avaliado futuramente.
 - O **mosaico adaptativo** distribui os próximos cards nas posições livres das duas colunas, evitando linhas vazias quando um gráfico é mais alto que os compromissos. Os spans se atualizam automaticamente ao carregar mais lançamentos ou redimensionar a tela.
 - No mobile, todos os widgets são empilhados em **uma única coluna**, preservando a ordem configurada em Preferências do Painel. O tema continua claro; popovers de lançamentos permanecem fora de contêineres com recorte.
