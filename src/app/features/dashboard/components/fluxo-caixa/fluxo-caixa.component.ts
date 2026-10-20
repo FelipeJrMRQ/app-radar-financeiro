@@ -6,6 +6,7 @@ import type { Chart, ScriptableContext } from 'chart.js';
 
 import { formatarDiaMes, formatarDataLocal, formatarMoeda } from '../../../../shared/valor-monetario';
 import { FluxoCaixaConsolidado, SaldoContaPainel } from '../../models/painel-financeiro.model';
+import { criarSerieConsolidadaParaGrafico } from '../../utils/painel-visuais';
 
 @Component({
   selector: 'app-fluxo-caixa-card',
@@ -107,9 +108,7 @@ export class FluxoCaixaCardComponent {
         ctx.restore();
       },
     };
-    const valores = dados.pontos.map((ponto, indice) => ({
-      x: indice, y: Number(ponto.saldo),
-    }));
+    const valores = criarSerieConsolidadaParaGrafico(dados.pontos);
 
     this.grafico = new ChartJs(canvas, {
       type: 'line',
@@ -123,7 +122,8 @@ export class FluxoCaixaCardComponent {
           borderWidth: 2.7,
           tension: 0,
           fill: false,
-          pointRadius: (ctx: ScriptableContext<'line'>) => ctx.dataIndex === hoje ? 4 : 0,
+          pointRadius: (ctx: ScriptableContext<'line'>) =>
+            valores[ctx.dataIndex]?.x === hoje ? 4 : 0,
           pointHoverRadius: 6,
           pointHitRadius: 14,
           pointBackgroundColor: '#8be6cc',
@@ -146,6 +146,8 @@ export class FluxoCaixaCardComponent {
         plugins: {
           legend: { display: false },
           tooltip: {
+            // Cruzamentos interpolados não são datas financeiras nem valores realizados.
+            filter: (item) => Number.isInteger(item.parsed.x),
             displayColors: false,
             backgroundColor: '#faffff',
             titleColor: '#173447',
