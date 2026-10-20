@@ -191,6 +191,7 @@ export class FluxoCaixaCardComponent {
             },
           },
           y: {
+            beginAtZero: true,
             grace: '12%',
             border: { display: false },
             ticks: {
