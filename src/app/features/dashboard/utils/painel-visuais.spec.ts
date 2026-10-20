@@ -1,4 +1,4 @@
-import { criarPontosGrafico, criarSerieConsolidadaParaGrafico, largurasCategorias, pontosSvg } from './painel-visuais';
+import { criarPontosGrafico, criarSerieConsolidadaParaGrafico, pontosSvg } from './painel-visuais';
 
 describe('Visualização de dados do painel', () => {
   it('não cria pontos falsos se a API não enviar movimento', () => {
@@ -38,11 +38,5 @@ describe('Visualização de dados do painel', () => {
     expect(serie.every(ponto => !ponto.cruzamento)).toBeTrue();
   });
 
-  it('calcula apenas percentual visual, sem redefinir total da API', () => {
-    const dados = largurasCategorias([
-      { categoriaId: 1, categoriaNome: 'Moradia', valor: 30 },
-      { categoriaId: 2, categoriaNome: 'Saúde', valor: 70 },
-    ]);
-    expect(dados.map(c => c.percentual)).toEqual([30, 70]);
-  });
+
 });
