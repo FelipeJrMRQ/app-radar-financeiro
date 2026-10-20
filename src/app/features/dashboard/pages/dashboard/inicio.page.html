@@ -82,28 +82,28 @@
       @for (preferencia of preferencias.visiveis(); track preferencia.codigoComponente) {
         @switch (preferencia.codigoComponente) {
       @case ('CONTAS_RECEBER') {
-        <app-contas-receber-card [itens]="aReceber()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" />
+        <app-contas-receber-card rfMosaicoPainelItem [itens]="aReceber()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" />
       }
       @case ('CONTAS_PAGAR') {
-        <app-contas-pagar-card [itens]="aPagar()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" />
+        <app-contas-pagar-card rfMosaicoPainelItem [itens]="aPagar()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" />
       }
       @case ('SALDOS_CONTAS') {
-        <app-saldos-contas-card [contas]="dados.contas.slice(0, 5)" [saldoConfirmado]="dados.saldoConfirmado" [saldoProjetado]="dados.saldoProjetado" />
+        <app-saldos-contas-card rfMosaicoPainelItem [contas]="dados.contas.slice(0, 5)" [saldoConfirmado]="dados.saldoConfirmado" [saldoProjetado]="dados.saldoProjetado" />
       }
       @case ('FLUXO_CAIXA') {
-        <app-fluxo-caixa-card [contas]="dados.contas" [contasSelecionadas]="contasGraficoIds() ?? []" [fluxo]="fluxo()" [carregandoFluxo]="carregandoFluxo()" [erroFluxo]="erroFluxo()" (selecaoAlterada)="alterarContasGrafico($event)" />
+        <app-fluxo-caixa-card rfMosaicoPainelItem [contas]="dados.contas" [contasSelecionadas]="contasGraficoIds() ?? []" [fluxo]="fluxo()" [carregandoFluxo]="carregandoFluxo()" [erroFluxo]="erroFluxo()" (selecaoAlterada)="alterarContasGrafico($event)" />
       }
       @case ('DESPESAS_CATEGORIA') {
-        <app-despesas-categoria-card [categorias]="categorias()" [erroCategorias]="erroCategorias()" />
+        <app-despesas-categoria-card rfMosaicoPainelItem [categorias]="categorias()" [erroCategorias]="erroCategorias()" />
       }
         }
       }
       @if (!preferencias.visiveis().length) {
-        <div class="dashboard-state">
+        <div rfMosaicoPainelItem class="dashboard-state">
           Você ocultou todos os componentes. <a routerLink="/configuracoes/painel">Reativar componentes</a>
         </div>
       }
-<section class="panel shortcuts-panel" aria-labelledby="titulo-acoes">
+<section rfMosaicoPainelItem class="panel shortcuts-panel" aria-labelledby="titulo-acoes">
         <div class="panel-head"><div><span class="eyebrow">ACESSO RÁPIDO</span><h2 id="titulo-acoes">O que deseja fazer?</h2></div></div>
         <div class="shortcuts">
           <a routerLink="/lancamentos/novo"><span aria-hidden="true">+</span> Novo lançamento</a>
