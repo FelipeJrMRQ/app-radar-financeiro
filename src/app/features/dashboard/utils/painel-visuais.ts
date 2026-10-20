@@ -31,3 +31,24 @@ export function largurasCategorias(categorias: TotalCategoria[]): Array<TotalCat
     percentual: total > 0 ? Math.round(numeros[i] / total * 1000) / 10 : 0,
   }));
 }
+
+/**
+ * Pontos adicionais são exclusivamente geométricos para o Chart.js:
+ * dividem o segmento exatamente no cruzamento do eixo zero.
+ * O saldo monetário por dia continua vindo integralmente da API.
+ */
+export function criarSerieConsolidadaParaGrafico(pontos: Array<{ saldo: number | string }>) {
+  const serie: Array<{ x: number; y: number; cruzamento: boolean }> = [];
+  pontos.forEach((ponto, indice) => {
+    const atual = Number(ponto.saldo);
+    if (indice > 0) {
+      const anterior = Number(pontos[indice - 1].saldo);
+      if (Number.isFinite(anterior) && Number.isFinite(atual) && anterior * atual < 0) {
+        const fracao = Math.abs(anterior) / (Math.abs(anterior) + Math.abs(atual));
+        serie.push({ x: indice - 1 + fracao, y: 0, cruzamento: true });
+      }
+    }
+    serie.push({ x: indice, y: atual, cruzamento: false });
+  });
+  return serie;
+}
