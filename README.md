@@ -420,6 +420,9 @@ O cartão **Fluxo de caixa consolidado** substitui as duas linhas SVG por uma ú
 - Tooltip exibe dia e valor fornecido pelo backend, com etiqueta **Realizado** ou **Projetado**. Pontos intermediários introduzidos unicamente para mudar a cor no cruzamento do eixo zero não representam transações e não mostram tooltip.
 - Uma linha tracejada indica a previsão depois do dia atual; hoje é marcado no gráfico quando está dentro do período selecionado.
 - O cartão permanece em **uma das duas colunas do dashboard no desktop** (como os demais widgets) e ocupa a largura disponível no celular/PWA. O tema é **claro**, alinhado à identidade visual atual; o tema escuro será avaliado futuramente.
+- O **mosaico adaptativo** distribui os próximos cards nas posições livres das duas colunas, evitando linhas vazias quando um gráfico é mais alto que os compromissos. Os spans se atualizam automaticamente ao carregar mais lançamentos ou redimensionar a tela.
+- No mobile, todos os widgets são empilhados em **uma única coluna**, preservando a ordem configurada em Preferências do Painel. O tema continua claro; popovers de lançamentos permanecem fora de contêineres com recorte.
+
 
 **Requer backend** `chatgpt/fluxo-caixa-consolidado-multicontas` (rota `GET /relatorios/fluxo-caixa-consolidado` com filtros `contaId` repetidos).
 
