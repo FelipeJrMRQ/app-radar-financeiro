@@ -87,12 +87,30 @@
         <img class="mobile-symbol" src="/assets/brand/simbolo-radar.webp" alt="" aria-hidden="true" width="160" height="160" />
         <span>radar<strong>financeiro</strong></span>
       </a>
-      <button type="button" class="mobile-logout" (click)="sair()">Sair</button>
+      <div class="privacidade-controles">
+        <button type="button" class="toggle-privacidade" (click)="privacidade.alternar()"
+        [attr.aria-label]="privacidade.valoresVisiveis() ? 'Ocultar valores financeiros' : 'Mostrar valores financeiros'"
+        [attr.title]="privacidade.valoresVisiveis() ? 'Ocultar valores financeiros' : 'Mostrar valores financeiros'"
+        [attr.aria-pressed]="privacidade.valoresVisiveis()">
+        <fa-icon [icon]="privacidade.valoresVisiveis() ? iconeOlhoFechado : iconeOlho"
+          aria-hidden="true"></fa-icon>
+      </button>
+        <button type="button" class="mobile-logout" (click)="sair()">Sair</button>
+      </div>
     </header>
 
     <header class="desktop-header">
       <div><span class="header-kicker">SEU PAINEL</span><span class="header-title">Radar Financeiro</span></div>
-      <span class="header-user">{{ sessao.usuario()?.email }}</span>
+      <div class="privacidade-controles">
+        <button type="button" class="toggle-privacidade" (click)="privacidade.alternar()"
+        [attr.aria-label]="privacidade.valoresVisiveis() ? 'Ocultar valores financeiros' : 'Mostrar valores financeiros'"
+        [attr.title]="privacidade.valoresVisiveis() ? 'Ocultar valores financeiros' : 'Mostrar valores financeiros'"
+        [attr.aria-pressed]="privacidade.valoresVisiveis()">
+        <fa-icon [icon]="privacidade.valoresVisiveis() ? iconeOlhoFechado : iconeOlho"
+          aria-hidden="true"></fa-icon>
+      </button>
+        <span class="header-user">{{ sessao.usuario()?.email }}</span>
+      </div>
     </header>
 
     <main class="page-content" id="conteudo"><router-outlet /></main>

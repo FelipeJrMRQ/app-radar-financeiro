@@ -177,3 +177,14 @@
 @media(min-width:860px) {
   .feedback-lancamento { left:auto; right:26px; bottom:26px; width:min(420px,calc(100vw - 52px)); }
 }
+
+/* Alternância de privacidade acessível nos cabeçalhos mobile e desktop. */
+.privacidade-controles { display:flex; align-items:center; justify-content:flex-end; gap:10px; min-width:0; }
+.toggle-privacidade {
+  width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center;
+  border:1px solid #c6dfd8; border-radius:11px; background:#f1f9f6;
+  color:#0b7969; cursor:pointer; flex-shrink:0; font-size:17px;
+}
+.toggle-privacidade:hover { background:#dff3ec; }
+.toggle-privacidade:focus-visible { outline:3px solid #0b7969; outline-offset:2px; }
+.toggle-privacidade[aria-pressed="true"] { background:#e3f5ef; }
