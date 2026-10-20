@@ -158,7 +158,7 @@
                   </span>
                 </div>
                 <div class="movement-value">
-                  <strong [class.negative]="privacidade.valoresVisiveis() && negativo(movimento.valor)">{{ privacidade.valoresVisiveis() ? moeda(movimento.valor) : '••••••' }}</strong>
+                  <strong [class.negative]="negativo(movimento.valor)">{{ moeda(movimento.valor) }}</strong>
                   <span [class.pending]="movimento.situacao === 'PREVISTO'">
                     {{ movimento.situacao === 'PREVISTO' ? 'Previsto' : 'Confirmado' }}
                   </span>

@@ -26,11 +26,6 @@ describe('Card de contas a pagar', () => {
     fixture.detectChanges();
 
     const card = fixture.nativeElement as HTMLElement;
-    expect(card.querySelector('.due-value')?.textContent).toContain('••••••');
-    expect(card.querySelector('.due-value')?.textContent).not.toContain('120,00');
-
-    fixture.componentRef.setInput('valoresVisiveis', true);
-    fixture.detectChanges();
     expect(card.querySelector('time')?.textContent?.trim()).toBe('20/10');
     expect(card.querySelector('.due-description')?.textContent).toContain('Conta de luz');
     expect(card.querySelector('.late-label')?.textContent).toContain('Atrasado');

@@ -13,7 +13,6 @@ import { DadosDespesasRosca, prepararDespesasRosca } from '../../utils/despesas-
 })
 export class DespesasCategoriaCardComponent {
   readonly categorias = input.required<TotalCategoria[]>();
-  readonly valoresVisiveis = input(false);
   readonly erroCategorias = input<string | null>(null);
 
   readonly dadosRosca = computed(() => prepararDespesasRosca(this.categorias()));

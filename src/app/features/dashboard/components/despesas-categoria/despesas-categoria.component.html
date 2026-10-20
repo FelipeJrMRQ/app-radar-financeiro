@@ -3,9 +3,7 @@
     <h2 id="titulo-categorias">Despesas por categoria</h2>
   </div>
 
-  @if (!valoresVisiveis()) {
-    <p class="empty-data">Gráfico e distribuição ocultos para sua privacidade.</p>
-  } @else if (erroCategorias()) {
+  @if (erroCategorias()) {
     <p class="empty-data" role="alert">{{ erroCategorias() }}</p>
   } @else if (dadosRosca().fatias.length === 0) {
     <p class="empty-data">Sem despesas realizadas neste período.</p>

@@ -99,7 +99,7 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     expect(pagina.contasGraficoIds()).toEqual([7, 9, 10]);
   });
 
-  it('oculta valores financeiros do DOM e permite revelá-los novamente', async () => {
+  it('oculta apenas saldos e valores a receber, mantendo valores a pagar', async () => {
     const { fixture, visibilidade } = await montar();
     visibilidade.set(false);
     fixture.detectChanges();
@@ -108,7 +108,8 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     expect(raiz.querySelector('.stats-grid')?.textContent).not.toContain('1.619,76');
     expect(raiz.querySelector('.account-list')?.textContent).not.toContain('119,76');
     expect(raiz.querySelector('.cash-flow-chart canvas')).toBeNull();
-    expect(raiz.querySelector('.category-doughnut-figure canvas')).toBeNull();
+    expect(raiz.querySelector('.stats-grid')?.textContent).toContain('750,00');
+    expect(raiz.querySelector('.due-panel')?.textContent).not.toContain('••••••');
 
     visibilidade.set(true);
     fixture.detectChanges();

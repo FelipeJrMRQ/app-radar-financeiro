@@ -8,7 +8,6 @@ import { LancamentoAcoesComponent } from '../../../lancamentos/components/lancam
   templateUrl: './contas-pagar.component.html' })
 export class ContasPagarCardComponent {
   readonly itens = input.required<PendenciaPainel[]>();
-  readonly valoresVisiveis = input(false);
   @Output() readonly alterado = new EventEmitter<void>();
   readonly mesReferencia = input<string | null>(null);
   readonly moeda = formatarMoeda;
