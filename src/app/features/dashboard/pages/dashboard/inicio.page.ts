@@ -6,7 +6,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { mensagemDeErro } from '../../../../core/http/api-error';
 import { interpretarErroDoPainel } from '../../utils/painel-erro';
 import { dataLocalIso } from '../../../contas-financeiras/utils/formatacao-contas';
-import { formatarMoeda } from '../../../../shared/valor-monetario';
+import { formatarDiaMes, formatarMoeda } from '../../../../shared/valor-monetario';
 import { FluxoCaixaConsolidado, PainelFinanceiro, TotalCategoria } from '../../models/painel-financeiro.model';
 import { PainelFinanceiroService } from '../../services/painel-financeiro.service';
 import { PainelPreferenciasService } from '../../services/painel-preferencias.service';
@@ -52,6 +52,8 @@ export class InicioPage implements OnInit {
   readonly categorias = signal<TotalCategoria[]>([]);
   readonly erroCategorias = signal<string | null>(null);
   readonly moeda = formatarMoeda;
+  readonly dataCurta = formatarDiaMes;
+  readonly saldoProjetadoNegativo = computed(() => Number(this.painel()?.saldoProjetado ?? 0) < 0);
 
   constructor() { this.destroyRef.onDestroy(() => { this.destruido = true; this.versao++; this.versaoGrafico++; }); }
 
