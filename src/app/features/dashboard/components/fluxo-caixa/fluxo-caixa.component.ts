@@ -3,6 +3,8 @@ import {
   inject, input, Output, viewChild,
 } from '@angular/core';
 import type { Chart, ScriptableContext } from 'chart.js';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 import { formatarDataLocal, formatarMoeda } from '../../../../shared/valor-monetario';
 import { FluxoCaixaConsolidado, SaldoContaPainel } from '../../models/painel-financeiro.model';
@@ -11,12 +13,16 @@ import { criarSerieConsolidadaParaGrafico } from '../../utils/painel-visuais';
 @Component({
   selector: 'app-fluxo-caixa-card',
   standalone: true,
+  imports: [FontAwesomeModule],
   templateUrl: './fluxo-caixa.component.html',
 })
 export class FluxoCaixaCardComponent {
   readonly contas = input.required<SaldoContaPainel[]>();
   readonly contasSelecionadas = input.required<number[]>();
   readonly fluxo = input<FluxoCaixaConsolidado | null>(null);
+  readonly valoresVisiveis = input(false);
+  readonly iconeOlho = faEye;
+  readonly iconeOlhoFechado = faEyeSlash;
   readonly carregandoFluxo = input(false);
   readonly erroFluxo = input<string | null>(null);
   readonly ocultarContasZeradas = input(false);

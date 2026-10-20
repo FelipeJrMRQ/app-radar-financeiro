@@ -7,7 +7,8 @@
       <button type="button" class="cash-flow-zero-toggle" (click)="alternarZeradas.emit()"
         [attr.aria-pressed]="ocultarContasZeradas()"
         [attr.aria-label]="ocultarContasZeradas() ? 'Exibir contas com saldo zerado' : 'Ocultar contas com saldo zerado'">
-        {{ ocultarContasZeradas() ? 'Exibir zeradas' : 'Ocultar zeradas' }}
+        <fa-icon [icon]="ocultarContasZeradas() ? iconeOlho : iconeOlhoFechado" aria-hidden="true"></fa-icon>
+        <span>{{ ocultarContasZeradas() ? 'Exibir zeradas' : 'Ocultar zeradas' }}</span>
       </button>
       <span class="cash-flow-count">{{ contasSelecionadas().length }} de {{ contas().length }} contas</span>
     </div>
@@ -22,7 +23,9 @@
       }
     </p>
   } @else {
-    @if (!contasSelecionadas().length) {
+    @if (!valoresVisiveis()) {
+      <p class="cash-flow-empty">Gráfico protegido. Use o botão de olho no cabeçalho para visualizar os valores.</p>
+    } @else if (!contasSelecionadas().length) {
       <div class="cash-flow-empty">Selecione ao menos uma conta para visualizar a projeção.</div>
     } @else if (carregandoFluxo()) {
       <p class="cash-flow-empty" role="status">Calculando o fluxo de caixa das contas selecionadas…</p>
