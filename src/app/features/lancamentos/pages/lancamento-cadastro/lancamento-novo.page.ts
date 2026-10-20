@@ -2,7 +2,7 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import {
   AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { firstValueFrom, forkJoin } from 'rxjs';
 
 import { mensagemDeErro } from '../../../../core/http/api-error';
@@ -35,6 +35,7 @@ export class LancamentoNovoPage implements OnInit {
   private readonly contasApi = inject(ContasFinanceirasService);
   private readonly categoriasApi = inject(CategoriasService);
   private readonly router = inject(Router);
+  private readonly rota = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private destruida = false;
 
@@ -64,7 +65,13 @@ export class LancamentoNovoPage implements OnInit {
 
   constructor() { this.destroyRef.onDestroy(() => { this.destruida = true; }); }
 
-  ngOnInit(): void { void this.carregarOpcoes(); }
+  ngOnInit(): void {
+    const tipoInicial = this.rota.snapshot.queryParamMap.get('tipo');
+    if (tipoInicial === 'RECEITA' || tipoInicial === 'DESPESA') {
+      this.selecionarTipo(tipoInicial);
+    }
+    void this.carregarOpcoes();
+  }
 
   selecionarModalidade(modalidade: ModalidadeLancamento): void {
     this.modalidade.set(modalidade);

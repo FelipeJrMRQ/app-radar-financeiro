@@ -78,50 +78,83 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .app-layout .privacidade-controles { gap:6px; }
   .app-layout .toggle-privacidade { width:38px; height:38px; }
 }
-
-// Mesmo botão flutuante do celular também disponível no desktop.
-@media (min-width: 860px) {
-  .app-layout .lancamento-fab {
-    right: 24px;
-    bottom: 24px;
-    width: 56px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    overflow: hidden;
-    padding: 0 16px;
-    border-radius: 28px;
-    white-space: nowrap;
-    transition: width .2s ease, gap .2s ease, background-color .2s ease;
-  }
-  .app-layout .lancamento-fab fa-icon { flex: 0 0 auto; font-size: 22px; }
-  .app-layout .lancamento-fab-texto {
-    display: block;
-    max-width: 0;
-    opacity: 0;
-    overflow: hidden;
-    font-size: 13px;
-    font-weight: 700;
-    transition: max-width .2s ease, opacity .15s ease;
-  }
-  .app-layout .lancamento-fab:hover,
-  .app-layout .lancamento-fab:focus-visible {
-    width: 188px;
-    gap: 10px;
-  }
-  .app-layout .lancamento-fab:hover .lancamento-fab-texto,
-  .app-layout .lancamento-fab:focus-visible .lancamento-fab-texto {
-    max-width: 135px;
-    opacity: 1;
-  }
-  .app-layout .feedback-lancamento.tem-acao-flutuante { bottom: 96px; }
+/* Speed dial Radar: referência apenas funcional, cores e proporções do projeto. */
+.app-layout .lancamento-speed-dial {
+  position:fixed; z-index:30;
+  right:calc(18px + env(safe-area-inset-right));
+  bottom:calc(65px + 14px + env(safe-area-inset-bottom));
+  display:flex; flex-direction:column; align-items:flex-end;
+  pointer-events:none;
 }
-@media (max-width: 859px) {
-  .app-layout .lancamento-fab-texto { display: none; }
+.app-layout .lancamento-fab,
+.app-layout .lancamento-speed-opcao { pointer-events:auto; }
+.app-layout .lancamento-fab {
+  display:grid; place-items:center; width:58px; height:58px; padding:0;
+  border:2px solid rgba(255,255,255,.9); border-radius:50%;
+  background:var(--rf-teal-700,#087d73); color:white;
+  box-shadow:0 8px 22px rgba(5,61,70,.28);
+  cursor:pointer; font-size:25px;
+  transition:background .16s ease, transform .16s ease;
 }
-@media (prefers-reduced-motion: reduce) {
+.app-layout .lancamento-fab:hover,
+.app-layout .lancamento-fab:focus-visible { background:var(--rf-teal-600,#099587); }
+.app-layout .lancamento-speed-dial.aberto .lancamento-fab { transform:rotate(45deg); }
+.app-layout .lancamento-speed-opcoes {
+  position:absolute; bottom:100%; right:0; display:flex; flex-direction:column;
+  align-items:flex-end; gap:10px; padding-bottom:12px; min-width:220px;
+  animation:radar-atalhos-entrar .14s ease-out both;
+}
+.app-layout .lancamento-speed-opcao {
+  display:flex; flex-direction:row; align-items:center; justify-content:flex-end;
+  gap:10px; min-height:46px; text-decoration:none; color:inherit;
+}
+.app-layout .lancamento-speed-icone {
+  display:grid; place-items:center; flex:0 0 46px; width:46px; height:46px; padding:0;
+  border:1px solid rgba(255,255,255,.85); border-radius:50%;
+  background:var(--rf-teal-700,#087d73); color:#fff;
+  box-shadow:0 4px 12px rgba(5,61,70,.18);
+  font:inherit; font-size:19px;
+}
+.app-layout .lancamento-speed-opcao:hover .lancamento-speed-icone,
+.app-layout .lancamento-speed-opcao:focus-visible .lancamento-speed-icone {
+  background:var(--rf-teal-600,#099587);
+}
+.app-layout .lancamento-speed-descricao {
+  display:inline-block; max-width:170px;
+  background:var(--rf-navy-900,#082338); color:#fff; border-radius:6px;
+  padding:7px 9px; font-size:12px; font-weight:600; line-height:1.2;
+  white-space:nowrap; box-shadow:0 3px 10px rgba(5,27,43,.12);
+}
+.app-layout .lancamento-speed-opcao.indisponivel { cursor:default; }
+.app-layout .lancamento-speed-opcao.indisponivel .lancamento-speed-icone {
+  opacity:.48; cursor:not-allowed; box-shadow:none;
+}
+.app-layout .lancamento-speed-opcao.indisponivel .lancamento-speed-descricao { opacity:.75; }
+@keyframes radar-atalhos-entrar {
+  from { opacity:0; transform:translateY(8px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@media (min-width:860px) {
+  .app-layout .lancamento-speed-dial { right:24px; bottom:24px; }
+  .app-layout .lancamento-fab { width:56px; height:56px; font-size:23px; }
+  .app-layout .lancamento-speed-descricao {
+    opacity:0; visibility:hidden; transition:opacity .12s ease;
+  }
+  .app-layout .lancamento-speed-opcao:hover .lancamento-speed-descricao,
+  .app-layout .lancamento-speed-opcao:focus-within .lancamento-speed-descricao,
+  .app-layout .lancamento-speed-opcao:focus-visible .lancamento-speed-descricao {
+    opacity:1; visibility:visible;
+  }
+  .app-layout .feedback-lancamento.tem-acao-flutuante { bottom:96px; }
+  .app-layout .feedback-lancamento.menu-atalhos-aberto { bottom:270px; }
+}
+@media (max-width:859px) {
+  .app-layout .feedback-lancamento.menu-atalhos-aberto {
+    bottom:calc(365px + env(safe-area-inset-bottom));
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .app-layout .lancamento-speed-opcoes { animation:none; }
   .app-layout .lancamento-fab,
-  .app-layout .lancamento-fab-texto { transition: none; }
+  .app-layout .lancamento-speed-descricao { transition:none; }
 }

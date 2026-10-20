@@ -103,18 +103,54 @@
 
 
   @if (feedbackOperacoes.mensagem(); as mensagem) {
-    <div class="feedback-lancamento" [class.tem-acao-flutuante]="!cadastroLancamentoAtivo()" role="status" aria-live="polite">
+    <div class="feedback-lancamento" [class.tem-acao-flutuante]="!cadastroLancamentoAtivo()"
+         [class.menu-atalhos-aberto]="menuLancamentoAberto()" role="status" aria-live="polite">
       <span>{{ mensagem }}</span>
       <button type="button" (click)="feedbackOperacoes.limpar()" aria-label="Fechar mensagem">×</button>
     </div>
   }
 
   @if (!cadastroLancamentoAtivo()) {
-    <a routerLink="/lancamentos/novo" class="lancamento-fab"
-       aria-label="Novo lançamento" title="Novo lançamento">
-      <fa-icon [icon]="iconeNovoLancamento" aria-hidden="true"></fa-icon>
-      <span class="lancamento-fab-texto" aria-hidden="true">Novo lançamento</span>
-    </a>
+    <div #areaAcoes class="lancamento-speed-dial" [class.aberto]="menuLancamentoAberto()"
+         (pointerleave)="aoSairPonteiro($event)" (focusout)="aoPerderFoco($event)">
+      <button #botaoAcoes class="lancamento-fab" type="button"
+        aria-label="Ações rápidas financeiras" title="Ações rápidas financeiras"
+        aria-controls="acoes-rapidas-lancamento"
+        [attr.aria-expanded]="menuLancamentoAberto()"
+        (pointerenter)="aoEntrarPonteiro($event)"
+        (click)="alternarMenuLancamento()">
+        <fa-icon [icon]="iconeNovoLancamento" aria-hidden="true"></fa-icon>
+      </button>
+      @if (menuLancamentoAberto()) {
+        <div class="lancamento-speed-opcoes" id="acoes-rapidas-lancamento"
+             aria-label="Ações rápidas financeiras">
+          <a class="lancamento-speed-opcao" routerLink="/lancamentos/novo"
+             [queryParams]="{ tipo: 'RECEITA' }"
+             aria-label="Nova receita" (click)="fecharMenuLancamento()">
+            <span class="lancamento-speed-descricao">Nova receita</span>
+            <span class="lancamento-speed-icone">
+              <fa-icon [icon]="iconeReceita" aria-hidden="true"></fa-icon>
+            </span>
+          </a>
+          <a class="lancamento-speed-opcao" routerLink="/lancamentos/novo"
+             [queryParams]="{ tipo: 'DESPESA' }"
+             aria-label="Nova despesa" (click)="fecharMenuLancamento()">
+            <span class="lancamento-speed-descricao">Nova despesa</span>
+            <span class="lancamento-speed-icone">
+              <fa-icon [icon]="iconeDespesa" aria-hidden="true"></fa-icon>
+            </span>
+          </a>
+          <div class="lancamento-speed-opcao indisponivel">
+            <span class="lancamento-speed-descricao">Transferência · em breve</span>
+            <button type="button" class="lancamento-speed-icone" disabled
+              aria-label="Nova transferência indisponível: em breve"
+              title="Transferências serão implementadas em uma próxima etapa">
+              <fa-icon [icon]="iconeTransferencia" aria-hidden="true"></fa-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
   }
 
   <nav class="mobile-bottom-nav" aria-label="Navegação principal">
