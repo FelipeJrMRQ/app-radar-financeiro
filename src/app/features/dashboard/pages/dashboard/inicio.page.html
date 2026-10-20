@@ -1,7 +1,6 @@
 <section class="dashboard">
   <header class="dashboard-heading">
     <div>
-      <span class="eyebrow">SUA VISÃO FINANCEIRA</span>
       <h1>Visão geral, {{ primeiroNome() }}</h1>
       <p>Acompanhe obrigações, saldos e movimentações com dados atualizados das suas contas.</p>
     </div>
@@ -32,7 +31,9 @@
       <div class="dashboard-state" role="status">{{ preferencias.erro() }}</div>
     }
     @if (preferencias.estaVisivel('CONTAS_RECEBER') ||
-         preferencias.estaVisivel('CONTAS_PAGAR') || preferencias.estaVisivel('SALDOS_CONTAS')) {
+         preferencias.estaVisivel('CONTAS_PAGAR') ||
+         preferencias.estaVisivel('SALDOS_CONTAS') ||
+         preferencias.estaVisivel('FLUXO_CAIXA')) {
       <div class="stats-grid">
         @for (item of preferencias.visiveis(); track item.codigoComponente) {
           @switch (item.codigoComponente) {
@@ -59,21 +60,13 @@
             }
           }
         }
-        @if (preferencias.estaVisivel('CONTAS_RECEBER') || preferencias.estaVisivel('CONTAS_PAGAR')) {
-          <article class="stat-card">
-            <span class="stat-label"><span class="stat-dot warning"></span>Em atraso</span>
-            @if (preferencias.estaVisivel('CONTAS_RECEBER') && preferencias.estaVisivel('CONTAS_PAGAR')) {
-              <strong class="warning-text">{{ moeda(dados.receberAtrasado) }} <span class="small-divider">/</span> {{ moeda(dados.pagarAtrasado) }}</strong>
-              <small>A receber / a pagar vencidos e ainda pendentes</small>
-            } @else if (preferencias.estaVisivel('CONTAS_RECEBER')) {
-              <strong class="warning-text">{{ moeda(dados.receberAtrasado) }}</strong>
-              <small>Recebimentos vencidos e pendentes</small>
-            } @else {
-              <strong class="warning-text">{{ moeda(dados.pagarAtrasado) }}</strong>
-              <small>Pagamentos vencidos e pendentes</small>
-            }
-          </article>
-        }
+        <article class="stat-card">
+          <span class="stat-label"><span class="stat-dot projection"></span>Saldo ao fim do período</span>
+          <strong class="projection-text" [class.negative]="saldoProjetadoNegativo()">
+            {{ moeda(dados.saldoProjetado) }}
+          </strong>
+          <small>Projeção para {{ dataCurta(dados.dataFim) }} · todas as contas</small>
+        </article>
       </div>
     }
 
@@ -104,7 +97,7 @@
         </div>
       }
 <section rfMosaicoPainelItem class="panel shortcuts-panel" aria-labelledby="titulo-acoes">
-        <div class="panel-head"><div><span class="eyebrow">ACESSO RÁPIDO</span><h2 id="titulo-acoes">O que deseja fazer?</h2></div></div>
+        <div class="panel-head"><div><h2 id="titulo-acoes">O que deseja fazer?</h2></div></div>
         <div class="shortcuts">
           <a routerLink="/lancamentos/novo"><span aria-hidden="true">+</span> Novo lançamento</a>
           <a routerLink="/contas"><span aria-hidden="true">▣</span> Consultar contas</a>
