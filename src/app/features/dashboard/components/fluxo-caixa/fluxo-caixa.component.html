@@ -23,9 +23,7 @@
       }
     </p>
   } @else {
-    @if (!valoresVisiveis()) {
-      <p class="cash-flow-empty">Gráfico protegido. Use o botão de olho no cabeçalho para visualizar os valores.</p>
-    } @else if (!contasSelecionadas().length) {
+    @if (!contasSelecionadas().length) {
       <div class="cash-flow-empty">Selecione ao menos uma conta para visualizar a projeção.</div>
     } @else if (carregandoFluxo()) {
       <p class="cash-flow-empty" role="status">Calculando o fluxo de caixa das contas selecionadas…</p>
@@ -36,7 +34,9 @@
         <div class="cash-flow-chart">
           <canvas #graficoFluxo role="img"
             [attr.aria-label]="'Evolução diária consolidada de ' + dataCompleta(dados.dataInicio)
-              + ' a ' + dataCompleta(dados.dataFim) + '. Saldo ao final: ' + moeda(dados.saldoFinal)">
+              + ' a ' + dataCompleta(dados.dataFim)
+              + (valoresVisiveis() ? '. Saldo ao final: ' + moeda(dados.saldoFinal)
+                : '. Toque ou clique para consultar os valores de cada dia.')">
             Gráfico de saldo financeiro diário.
           </canvas>
         </div>

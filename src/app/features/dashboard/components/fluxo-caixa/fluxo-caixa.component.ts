@@ -48,10 +48,14 @@ export class FluxoCaixaCardComponent {
     effect(() => {
       const canvas = this.canvas()?.nativeElement;
       const dados = this.fluxo();
+      // Refaz o gráfico ao alternar a privacidade, atualizando eixo e interações.
+      const valoresVisiveis = this.valoresVisiveis();
       const versao = ++this.versao;
       this.grafico?.destroy();
       this.grafico = null;
-      if (canvas && dados?.pontos?.length) void this.desenhar(canvas, dados, versao);
+      if (canvas && dados?.pontos?.length) {
+        void this.desenhar(canvas, dados, versao, valoresVisiveis);
+      }
     });
     this.destroyRef.onDestroy(() => {
       this.versao++;
@@ -78,6 +82,7 @@ export class FluxoCaixaCardComponent {
 
   async desenhar(
     canvas: HTMLCanvasElement, dados: FluxoCaixaConsolidado, versao: number,
+    valoresVisiveis: boolean,
   ): Promise<void> {
     // Lazy load: Chart.js não faz parte do bundle inicial do painel.
     const { default: ChartJs } = await import('chart.js/auto');
@@ -145,6 +150,10 @@ export class FluxoCaixaCardComponent {
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
+        // No modo privado, apenas clique/toque revela o valor no tooltip.
+        events: valoresVisiveis
+          ? ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove']
+          : ['click'],
         interaction: { mode: 'nearest', intersect: false },
         plugins: {
           legend: { display: false },
@@ -200,7 +209,7 @@ export class FluxoCaixaCardComponent {
             ticks: {
               color: '#637e8d',
               maxTicksLimit: 5,
-              callback: (valor) => escalaReais.format(Number(valor)),
+              callback: (valor) => valoresVisiveis ? escalaReais.format(Number(valor)) : '',
             },
             grid: {
               color: (ctx) => Number(ctx.tick.value) === 0

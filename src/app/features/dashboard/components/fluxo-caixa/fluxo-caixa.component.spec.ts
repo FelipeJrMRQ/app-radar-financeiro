@@ -22,7 +22,7 @@ describe('Fluxo de caixa consolidado', () => {
     }).compileComponents();
   });
 
-  it('oculta canvas e saldos da acessibilidade quando valores são privados', () => {
+  it('mantém o gráfico visível sem anunciar saldo final ao ativar privacidade', () => {
     const fixture = preparar();
     fixture.componentRef.setInput('fluxo', {
       dataInicio: '2026-10-01', dataFim: '2026-10-31', dataHoje: '2026-10-20',
@@ -32,9 +32,46 @@ describe('Fluxo de caixa consolidado', () => {
     fixture.componentRef.setInput('valoresVisiveis', false);
     fixture.detectChanges();
     const raiz = fixture.nativeElement as HTMLElement;
-    expect(raiz.querySelector('canvas')).toBeNull();
+    const grafico = raiz.querySelector('.cash-flow-chart canvas');
+    expect(grafico).not.toBeNull();
+    expect(grafico?.getAttribute('aria-label')).not.toContain('9.999,00');
+    expect(grafico?.getAttribute('aria-label')).toContain('Toque ou clique');
     expect(raiz.textContent).not.toContain('9.999,00');
-    expect(raiz.textContent).toContain('Gráfico protegido');
+    fixture.destroy();
+  });
+
+  it('permite revelar saldos apenas por clique no gráfico durante a privacidade', async () => {
+    const fixture = preparar();
+    fixture.componentRef.setInput('fluxo', {
+      dataInicio: '2026-10-19', dataFim: '2026-10-21', dataHoje: '2026-10-20',
+      saldoHoje: '1500.00', saldoFinal: '900.00', contas: [],
+      pontos: [
+        { data: '2026-10-19', saldo: '1200.00', situacao: 'REALIZADO' },
+        { data: '2026-10-20', saldo: '1500.00', situacao: 'REALIZADO' },
+        { data: '2026-10-21', saldo: '900.00', situacao: 'PROJETADO' },
+      ],
+    });
+    fixture.componentRef.setInput('valoresVisiveis', false);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const { default: ChartJs } = await import('chart.js/auto');
+    const canvas = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLCanvasElement>('.cash-flow-chart canvas');
+    expect(canvas).not.toBeNull();
+    const graficoPrivado = ChartJs.getChart(canvas!);
+    expect(graficoPrivado).toBeDefined();
+    expect(graficoPrivado?.options.events).toEqual(['click']);
+    const escalaPrivada = graficoPrivado?.options.scales?.['y']?.ticks?.callback;
+    expect(escalaPrivada?.call(graficoPrivado?.scales['y'] as never, 1500, 0, []))
+      .toBe('');
+
+    fixture.componentRef.setInput('valoresVisiveis', true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const graficoNormal = ChartJs.getChart(canvas!);
+    expect(graficoNormal?.options.events).toContain('mousemove');
+    expect(canvas?.getAttribute('aria-label')).toContain('900,00');
     fixture.destroy();
   });
 
