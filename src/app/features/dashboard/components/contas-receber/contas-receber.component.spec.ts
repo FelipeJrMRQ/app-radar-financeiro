@@ -26,6 +26,13 @@ describe('Card de contas a receber', () => {
     fixture.detectChanges();
 
     const card = fixture.nativeElement as HTMLElement;
+    expect(card.querySelector('.due-value')?.textContent).toContain('••••••');
+    expect(card.querySelector('.due-value')?.textContent).not.toContain('1.500,00');
+
+    fixture.componentRef.setInput('valoresVisiveis', true);
+    fixture.detectChanges();
+    expect(card.querySelector('.due-value')?.textContent).toContain('1.500,00');
+
     const data = card.querySelector('time');
     expect(data?.textContent?.trim()).toBe('20/10');
     expect(data?.getAttribute('datetime')).toBe('2026-10-20');
