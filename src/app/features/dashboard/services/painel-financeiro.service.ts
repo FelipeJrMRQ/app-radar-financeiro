@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { API_BASE_URL } from '../../../core/config/api.config';
-import { FluxoCaixaConta, PainelFinanceiro, TotalCategoria } from '../models/painel-financeiro.model';
+import { FluxoCaixaConsolidado, FluxoCaixaConta, PainelFinanceiro, TotalCategoria } from '../models/painel-financeiro.model';
 
 @Injectable({ providedIn: 'root' })
 export class PainelFinanceiroService {
@@ -25,6 +25,15 @@ export class PainelFinanceiroService {
     const params = new HttpParams().set('dataInicio', dataInicio).set('dataFim', dataFim);
     return this.http.get<FluxoCaixaConta>(
       this.caminho() + '/contas-financeiras/' + contaId + '/fluxo-caixa', { params });
+  }
+
+  fluxoCaixaConsolidado(contasSelecionadas: number[], dataInicio: string, dataFim: string) {
+    let params = new HttpParams().set('dataInicio', dataInicio).set('dataFim', dataFim);
+    for (const contaId of contasSelecionadas) {
+      params = params.append('contaId', String(contaId));
+    }
+    return this.http.get<FluxoCaixaConsolidado>(
+      this.caminho() + '/relatorios/fluxo-caixa-consolidado', { params });
   }
 
   despesasPorCategoria(dataInicio: string, dataFim: string) {
