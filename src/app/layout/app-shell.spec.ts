@@ -83,7 +83,7 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
       .toBe('/lancamentos/novo?tipo=RECEITA');
     expect(raiz.querySelector('a[aria-label="Nova despesa"]')?.getAttribute('href'))
       .toBe('/lancamentos/novo?tipo=DESPESA');
-    expect(raiz.querySelector('button[aria-label^="Nova transferência"]')?.disabled)
+    expect(raiz.querySelector<HTMLButtonElement>('button[aria-label^="Nova transferência"]')?.disabled)
       .toBeTrue();
     raiz.querySelector('.lancamento-speed-dial')?.dispatchEvent(
       new PointerEvent('pointerleave', { pointerType:'mouse' }),
