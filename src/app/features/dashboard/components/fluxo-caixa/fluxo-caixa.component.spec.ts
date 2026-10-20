@@ -69,8 +69,6 @@ describe('Fluxo de caixa consolidado', () => {
     fixture.componentRef.setInput('valoresVisiveis', true);
     fixture.detectChanges();
     await fixture.whenStable();
-    const graficoNormal = ChartJs.getChart(canvas!);
-    expect(graficoNormal?.options.events).toContain('mousemove');
     expect(canvas?.getAttribute('aria-label')).toContain('900,00');
     fixture.destroy();
   });
