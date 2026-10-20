@@ -94,7 +94,7 @@ export class FluxoCaixaCardComponent {
         if (!Number.isFinite(x)) return;
         const ctx = grafico.ctx;
         ctx.save();
-        ctx.strokeStyle = 'rgba(94, 220, 188, 0.68)';
+        ctx.strokeStyle = 'rgba(8, 125, 115, 0.56)';
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 5]);
         ctx.beginPath();
@@ -102,7 +102,7 @@ export class FluxoCaixaCardComponent {
         ctx.lineTo(x, bottom);
         ctx.stroke();
         ctx.setLineDash([]);
-        ctx.fillStyle = '#8cf0d2';
+        ctx.fillStyle = '#087d73';
         ctx.font = '600 11px sans-serif';
         ctx.fillText('Hoje', Math.min(x + 6, right - 30), top + 13);
         ctx.restore();
@@ -117,8 +117,8 @@ export class FluxoCaixaCardComponent {
           label: 'Saldo consolidado',
           data: valores,
           parsing: false,
-          borderColor: '#a9bac5',
-          backgroundColor: '#b9d2d5',
+          borderColor: '#278f7d',
+          backgroundColor: '#b7ded4',
           borderWidth: 2.7,
           tension: 0,
           fill: false,
@@ -126,12 +126,12 @@ export class FluxoCaixaCardComponent {
             valores[ctx.dataIndex]?.x === hoje ? 4 : 0,
           pointHoverRadius: 6,
           pointHitRadius: 14,
-          pointBackgroundColor: '#8be6cc',
-          pointBorderColor: '#0c2030',
+          pointBackgroundColor: '#e5f7f1',
+          pointBorderColor: '#12836f',
           pointBorderWidth: 1.5,
           segment: {
             borderColor: (ctx) =>
-              (ctx.p0.parsed.y ?? 0) < 0 || (ctx.p1.parsed.y ?? 0) < 0 ? '#ff6972' : '#b6c5cb',
+              (ctx.p0.parsed.y ?? 0) < 0 || (ctx.p1.parsed.y ?? 0) < 0 ? '#d04a58' : '#278f7d',
             borderDash: (ctx) =>
               (ctx.p0.parsed.x ?? -1) >= hoje && hoje >= 0 ? [5, 4] : [],
           },
@@ -178,8 +178,8 @@ export class FluxoCaixaCardComponent {
             border: { display: false },
             grid: { display: false },
             ticks: {
-              color: '#a9c0ca',
-              maxTicksLimit: 9,
+              color: '#637e8d',
+              maxTicksLimit: 7,
               autoSkip: true,
               maxRotation: 0,
               callback: (valor) => {
@@ -195,13 +195,13 @@ export class FluxoCaixaCardComponent {
             grace: '12%',
             border: { display: false },
             ticks: {
-              color: '#a9c0ca',
-              maxTicksLimit: 6,
+              color: '#637e8d',
+              maxTicksLimit: 5,
               callback: (valor) => escalaReais.format(Number(valor)),
             },
             grid: {
               color: (ctx) => Number(ctx.tick.value) === 0
-                ? 'rgba(223,233,235,.58)' : 'rgba(178,199,205,.14)',
+                ? 'rgba(133,155,165,.65)' : 'rgba(193,210,217,.35)',
             },
           },
         },
