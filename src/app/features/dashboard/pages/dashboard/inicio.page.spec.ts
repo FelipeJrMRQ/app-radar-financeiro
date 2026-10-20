@@ -9,6 +9,7 @@ import {
 } from '../../models/painel-preferencias.model';
 import { PainelFinanceiroService } from '../../services/painel-financeiro.service';
 import { PainelPreferenciasService } from '../../services/painel-preferencias.service';
+import { PreferenciasFluxoCaixaService } from '../../services/preferencias-fluxo-caixa.service';
 import { InicioPage } from './inicio.page';
 
 describe('Resumo sem redundâncias do painel inicial', () => {
@@ -53,6 +54,11 @@ describe('Resumo sem redundâncias do painel inicial', () => {
           fluxoCaixaConsolidado,
           despesasPorCategoria: () => of([]),
         } },
+        { provide: PreferenciasFluxoCaixaService, useValue: {
+          erro: () => null,
+          carregar: async () => ({ ocultarContasZeradas: false, contasDesmarcadas: [] }),
+          salvar: jasmine.createSpy('salvarPreferencias'),
+        } },
         { provide: PainelPreferenciasService, useValue: {
           erro: () => null,
           visiveis: () => visiveis,
@@ -69,6 +75,25 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     fixture.detectChanges();
     return { fixture, consultar, fluxoCaixaConsolidado };
   }
+
+  it('oculta apenas contas realmente zeradas, preservando preferências manuais', async () => {
+    const { fixture } = await montar();
+    const pagina = fixture.componentInstance;
+    pagina.painel.update(atual => atual ? {
+      ...atual,
+      contas: [...atual.contas,
+        { contaFinanceiraId: 9, nome: 'Conta zero', saldoConfirmado: '0.0000', saldoProjetado: '0' },
+        { contaFinanceiraId: 10, nome: 'Conta futura', saldoConfirmado: '0', saldoProjetado: '50' },
+      ],
+    } : atual);
+    pagina.alterarContasGrafico([7, 9, 10]);
+    expect(pagina.contasDesmarcadas()).toContain(8);
+    pagina.alternarContasZeradas();
+    expect(pagina.contasVisiveis().map(conta => conta.contaFinanceiraId)).toEqual([7, 8, 10]);
+    expect(pagina.contasGraficoIds()).toEqual([7, 10]);
+    pagina.alternarContasZeradas();
+    expect(pagina.contasGraficoIds()).toEqual([7, 9, 10]);
+  });
 
   it('troca Em atraso por projeção do fim do mês de todas as contas', async () => {
     const { fixture } = await montar();

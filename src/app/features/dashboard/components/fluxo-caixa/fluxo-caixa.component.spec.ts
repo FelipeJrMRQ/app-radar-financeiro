@@ -21,6 +21,22 @@ describe('Fluxo de caixa consolidado', () => {
     }).compileComponents();
   });
 
+  it('permite alternar contas zeradas pelo botão de olho', () => {
+    const fixture = preparar();
+    const alternar = spyOn(fixture.componentInstance.alternarZeradas, 'emit');
+    const botao = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+      '.cash-flow-zero-toggle',
+    );
+    expect(botao?.textContent).toContain('Ocultar zeradas');
+    botao?.click();
+    expect(alternar).toHaveBeenCalled();
+    fixture.componentRef.setInput('ocultarContasZeradas', true);
+    fixture.componentRef.setInput('quantidadeOcultas', 2);
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Exibir zeradas');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('2 conta(s) zerada(s)');
+  });
+
   it('exibe nomes e seleção de contas sem repetir os saldos do card de contas', () => {
     const fixture = preparar();
     const raiz = fixture.nativeElement as HTMLElement;
