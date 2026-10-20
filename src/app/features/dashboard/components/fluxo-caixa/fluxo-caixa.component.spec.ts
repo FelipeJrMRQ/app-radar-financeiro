@@ -11,6 +11,7 @@ describe('Fluxo de caixa consolidado', () => {
       { contaFinanceiraId: 29, nome: 'Itaú', saldoConfirmado: 750, saldoProjetado: 700 },
     ]);
     fixture.componentRef.setInput('contasSelecionadas', [13, 29]);
+    fixture.componentRef.setInput('valoresVisiveis', true);
     fixture.detectChanges();
     return fixture;
   }
@@ -19,6 +20,22 @@ describe('Fluxo de caixa consolidado', () => {
     await TestBed.configureTestingModule({
       imports: [FluxoCaixaCardComponent],
     }).compileComponents();
+  });
+
+  it('oculta canvas e saldos da acessibilidade quando valores são privados', () => {
+    const fixture = preparar();
+    fixture.componentRef.setInput('fluxo', {
+      dataInicio: '2026-10-01', dataFim: '2026-10-31', dataHoje: '2026-10-20',
+      saldoHoje: '1789.00', saldoFinal: '9999.00', contas: [],
+      pontos: [{ data: '2026-10-20', saldo: '1789.00', situacao: 'REALIZADO' }],
+    });
+    fixture.componentRef.setInput('valoresVisiveis', false);
+    fixture.detectChanges();
+    const raiz = fixture.nativeElement as HTMLElement;
+    expect(raiz.querySelector('canvas')).toBeNull();
+    expect(raiz.textContent).not.toContain('9.999,00');
+    expect(raiz.textContent).toContain('Gráfico protegido');
+    fixture.destroy();
   });
 
   it('permite alternar contas zeradas pelo botão de olho', () => {

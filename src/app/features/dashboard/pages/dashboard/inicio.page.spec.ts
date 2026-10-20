@@ -1,4 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
+import { PrivacidadeValoresService } from '../../../../core/privacidade/privacidade-valores.service';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
@@ -44,10 +46,12 @@ describe('Resumo sem redundâncias do painel inicial', () => {
       pontos: [],
     }));
 
+    const visibilidade = signal(true);
     await TestBed.configureTestingModule({
       imports: [InicioPage],
       providers: [
         provideRouter([]),
+        { provide: PrivacidadeValoresService, useValue: { valoresVisiveis: visibilidade.asReadonly() } },
         { provide: AuthService, useValue: { usuario: () => ({ nome: 'Teste' }) } },
         { provide: PainelFinanceiroService, useValue: {
           consultar,
@@ -73,7 +77,7 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
-    return { fixture, consultar, fluxoCaixaConsolidado };
+    return { fixture, consultar, fluxoCaixaConsolidado, visibilidade };
   }
 
   it('oculta apenas contas realmente zeradas, preservando preferências manuais', async () => {
@@ -93,6 +97,22 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     expect(pagina.contasGraficoIds()).toEqual([7, 10]);
     pagina.alternarContasZeradas();
     expect(pagina.contasGraficoIds()).toEqual([7, 9, 10]);
+  });
+
+  it('oculta valores financeiros do DOM e permite revelá-los novamente', async () => {
+    const { fixture, visibilidade } = await montar();
+    visibilidade.set(false);
+    fixture.detectChanges();
+    const raiz = fixture.nativeElement as HTMLElement;
+    expect(raiz.querySelector('.stats-grid')?.textContent).toContain('••••••');
+    expect(raiz.querySelector('.stats-grid')?.textContent).not.toContain('1.619,76');
+    expect(raiz.querySelector('.account-list')?.textContent).not.toContain('119,76');
+    expect(raiz.querySelector('.cash-flow-chart canvas')).toBeNull();
+    expect(raiz.querySelector('.category-doughnut-figure canvas')).toBeNull();
+
+    visibilidade.set(true);
+    fixture.detectChanges();
+    expect(raiz.querySelector('.stats-grid')?.textContent).toContain('1.619,76');
   });
 
   it('troca Em atraso por projeção do fim do mês de todas as contas', async () => {

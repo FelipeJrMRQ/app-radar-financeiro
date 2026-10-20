@@ -9,8 +9,22 @@ describe('Despesas por categoria com Chart.js Doughnut', () => {
     }).compileComponents();
   });
 
+  it('não inclui dados de gráfico, percentual ou total no DOM enquanto privado', () => {
+    const fixture = TestBed.createComponent(DespesasCategoriaCardComponent);
+    fixture.componentRef.setInput('categorias', [
+      { categoriaId: 1, categoriaNome: 'Compras', valor: '1234.56' },
+    ]);
+    fixture.detectChanges();
+    const raiz = fixture.nativeElement as HTMLElement;
+    expect(raiz.querySelector('canvas')).toBeNull();
+    expect(raiz.textContent).not.toContain('1.234,56');
+    expect(raiz.textContent).not.toContain('100,0%');
+    fixture.destroy();
+  });
+
   it('mostra título, rosca e total realizado sem barras horizontais', async () => {
     const fixture = TestBed.createComponent(DespesasCategoriaCardComponent);
+    fixture.componentRef.setInput('valoresVisiveis', true);
     fixture.componentRef.setInput('categorias', [
       { categoriaId: 1, categoriaNome: 'Compras', valor: '750.00' },
       { categoriaId: 2, categoriaNome: 'Moradia', valor: '90.12' },
@@ -34,6 +48,7 @@ describe('Despesas por categoria com Chart.js Doughnut', () => {
 
   it('agrupa mais de cinco categorias na legenda Outras e mantém o valor exato', () => {
     const fixture = TestBed.createComponent(DespesasCategoriaCardComponent);
+    fixture.componentRef.setInput('valoresVisiveis', true);
     fixture.componentRef.setInput('categorias', [
       { categoriaId: 1, categoriaNome: 'A', valor: 600 },
       { categoriaId: 2, categoriaNome: 'B', valor: 200 },
@@ -56,6 +71,7 @@ describe('Despesas por categoria com Chart.js Doughnut', () => {
 
   it('preserva o estado vazio quando a API não retorna despesas realizadas', () => {
     const fixture = TestBed.createComponent(DespesasCategoriaCardComponent);
+    fixture.componentRef.setInput('valoresVisiveis', true);
     fixture.componentRef.setInput('categorias', []);
     fixture.detectChanges();
 
@@ -67,6 +83,7 @@ describe('Despesas por categoria com Chart.js Doughnut', () => {
 
   it('prioriza mensagens de erro sem exibir gráfico desatualizado', () => {
     const fixture = TestBed.createComponent(DespesasCategoriaCardComponent);
+    fixture.componentRef.setInput('valoresVisiveis', true);
     fixture.componentRef.setInput('categorias', [
       { categoriaId: 1, categoriaNome: 'Compras', valor: 100 },
     ]);
@@ -83,6 +100,7 @@ describe('Despesas por categoria com Chart.js Doughnut', () => {
 
   it('atualiza a legenda e o total quando os dados do período são alterados', () => {
     const fixture = TestBed.createComponent(DespesasCategoriaCardComponent);
+    fixture.componentRef.setInput('valoresVisiveis', true);
     fixture.componentRef.setInput('categorias', [
       { categoriaId: 1, categoriaNome: 'Compras', valor: 750 },
     ]);

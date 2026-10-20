@@ -4,6 +4,7 @@ import { Router, provideRouter } from '@angular/router';
 
 import { AuthService } from '../core/auth/auth.service';
 import { AppShell } from './app-shell';
+import { PrivacidadeValoresService } from '../core/privacidade/privacidade-valores.service';
 
 @Component({ standalone: true, template: '' })
 class PaginaVazia {}
@@ -22,6 +23,24 @@ describe('Ação flutuante no layout mobile', () => {
         }},
       ],
     }).compileComponents();
+  });
+
+  it('inicia valores ocultos e alterna pelo olho em desktop e celular', () => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+    const privacidade = TestBed.inject(PrivacidadeValoresService);
+    expect(privacidade.valoresVisiveis()).toBeFalse();
+    const botoes = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+      '.toggle-privacidade',
+    );
+    expect(botoes.length).toBe(2);
+    expect(botoes[0].getAttribute('aria-label')).toBe('Mostrar valores financeiros');
+    botoes[0].click();
+    fixture.detectChanges();
+    expect(privacidade.valoresVisiveis()).toBeTrue();
+    expect(botoes[1].getAttribute('aria-label')).toBe('Ocultar valores financeiros');
+    fixture.componentInstance.sair();
+    expect(privacidade.valoresVisiveis()).toBeFalse();
   });
 
   it('mantém consulta na navegação e usa o botão flutuante para criar', () => {
