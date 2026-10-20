@@ -52,6 +52,10 @@ export class FluxoCaixaCardComponent {
     });
   }
 
+  saldoNegativo(valor: string | number): boolean {
+    return Number(valor) < 0;
+  }
+
   estaSelecionada(id: number): boolean {
     return this.contasSelecionadas().includes(id);
   }
