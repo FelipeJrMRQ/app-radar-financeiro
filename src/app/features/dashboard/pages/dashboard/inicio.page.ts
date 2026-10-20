@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import { AuthService } from '../../../../core/auth/auth.service';
+import { PrivacidadeValoresService } from '../../../../core/privacidade/privacidade-valores.service';
 import { mensagemDeErro } from '../../../../core/http/api-error';
 import { interpretarErroDoPainel } from '../../utils/painel-erro';
 import { dataLocalIso } from '../../../contas-financeiras/utils/formatacao-contas';
@@ -28,6 +29,7 @@ import { MosaicoPainelItemDirective } from '../../directives/mosaico-painel-item
 export class InicioPage implements OnInit {
   private readonly sessao = inject(AuthService);
   private readonly api = inject(PainelFinanceiroService);
+  readonly privacidade = inject(PrivacidadeValoresService);
   readonly preferencias = inject(PainelPreferenciasService);
   readonly preferenciasFluxo = inject(PreferenciasFluxoCaixaService);
   private readonly destroyRef = inject(DestroyRef);

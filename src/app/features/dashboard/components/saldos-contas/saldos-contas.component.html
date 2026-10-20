@@ -8,15 +8,15 @@
                     @for (conta of contas(); track conta.contaFinanceiraId) {
                       <div class="account-row">
                         <span class="account-name"><span class="account-indicator" aria-hidden="true"></span>{{ conta.nome }}</span>
-                        <strong class="account-value"><span class="account-value-label">Confirmado</span>{{ moeda(conta.saldoConfirmado) }}</strong>
-                        <strong class="account-value"><span class="account-value-label">Projetado</span>{{ moeda(conta.saldoProjetado) }}</strong>
+                        <strong class="account-value"><span class="account-value-label">Confirmado</span>{{ valoresVisiveis() ? moeda(conta.saldoConfirmado) : '••••••' }}</strong>
+                        <strong class="account-value"><span class="account-value-label">Projetado</span>{{ valoresVisiveis() ? moeda(conta.saldoProjetado) : '••••••' }}</strong>
                       </div>
                     }
                   </div>
                 }
                 <footer class="panel-total account-footer">
                   <span class="account-footer-label">Total</span>
-                  <strong class="account-value"><span class="account-value-label">Confirmado</span>{{ moeda(saldoConfirmado()) }}</strong>
-                  <strong class="account-value"><span class="account-value-label">Projetado</span>{{ moeda(saldoProjetado()) }}</strong>
+                  <strong class="account-value"><span class="account-value-label">Confirmado</span>{{ valoresVisiveis() ? moeda(saldoConfirmado()) : '••••••' }}</strong>
+                  <strong class="account-value"><span class="account-value-label">Projetado</span>{{ valoresVisiveis() ? moeda(saldoProjetado()) : '••••••' }}</strong>
                 </footer>
               </section>

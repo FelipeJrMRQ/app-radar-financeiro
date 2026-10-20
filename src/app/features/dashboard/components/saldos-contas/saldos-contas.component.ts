@@ -7,6 +7,7 @@ import { SaldoContaPainel } from '../../models/painel-financeiro.model';
   templateUrl: './saldos-contas.component.html' })
 export class SaldosContasCardComponent {
   readonly contas = input.required<SaldoContaPainel[]>();
+  readonly valoresVisiveis = input(false);
   readonly saldoConfirmado = input.required<ValorFinanceiroApi>();
   readonly saldoProjetado = input.required<ValorFinanceiroApi>();
   readonly moeda = formatarMoeda;

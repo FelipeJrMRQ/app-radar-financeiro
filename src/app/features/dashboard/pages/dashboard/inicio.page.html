@@ -40,21 +40,21 @@
             @case ('CONTAS_RECEBER') {
               <article class="stat-card">
                 <span class="stat-label"><span class="stat-dot income"></span>A receber no período</span>
-                <strong class="income-text">{{ moeda(dados.aReceberPeriodo) }}</strong>
+                <strong class="income-text">{{ privacidade.valoresVisiveis() ? moeda(dados.aReceberPeriodo) : '••••••' }}</strong>
                 <small>Receitas pendentes com vencimento no mês</small>
               </article>
             }
             @case ('CONTAS_PAGAR') {
               <article class="stat-card">
                 <span class="stat-label"><span class="stat-dot expense"></span>A pagar no período</span>
-                <strong class="expense-text">{{ moeda(dados.aPagarPeriodo) }}</strong>
+                <strong class="expense-text">{{ privacidade.valoresVisiveis() ? moeda(dados.aPagarPeriodo) : '••••••' }}</strong>
                 <small>Despesas pendentes com vencimento no mês</small>
               </article>
             }
             @case ('SALDOS_CONTAS') {
               <article class="stat-card">
                 <span class="stat-label"><span class="stat-dot neutral"></span>Saldo confirmado</span>
-                <strong>{{ moeda(dados.saldoConfirmado) }}</strong>
+                <strong>{{ privacidade.valoresVisiveis() ? moeda(dados.saldoConfirmado) : '••••••' }}</strong>
                 <small>Soma dos saldos confirmados de todas as contas</small>
               </article>
             }
@@ -62,8 +62,8 @@
         }
         <article class="stat-card">
           <span class="stat-label"><span class="stat-dot projection"></span>Saldo ao fim do período</span>
-          <strong class="projection-text" [class.negative]="saldoProjetadoNegativo()">
-            {{ moeda(dados.saldoProjetado) }}
+          <strong class="projection-text" [class.negative]="privacidade.valoresVisiveis() && saldoProjetadoNegativo()">
+            {{ privacidade.valoresVisiveis() ? moeda(dados.saldoProjetado) : '••••••' }}
           </strong>
           <small>Projeção para {{ dataCurta(dados.dataFim) }} · todas as contas</small>
         </article>
@@ -75,19 +75,19 @@
       @for (preferencia of preferencias.visiveis(); track preferencia.codigoComponente) {
         @switch (preferencia.codigoComponente) {
       @case ('CONTAS_RECEBER') {
-        <app-contas-receber-card rfMosaicoPainelItem [itens]="aReceber()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" />
+        <app-contas-receber-card rfMosaicoPainelItem [itens]="aReceber()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" [valoresVisiveis]="privacidade.valoresVisiveis()" />
       }
       @case ('CONTAS_PAGAR') {
-        <app-contas-pagar-card rfMosaicoPainelItem [itens]="aPagar()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" />
+        <app-contas-pagar-card rfMosaicoPainelItem [itens]="aPagar()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" [valoresVisiveis]="privacidade.valoresVisiveis()" />
       }
       @case ('SALDOS_CONTAS') {
-        <app-saldos-contas-card rfMosaicoPainelItem [contas]="dados.contas.slice(0, 5)" [saldoConfirmado]="dados.saldoConfirmado" [saldoProjetado]="dados.saldoProjetado" />
+        <app-saldos-contas-card rfMosaicoPainelItem [contas]="dados.contas.slice(0, 5)" [saldoConfirmado]="dados.saldoConfirmado" [saldoProjetado]="dados.saldoProjetado" [valoresVisiveis]="privacidade.valoresVisiveis()" />
       }
       @case ('FLUXO_CAIXA') {
-        <app-fluxo-caixa-card rfMosaicoPainelItem [contas]="contasVisiveis()" [contasSelecionadas]="contasGraficoIds() ?? []" [fluxo]="fluxo()" [carregandoFluxo]="carregandoFluxo()" [erroFluxo]="erroFluxo()" [ocultarContasZeradas]="ocultarContasZeradas()" [quantidadeOcultas]="ocultarContasZeradas() ? contasZeradas().length : 0" [erroPreferencias]="preferenciasFluxo.erro()" (selecaoAlterada)="alterarContasGrafico($event)" (alternarZeradas)="alternarContasZeradas()" />
+        <app-fluxo-caixa-card rfMosaicoPainelItem [contas]="contasVisiveis()" [contasSelecionadas]="contasGraficoIds() ?? []" [fluxo]="fluxo()" [carregandoFluxo]="carregandoFluxo()" [erroFluxo]="erroFluxo()" [ocultarContasZeradas]="ocultarContasZeradas()" [quantidadeOcultas]="ocultarContasZeradas() ? contasZeradas().length : 0" [erroPreferencias]="preferenciasFluxo.erro()" (selecaoAlterada)="alterarContasGrafico($event)" (alternarZeradas)="alternarContasZeradas()" [valoresVisiveis]="privacidade.valoresVisiveis()" />
       }
       @case ('DESPESAS_CATEGORIA') {
-        <app-despesas-categoria-card rfMosaicoPainelItem [categorias]="categorias()" [erroCategorias]="erroCategorias()" />
+        <app-despesas-categoria-card rfMosaicoPainelItem [categorias]="categorias()" [erroCategorias]="erroCategorias()" [valoresVisiveis]="privacidade.valoresVisiveis()" />
       }
         }
       }
