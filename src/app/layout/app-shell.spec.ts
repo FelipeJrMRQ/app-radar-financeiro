@@ -9,7 +9,7 @@ import { PrivacidadeValoresService } from '../core/privacidade/privacidade-valor
 @Component({ standalone: true, template: '' })
 class PaginaVazia {}
 
-describe('Ação flutuante no layout mobile', () => {
+describe('Ação flutuante de lançamento no layout responsivo', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppShell],
@@ -62,7 +62,7 @@ describe('Ação flutuante no layout mobile', () => {
     conferir('.mobile-bottom-nav a[href="/lancamentos"]', 'list-ul');
     conferir('.mobile-bottom-nav a[href="/cadastros"]', 'folder-open');
     conferir('.mobile-bottom-nav a[href="/configuracoes"]', 'gear');
-    conferir('a.mobile-fab', 'plus');
+    conferir('a.lancamento-fab', 'plus');
     expect(raiz.querySelectorAll('.sidebar-group-trigger fa-icon.group-chevron').length)
       .toBe(2);
     expect(raiz.querySelector('.side-logout fa-icon svg')?.getAttribute('data-icon'))
@@ -74,12 +74,29 @@ describe('Ação flutuante no layout mobile', () => {
     const fixture = TestBed.createComponent(AppShell);
     fixture.detectChanges();
     const root = fixture.nativeElement as HTMLElement;
-    const fab = root.querySelector<HTMLAnchorElement>('a.mobile-fab');
+    const fab = root.querySelector<HTMLAnchorElement>('a.lancamento-fab');
     expect(fab).not.toBeNull();
     expect(fab?.getAttribute('href')).toBe('/lancamentos/novo');
     expect(fab?.getAttribute('aria-label')).toBe('Novo lançamento');
+    expect(fab?.querySelector('.lancamento-fab-texto')?.textContent).toBe('Novo lançamento');
+    expect(root.querySelectorAll('a.lancamento-fab')).toHaveSize(1);
     expect(root.querySelectorAll('.mobile-bottom-nav a').length).toBe(4);
     expect(root.querySelector('.mobile-bottom-nav a[href="/lancamentos"]')).not.toBeNull();
+  });
+
+  it('reserva espaço para o feedback quando o botão flutuante está disponível', () => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+    const feedback = fixture.componentInstance.feedbackOperacoes;
+    feedback.mostrar('Lançamento confirmado');
+    fixture.detectChanges();
+
+    const aviso = (fixture.nativeElement as HTMLElement).querySelector('.feedback-lancamento');
+    expect(aviso?.classList.contains('tem-acao-flutuante')).toBeTrue();
+    expect((fixture.nativeElement as HTMLElement).querySelector('a.lancamento-fab'))
+      .not.toBeNull();
+    feedback.limpar();
+    fixture.destroy();
   });
 
   it('remove a ação redundante na própria tela de novo lançamento', async () => {
@@ -89,6 +106,12 @@ describe('Ação flutuante no layout mobile', () => {
     await router.navigateByUrl('/lancamentos/novo');
     fixture.detectChanges();
     expect(fixture.componentInstance.cadastroLancamentoAtivo()).toBeTrue();
-    expect((fixture.nativeElement as HTMLElement).querySelector('.mobile-fab')).toBeNull();
+    expect((fixture.nativeElement as HTMLElement).querySelector('.lancamento-fab')).toBeNull();
+
+    fixture.componentInstance.feedbackOperacoes.mostrar('Lançamento salvo');
+    fixture.detectChanges();
+    const aviso = (fixture.nativeElement as HTMLElement).querySelector('.feedback-lancamento');
+    expect(aviso?.classList.contains('tem-acao-flutuante')).toBeFalse();
+    fixture.componentInstance.feedbackOperacoes.limpar();
   });
 });

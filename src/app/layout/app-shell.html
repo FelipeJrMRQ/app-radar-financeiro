@@ -103,16 +103,17 @@
 
 
   @if (feedbackOperacoes.mensagem(); as mensagem) {
-    <div class="feedback-lancamento" role="status" aria-live="polite">
+    <div class="feedback-lancamento" [class.tem-acao-flutuante]="!cadastroLancamentoAtivo()" role="status" aria-live="polite">
       <span>{{ mensagem }}</span>
       <button type="button" (click)="feedbackOperacoes.limpar()" aria-label="Fechar mensagem">×</button>
     </div>
   }
 
   @if (!cadastroLancamentoAtivo()) {
-    <a routerLink="/lancamentos/novo" class="mobile-fab"
+    <a routerLink="/lancamentos/novo" class="lancamento-fab"
        aria-label="Novo lançamento" title="Novo lançamento">
       <fa-icon [icon]="iconeNovoLancamento" aria-hidden="true"></fa-icon>
+      <span class="lancamento-fab-texto" aria-hidden="true">Novo lançamento</span>
     </a>
   }
 
