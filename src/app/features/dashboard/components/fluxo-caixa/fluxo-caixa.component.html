@@ -79,7 +79,7 @@
               (change)="alterarConta(conta.contaFinanceiraId, $event)" />
             <i class="cash-flow-account-color" aria-hidden="true"></i>
             <span class="cash-flow-account-name">{{ conta.nome }}</span>
-            <span class="cash-flow-account-value" [class.negative]="conta.saldoConfirmado < 0">
+            <span class="cash-flow-account-value" [class.negative]="saldoNegativo(conta.saldoConfirmado)">
               {{ moeda(conta.saldoConfirmado) }}
             </span>
           </label>
