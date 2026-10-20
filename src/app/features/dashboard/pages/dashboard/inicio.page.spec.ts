@@ -116,7 +116,7 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     const raiz = fixture.nativeElement as HTMLElement;
     expect(raiz.querySelectorAll('.eyebrow').length).toBe(0);
     for (const titulo of [
-      'Saldo das contas', 'Despesas por categoria', 'Fluxo de caixa consolidado',
+      'Saldos das contas', 'Despesas por categoria', 'Fluxo de caixa consolidado',
       'Contas a pagar', 'Contas a receber', 'O que deseja fazer?',
     ]) {
       expect(raiz.textContent).toContain(titulo);
