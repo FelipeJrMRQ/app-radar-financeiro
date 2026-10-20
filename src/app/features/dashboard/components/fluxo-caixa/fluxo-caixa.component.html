@@ -1,9 +1,7 @@
 <section class="panel cash-flow-panel" aria-labelledby="titulo-fluxo">
   <header class="panel-head cash-flow-heading">
     <div>
-      <span class="eyebrow">PLANEJAMENTO FINANCEIRO</span>
       <h2 id="titulo-fluxo">Fluxo de caixa consolidado</h2>
-      <p>Uma única linha representa as contas selecionadas: realizado até hoje e previsto para os próximos dias.</p>
     </div>
     <span class="cash-flow-count">{{ contasSelecionadas().length }} de {{ contas().length }} contas</span>
   </header>
@@ -11,23 +9,6 @@
   @if (contas().length === 0) {
     <p class="cash-flow-empty">Cadastre uma conta para visualizar seu fluxo de caixa.</p>
   } @else {
-    <div class="cash-flow-totals">
-      <div class="cash-flow-total">
-        <span>Saldo confirmado hoje</span>
-        <strong [class.negative]="saldoHojeNegativo()">
-          {{ fluxo() ? moeda(fluxo()!.saldoHoje) : '—' }}
-        </strong>
-      </div>
-      <div class="cash-flow-total">
-        <span>Saldo ao fim do período
-          @if (fluxo(); as f) { · {{ data(f.dataFim) }} }
-        </span>
-        <strong [class.negative]="saldoFinalNegativo()">
-          {{ fluxo() ? moeda(fluxo()!.saldoFinal) : '—' }}
-        </strong>
-      </div>
-    </div>
-
     @if (!contasSelecionadas().length) {
       <div class="cash-flow-empty">Selecione ao menos uma conta para visualizar a projeção.</div>
     } @else if (carregandoFluxo()) {
@@ -65,7 +46,6 @@
       <div class="cash-flow-accounts-heading">
         <div>
           <strong>Contas consideradas</strong>
-          <small>Inclua ou retire contas para recalcular a linha.</small>
         </div>
         <button type="button" (click)="selecionarTodas()" [disabled]="contasSelecionadas().length === contas().length">
           Selecionar todas
@@ -79,19 +59,10 @@
               (change)="alterarConta(conta.contaFinanceiraId, $event)" />
             <i class="cash-flow-account-color" aria-hidden="true"></i>
             <span class="cash-flow-account-name">{{ conta.nome }}</span>
-            <span class="cash-flow-account-value" [class.negative]="saldoNegativo(conta.saldoConfirmado)">
-              {{ moeda(conta.saldoConfirmado) }}
-            </span>
           </label>
         }
       </div>
     </div>
 
-    <footer class="cash-flow-footer">
-      <span>Transferências entre contas selecionadas se compensam no saldo total.</span>
-      @if (fluxo(); as f) {
-        <strong [class.negative]="saldoFinalNegativo()">Fim: {{ moeda(f.saldoFinal) }}</strong>
-      }
-    </footer>
   }
 </section>
