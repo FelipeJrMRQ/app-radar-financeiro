@@ -188,3 +188,15 @@
 .toggle-privacidade:hover { background:#dff3ec; }
 .toggle-privacidade:focus-visible { outline:3px solid #0b7969; outline-offset:2px; }
 .toggle-privacidade[aria-pressed="true"] { background:#e3f5ef; }
+
+/* O cabeçalho desktop usa flex-column nos divs diretos; manter controles na horizontal. */
+@media (min-width:860px) {
+  .desktop-header > .privacidade-controles { flex-direction:row; align-items:center; gap:14px; }
+}
+@media (max-width:420px) {
+  .mobile-header { padding-inline:12px; }
+  .mobile-logo { gap:5px; font-size:13px; }
+  .mobile-logout { padding:8px 10px; }
+  .privacidade-controles { gap:6px; }
+  .toggle-privacidade { width:38px; height:38px; }
+}

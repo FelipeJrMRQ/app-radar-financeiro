@@ -16,6 +16,7 @@ describe('Ação flutuante no layout mobile', () => {
       providers: [
         provideRouter([
           { path: 'lancamentos/novo', component: PaginaVazia },
+          { path: 'entrar', component: PaginaVazia },
         ]),
         { provide: AuthService, useValue: {
           usuario: signal({ nome: 'Pessoa Teste', email: 'pessoa@exemplo.com' }),

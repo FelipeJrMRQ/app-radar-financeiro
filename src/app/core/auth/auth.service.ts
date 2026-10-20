@@ -3,6 +3,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom, forkJoin } from 'rxjs';
 
 import { API_BASE_URL } from '../config/api.config';
+import { PrivacidadeValoresService } from '../privacidade/privacidade-valores.service';
 import {
   AutenticacaoResponse,
   CadastroRequest,
@@ -19,6 +20,7 @@ interface CredencialTemporaria {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly privacidade = inject(PrivacidadeValoresService);
   private readonly tokenState = signal<string | null>(null);
   private readonly expiracaoState = signal(0);
   private readonly usuarioState = signal<Usuario | null>(null);
@@ -125,6 +127,7 @@ export class AuthService {
   }
 
   sair(): void {
+    this.privacidade.ocultar();
     this.revisaoSessao++;
     this.tokenState.set(null);
     this.expiracaoState.set(0);
