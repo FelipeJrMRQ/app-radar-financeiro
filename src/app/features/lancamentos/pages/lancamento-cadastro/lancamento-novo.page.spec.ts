@@ -1,6 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 
 import { LancamentoNovoPage } from './lancamento-novo.page';
 
@@ -10,6 +10,16 @@ describe('LancamentoNovoPage', () => {
       imports: [LancamentoNovoPage],
       providers: [provideHttpClient(), provideRouter([])],
     }).compileComponents();
+  });
+
+  it('respeita a receita preselecionada pela rota', () => {
+    TestBed.overrideProvider(ActivatedRoute, { useValue: {
+      snapshot: { queryParamMap: convertToParamMap({ tipo: 'RECEITA' }) },
+    } });
+    const pagina = TestBed.createComponent(LancamentoNovoPage).componentInstance;
+    pagina.ngOnInit();
+    expect(pagina.tipo()).toBe('RECEITA');
+    expect(pagina.form.controls.categoriaId.value).toBeNull();
   });
 
   it('exige categoria, conta, descrição e valor positivo', () => {

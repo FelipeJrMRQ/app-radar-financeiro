@@ -62,7 +62,7 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
     conferir('.mobile-bottom-nav a[href="/lancamentos"]', 'list-ul');
     conferir('.mobile-bottom-nav a[href="/cadastros"]', 'folder-open');
     conferir('.mobile-bottom-nav a[href="/configuracoes"]', 'gear');
-    conferir('a.lancamento-fab', 'plus');
+    conferir('button.lancamento-fab', 'plus');
     expect(raiz.querySelectorAll('.sidebar-group-trigger fa-icon.group-chevron').length)
       .toBe(2);
     expect(raiz.querySelector('.side-logout fa-icon svg')?.getAttribute('data-icon'))
@@ -70,16 +70,56 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
     expect(raiz.querySelectorAll('.mobile-bottom-nav a').length).toBe(4);
   });
 
+  it('abre o menu no hover e fecha ao retirar o mouse', () => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+    const raiz = fixture.nativeElement as HTMLElement;
+    const botao = raiz.querySelector<HTMLButtonElement>('.lancamento-fab');
+    expect(botao?.getAttribute('aria-expanded')).toBe('false');
+    botao?.dispatchEvent(new PointerEvent('pointerenter', { pointerType:'mouse' }));
+    fixture.detectChanges();
+    expect(botao?.getAttribute('aria-expanded')).toBe('true');
+    expect(raiz.querySelector('a[aria-label="Nova receita"]')?.getAttribute('href'))
+      .toBe('/lancamentos/novo?tipo=RECEITA');
+    expect(raiz.querySelector('a[aria-label="Nova despesa"]')?.getAttribute('href'))
+      .toBe('/lancamentos/novo?tipo=DESPESA');
+    expect(raiz.querySelector('button[aria-label^="Nova transferência"]')?.disabled)
+      .toBeTrue();
+    raiz.querySelector('.lancamento-speed-dial')?.dispatchEvent(
+      new PointerEvent('pointerleave', { pointerType:'mouse' }),
+    );
+    fixture.detectChanges();
+    expect(botao?.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('abre com clique no celular, fecha fora e com Escape', () => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+    const raiz = fixture.nativeElement as HTMLElement;
+    const botao = raiz.querySelector<HTMLButtonElement>('.lancamento-fab');
+    botao?.click();
+    fixture.detectChanges();
+    expect(botao?.getAttribute('aria-expanded')).toBe('true');
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles:true }));
+    fixture.detectChanges();
+    expect(botao?.getAttribute('aria-expanded')).toBe('false');
+    botao?.click();
+    fixture.detectChanges();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key:'Escape', bubbles:true }));
+    fixture.detectChanges();
+    expect(botao?.getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(botao);
+  });
+
   it('mantém consulta na navegação e usa o botão flutuante para criar', () => {
     const fixture = TestBed.createComponent(AppShell);
     fixture.detectChanges();
     const root = fixture.nativeElement as HTMLElement;
-    const fab = root.querySelector<HTMLAnchorElement>('a.lancamento-fab');
+    const fab = root.querySelector<HTMLButtonElement>('button.lancamento-fab');
     expect(fab).not.toBeNull();
-    expect(fab?.getAttribute('href')).toBe('/lancamentos/novo');
-    expect(fab?.getAttribute('aria-label')).toBe('Novo lançamento');
-    expect(fab?.querySelector('.lancamento-fab-texto')?.textContent).toBe('Novo lançamento');
-    expect(root.querySelectorAll('a.lancamento-fab')).toHaveSize(1);
+    expect(fab?.getAttribute('aria-expanded')).toBe('false');
+    expect(fab?.getAttribute('aria-label')).toBe('Ações rápidas financeiras');
+    expect(root.querySelectorAll('button.lancamento-fab')).toHaveSize(1);
     expect(root.querySelectorAll('.mobile-bottom-nav a').length).toBe(4);
     expect(root.querySelector('.mobile-bottom-nav a[href="/lancamentos"]')).not.toBeNull();
   });
@@ -93,7 +133,7 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
 
     const aviso = (fixture.nativeElement as HTMLElement).querySelector('.feedback-lancamento');
     expect(aviso?.classList.contains('tem-acao-flutuante')).toBeTrue();
-    expect((fixture.nativeElement as HTMLElement).querySelector('a.lancamento-fab'))
+    expect((fixture.nativeElement as HTMLElement).querySelector('button.lancamento-fab'))
       .not.toBeNull();
     feedback.limpar();
     fixture.destroy();
@@ -106,7 +146,7 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
     await router.navigateByUrl('/lancamentos/novo');
     fixture.detectChanges();
     expect(fixture.componentInstance.cadastroLancamentoAtivo()).toBeTrue();
-    expect((fixture.nativeElement as HTMLElement).querySelector('.lancamento-fab')).toBeNull();
+    expect((fixture.nativeElement as HTMLElement).querySelector('.lancamento-speed-dial')).toBeNull();
 
     fixture.componentInstance.feedbackOperacoes.mostrar('Lançamento salvo');
     fixture.detectChanges();
