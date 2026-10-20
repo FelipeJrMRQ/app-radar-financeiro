@@ -1,5 +1,5 @@
 <section class="panel category-panel" aria-labelledby="titulo-categorias">
-                <div class="panel-head"><div><span class="eyebrow">ANÁLISE</span><h2 id="titulo-categorias">Despesas por categoria</h2></div></div>
+                <div class="panel-head"><div><h2 id="titulo-categorias">Despesas por categoria</h2></div></div>
                 @if (erroCategorias()) {
                   <p class="empty-data" role="alert">{{ erroCategorias() }}</p>
                 } @else if (categoriasGraficos().length === 0) {
