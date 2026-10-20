@@ -14,7 +14,13 @@
   </header>
 
   @if (contas().length === 0) {
-    <p class="cash-flow-empty">Cadastre uma conta para visualizar seu fluxo de caixa.</p>
+    <p class="cash-flow-empty">
+      @if (quantidadeOcultas() > 0) {
+        Todas as contas estão ocultas pelo filtro de saldo zerado. Use "Exibir zeradas" para visualizá-las.
+      } @else {
+        Cadastre uma conta para visualizar seu fluxo de caixa.
+      }
+    </p>
   } @else {
     @if (!contasSelecionadas().length) {
       <div class="cash-flow-empty">Selecione ao menos uma conta para visualizar a projeção.</div>
