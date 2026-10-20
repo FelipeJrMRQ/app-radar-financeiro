@@ -7,7 +7,7 @@ import { mensagemDeErro } from '../../../../core/http/api-error';
 import { interpretarErroDoPainel } from '../../utils/painel-erro';
 import { dataLocalIso } from '../../../contas-financeiras/utils/formatacao-contas';
 import { formatarMoeda } from '../../../../shared/valor-monetario';
-import { FluxoCaixaConta, PainelFinanceiro, TotalCategoria } from '../../models/painel-financeiro.model';
+import { FluxoCaixaConsolidado, PainelFinanceiro, TotalCategoria } from '../../models/painel-financeiro.model';
 import { PainelFinanceiroService } from '../../services/painel-financeiro.service';
 import { PainelPreferenciasService } from '../../services/painel-preferencias.service';
 import { ContasReceberCardComponent } from '../../components/contas-receber/contas-receber.component';
@@ -41,8 +41,9 @@ export class InicioPage implements OnInit {
   readonly erro = signal<string | null>(null);
   readonly rotaNaoEncontrada = signal(false);
   readonly painel = signal<PainelFinanceiro | null>(null);
-  readonly contaGraficoId = signal<number | null>(null);
-  readonly fluxo = signal<FluxoCaixaConta | null>(null);
+  // null = primeira carga; [] = usuário desmarcou todas as contas.
+  readonly contasGraficoIds = signal<number[] | null>(null);
+  readonly fluxo = signal<FluxoCaixaConsolidado | null>(null);
   readonly carregandoFluxo = signal(false);
   readonly erroFluxo = signal<string | null>(null);
   readonly aReceber = computed(() => this.painel()?.proximosVencimentos.filter(p => p.tipo === 'RECEITA').slice(0, 5) ?? []);
@@ -87,10 +88,11 @@ export class InicioPage implements OnInit {
       const dados = await firstValueFrom(this.api.consultar(inicio, fim));
       if (this.destruido || versao !== this.versao) return;
       this.painel.set(dados);
-      const idAtual = this.contaGraficoId();
-      if (!dados.contas.some(c => c.contaFinanceiraId === idAtual)) {
-        this.contaGraficoId.set(dados.contas[0]?.contaFinanceiraId ?? null);
-      }
+      const idsDisponiveis = dados.contas.map(c => c.contaFinanceiraId);
+      const selecaoAnterior = this.contasGraficoIds();
+      this.contasGraficoIds.set(selecaoAnterior === null
+        ? idsDisponiveis
+        : selecaoAnterior.filter(id => idsDisponiveis.includes(id)));
       if (this.preferencias.estaVisivel('FLUXO_CAIXA')) void this.carregarFluxo();
       if (this.preferencias.estaVisivel('DESPESAS_CATEGORIA')) {
         void this.carregarCategorias(versao, inicio, fim);
@@ -106,8 +108,9 @@ export class InicioPage implements OnInit {
     }
   }
 
-  alterarContaGrafico(id: number | null): void {
-    this.contaGraficoId.set(id);
+  alterarContasGrafico(ids: number[]): void {
+    const permitidos = new Set(this.painel()?.contas.map(c => c.contaFinanceiraId) ?? []);
+    this.contasGraficoIds.set([...new Set(ids)].filter(id => permitidos.has(id)));
     void this.carregarFluxo();
   }
 
@@ -115,12 +118,15 @@ export class InicioPage implements OnInit {
     const versao = ++this.versaoGrafico;
     this.fluxo.set(null);
     this.erroFluxo.set(null);
-    const id = this.contaGraficoId();
-    if (id === null) return;
+    const ids = this.contasGraficoIds() ?? [];
+    if (!ids.length) {
+      this.carregandoFluxo.set(false);
+      return;
+    }
     this.carregandoFluxo.set(true);
     const { inicio, fim } = this.datasPeriodo();
     try {
-      const fluxo = await firstValueFrom(this.api.fluxoCaixa(id, inicio, fim));
+      const fluxo = await firstValueFrom(this.api.fluxoCaixaConsolidado(ids, inicio, fim));
       if (!this.destruido && versao === this.versaoGrafico) this.fluxo.set(fluxo);
     } catch (erro) {
       if (!this.destruido && versao === this.versaoGrafico) this.erroFluxo.set(mensagemDeErro(erro));
