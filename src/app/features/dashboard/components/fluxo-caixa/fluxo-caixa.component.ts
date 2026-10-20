@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 import type { Chart, ScriptableContext } from 'chart.js';
 
-import { formatarDiaMes, formatarDataLocal, formatarMoeda } from '../../../../shared/valor-monetario';
+import { formatarDataLocal, formatarMoeda } from '../../../../shared/valor-monetario';
 import { FluxoCaixaConsolidado, SaldoContaPainel } from '../../models/painel-financeiro.model';
 import { criarSerieConsolidadaParaGrafico } from '../../utils/painel-visuais';
 
@@ -27,10 +27,7 @@ export class FluxoCaixaCardComponent {
   private versao = 0;
 
   readonly moeda = formatarMoeda;
-  readonly data = formatarDiaMes;
   readonly dataCompleta = formatarDataLocal;
-  readonly saldoHojeNegativo = computed(() => Number(this.fluxo()?.saldoHoje ?? 0) < 0);
-  readonly saldoFinalNegativo = computed(() => Number(this.fluxo()?.saldoFinal ?? 0) < 0);
   readonly temPendenciasAteHoje = computed(() => {
     const dados = this.fluxo();
     // A previsão só pode apresentar alteração no dia seguinte em períodos com hoje incluído.
@@ -51,10 +48,6 @@ export class FluxoCaixaCardComponent {
       this.grafico?.destroy();
       this.grafico = null;
     });
-  }
-
-  saldoNegativo(valor: string | number): boolean {
-    return Number(valor) < 0;
   }
 
   estaSelecionada(id: number): boolean {
