@@ -411,3 +411,16 @@ e **não habilita operações financeiras offline**; para utilizar saldos e lan�
 precisa estar acessível. Para conferir o modo na depuração:
 `window.matchMedia('(display-mode: fullscreen)').matches`.
 
+## Gráfico de fluxo consolidado com Chart.js
+
+O cartão **Fluxo de caixa consolidado** substitui as duas linhas SVG por uma única curva diária. `chart.js` é carregado de maneira lazy quando há dados; nenhuma soma monetária é realizada no navegador.
+
+- Seleção de contas por checkbox (por padrão, todas as contas ativas); atualizar a seleção consulta a API novamente. Desmarcar todas **não** consulta API e exibe o estado vazio.
+- Exibe o saldo confirmado hoje, o valor projetado ao final do período e a lista de contas com seus respectivos saldos atuais. Valores negativos reduzem a curva, cujo trecho abaixo de zero fica vermelho.
+- Tooltip exibe dia e valor fornecido pelo backend, com etiqueta **Realizado** ou **Projetado**. Pontos intermediários introduzidos unicamente para mudar a cor no cruzamento do eixo zero não representam transações e não mostram tooltip.
+- Uma linha tracejada indica a previsão depois do dia atual; hoje é marcado no gráfico quando está dentro do período selecionado.
+- O cartão ocupa a largura completa da grade no desktop e se adapta à visualização em celulares/PWA.
+
+**Requer backend** `chatgpt/fluxo-caixa-consolidado-multicontas` (rota `GET /relatorios/fluxo-caixa-consolidado` com filtros `contaId` repetidos).
+
+Comandos: `npm ci`, `npm run build` e `npm test -- --watch=false --browsers=ChromeHeadless`. Validar mudança de mês, seleção de contas, dias sem movimentação, previsão negativa, transferências entre contas e realização parcial; conferir layouts 320/375/430 px e desktop.
