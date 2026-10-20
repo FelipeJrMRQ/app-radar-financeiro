@@ -2,7 +2,7 @@ import {
   Component, computed, DestroyRef, effect, ElementRef, EventEmitter,
   inject, input, Output, viewChild,
 } from '@angular/core';
-import type { Chart } from 'chart.js';
+import type { Chart, ScriptableContext } from 'chart.js';
 
 import { formatarDiaMes, formatarDataLocal, formatarMoeda } from '../../../../shared/valor-monetario';
 import { FluxoCaixaConsolidado, SaldoContaPainel } from '../../models/painel-financeiro.model';
@@ -123,7 +123,7 @@ export class FluxoCaixaCardComponent {
           borderWidth: 2.7,
           tension: 0,
           fill: false,
-          pointRadius: (ctx) => ctx.dataIndex === hoje ? 4 : 0,
+          pointRadius: (ctx: ScriptableContext<'line'>) => ctx.dataIndex === hoje ? 4 : 0,
           pointHoverRadius: 6,
           pointHitRadius: 14,
           pointBackgroundColor: '#8be6cc',
@@ -131,9 +131,9 @@ export class FluxoCaixaCardComponent {
           pointBorderWidth: 1.5,
           segment: {
             borderColor: (ctx) =>
-              ctx.p0.parsed.y < 0 || ctx.p1.parsed.y < 0 ? '#ff6972' : '#b6c5cb',
+              (ctx.p0.parsed.y ?? 0) < 0 || (ctx.p1.parsed.y ?? 0) < 0 ? '#ff6972' : '#b6c5cb',
             borderDash: (ctx) =>
-              ctx.p0.parsed.x >= hoje && hoje >= 0 ? [5, 4] : [],
+              (ctx.p0.parsed.x ?? -1) >= hoje && hoje >= 0 ? [5, 4] : [],
           },
         }],
       },
@@ -159,7 +159,7 @@ export class FluxoCaixaCardComponent {
                 return formatarDataLocal(dados.pontos[indice]?.data ?? '');
               },
               label: (item) => {
-                const indice = Math.round(item.parsed.x);
+                const indice = Math.round(item.parsed.x ?? 0);
                 const ponto = dados.pontos[indice];
                 if (!ponto) return '';
                 return (ponto.situacao === 'REALIZADO' ? 'Realizado: ' : 'Projetado: ')
