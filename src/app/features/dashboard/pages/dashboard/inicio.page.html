@@ -91,7 +91,7 @@
         <app-saldos-contas-card [contas]="dados.contas.slice(0, 5)" [saldoConfirmado]="dados.saldoConfirmado" [saldoProjetado]="dados.saldoProjetado" />
       }
       @case ('FLUXO_CAIXA') {
-        <app-fluxo-caixa-card [contas]="dados.contas" [contaId]="contaGraficoId()" [fluxo]="fluxo()" [carregandoFluxo]="carregandoFluxo()" [erroFluxo]="erroFluxo()" (contaAlterada)="alterarContaGrafico($event)" />
+        <app-fluxo-caixa-card [contas]="dados.contas" [contasSelecionadas]="contasGraficoIds() ?? []" [fluxo]="fluxo()" [carregandoFluxo]="carregandoFluxo()" [erroFluxo]="erroFluxo()" (selecaoAlterada)="alterarContasGrafico($event)" />
       }
       @case ('DESPESAS_CATEGORIA') {
         <app-despesas-categoria-card [categorias]="categorias()" [erroCategorias]="erroCategorias()" />
