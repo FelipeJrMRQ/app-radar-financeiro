@@ -1,5 +1,5 @@
 <section class="panel due-panel" aria-labelledby="titulo-pagar">
-                <div class="panel-head"><div><span class="eyebrow">COMPROMISSOS</span><h2 id="titulo-pagar">Contas a pagar</h2></div>
+                <div class="panel-head"><div><h2 id="titulo-pagar">Contas a pagar</h2></div>
                   <a routerLink="/lancamentos" class="panel-link"
                      [queryParams]="{ tipo: 'DESPESA', mes: mesReferencia() }">Ver lançamentos →</a></div>
                 @if (itens().length === 0) {
