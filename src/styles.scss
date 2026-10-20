@@ -105,13 +105,23 @@ button, a { -webkit-tap-highlight-color: transparent; }
   animation:radar-atalhos-entrar .14s ease-out both;
 }
 .app-layout .lancamento-speed-opcao {
+  --rf-acao-cor:var(--rf-teal-700,#087d73);
+  --rf-acao-cor-hover:var(--rf-teal-600,#099587);
   display:flex; flex-direction:row; align-items:center; justify-content:flex-end;
   gap:10px; min-height:46px; text-decoration:none; color:inherit;
+}
+.app-layout .lancamento-speed-opcao.despesa {
+  --rf-acao-cor:#c0392b;
+  --rf-acao-cor-hover:#a93226;
+}
+.app-layout .lancamento-speed-opcao.transferencia {
+  --rf-acao-cor:#2563a6;
+  --rf-acao-cor-hover:#1d528b;
 }
 .app-layout .lancamento-speed-icone {
   display:grid; place-items:center; flex:0 0 46px; width:46px; height:46px; padding:0;
   border:1px solid rgba(255,255,255,.85); border-radius:50%;
-  background:var(--rf-teal-700,#087d73); color:#fff;
+  background:var(--rf-acao-cor); color:#fff;
   box-shadow:0 4px 12px rgba(5,61,70,.18);
   font:inherit; font-size:19px;
 }
@@ -126,7 +136,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .app-layout .lancamento-speed-opcao:hover .lancamento-speed-icone,
 .app-layout .lancamento-speed-opcao:focus-visible .lancamento-speed-icone {
-  background:var(--rf-teal-600,#099587);
+  background:var(--rf-acao-cor-hover);
 }
 .app-layout .lancamento-speed-descricao {
   display:inline-block; max-width:170px;
@@ -136,7 +146,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .app-layout .lancamento-speed-opcao.indisponivel { cursor:default; }
 .app-layout .lancamento-speed-opcao.indisponivel .lancamento-speed-icone {
-  opacity:.48; cursor:not-allowed; box-shadow:none;
+  opacity:.72; cursor:not-allowed; box-shadow:none;
 }
 .app-layout .lancamento-speed-opcao.indisponivel .lancamento-speed-descricao { opacity:.75; }
 @keyframes radar-atalhos-entrar {

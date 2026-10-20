@@ -87,10 +87,15 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
       .toBeTrue();
     expect(raiz.querySelector('[aria-label="Nova receita"] .lancamento-speed-letra')?.textContent)
       .toBe('R');
+    expect(raiz.querySelector('[aria-label="Nova receita"]')?.classList.contains('receita'))
+      .toBeTrue();
     expect(raiz.querySelector('[aria-label="Nova despesa"] .lancamento-speed-letra')?.textContent)
       .toBe('D');
+    expect(raiz.querySelector('[aria-label="Nova despesa"]')?.classList.contains('despesa'))
+      .toBeTrue();
     expect(raiz.querySelector('button[aria-label^="Nova transferência"] .lancamento-speed-letra')?.textContent)
       .toBe('T');
+    expect(raiz.querySelector('.lancamento-speed-opcao.transferencia.indisponivel')).not.toBeNull();
     raiz.querySelector('.lancamento-speed-dial')?.dispatchEvent(
       new PointerEvent('pointerleave', { pointerType:'mouse' }),
     );

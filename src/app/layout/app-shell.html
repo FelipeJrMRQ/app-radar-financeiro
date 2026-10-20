@@ -126,7 +126,7 @@
         <div class="lancamento-speed-opcoes" id="acoes-rapidas-lancamento"
              aria-label="Ações rápidas financeiras"
              (pointerenter)="aoEntrarPonteiro($event)">
-          <a class="lancamento-speed-opcao" routerLink="/lancamentos/novo"
+          <a class="lancamento-speed-opcao receita" routerLink="/lancamentos/novo"
              [queryParams]="{ tipo: 'RECEITA' }"
              aria-label="Nova receita" (click)="fecharMenuLancamento()">
             <span class="lancamento-speed-descricao">Nova receita</span>
@@ -134,7 +134,7 @@
               <span class="lancamento-speed-letra" aria-hidden="true">R</span>
             </span>
           </a>
-          <a class="lancamento-speed-opcao" routerLink="/lancamentos/novo"
+          <a class="lancamento-speed-opcao despesa" routerLink="/lancamentos/novo"
              [queryParams]="{ tipo: 'DESPESA' }"
              aria-label="Nova despesa" (click)="fecharMenuLancamento()">
             <span class="lancamento-speed-descricao">Nova despesa</span>
@@ -142,7 +142,7 @@
               <span class="lancamento-speed-letra" aria-hidden="true">D</span>
             </span>
           </a>
-          <div class="lancamento-speed-opcao indisponivel">
+          <div class="lancamento-speed-opcao transferencia indisponivel">
             <span class="lancamento-speed-descricao">Transferência · em breve</span>
             <button type="button" class="lancamento-speed-icone" disabled
               aria-label="Nova transferência indisponível: em breve"
