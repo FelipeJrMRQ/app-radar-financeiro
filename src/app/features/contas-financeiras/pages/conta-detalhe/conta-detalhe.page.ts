@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { firstValueFrom, forkJoin } from 'rxjs';
 
 import { mensagemDeErro } from '../../../../core/http/api-error';
+import { PrivacidadeValoresService } from '../../../../core/privacidade/privacidade-valores.service';
 import {
   ContaFinanceira,
   ExtratoContaFinanceira,
@@ -23,6 +24,7 @@ import { dataLocalIso, exibirData, exibirMoeda, valorNegativo } from '../../util
 })
 export class ContaDetalhePage implements OnInit {
   private readonly api = inject(ContasFinanceirasService);
+  readonly privacidade = inject(PrivacidadeValoresService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);

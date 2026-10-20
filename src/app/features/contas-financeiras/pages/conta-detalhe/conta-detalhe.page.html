@@ -27,12 +27,12 @@
       <div class="balance-grid">
         <div class="summary-card major">
           <span>Saldo confirmado</span>
-          <strong [class.negative]="negativo(saldoAtual.saldoConfirmado)">{{ moeda(saldoAtual.saldoConfirmado) }}</strong>
+          <strong [class.negative]="privacidade.valoresVisiveis() && negativo(saldoAtual.saldoConfirmado)">{{ privacidade.valoresVisiveis() ? moeda(saldoAtual.saldoConfirmado) : '••••••' }}</strong>
           <small>Saldo informado pelo servidor</small>
         </div>
         <div class="summary-card">
           <span>Saldo inicial</span>
-          <strong [class.negative]="negativo(contaAtual.saldoInicial)">{{ moeda(contaAtual.saldoInicial) }}</strong>
+          <strong [class.negative]="privacidade.valoresVisiveis() && negativo(contaAtual.saldoInicial)">{{ privacidade.valoresVisiveis() ? moeda(contaAtual.saldoInicial) : '••••••' }}</strong>
           <small>Valor informado no cadastro</small>
         </div>
       </div>
@@ -136,9 +136,9 @@
         </div>
       } @else if (extrato(); as extratoAtual) {
         <div class="statement-balances">
-          <div><span>Confirmado antes do período</span><strong>{{ moeda(extratoAtual.saldoConfirmadoAnterior) }}</strong></div>
-          <div><span>Confirmado ao fim do período</span><strong>{{ moeda(extratoAtual.saldoConfirmadoFinal) }}</strong></div>
-          <div><span>Projetado ao fim do período</span><strong>{{ moeda(extratoAtual.saldoProjetadoFinal) }}</strong></div>
+          <div><span>Confirmado antes do período</span><strong>{{ privacidade.valoresVisiveis() ? moeda(extratoAtual.saldoConfirmadoAnterior) : '••••••' }}</strong></div>
+          <div><span>Confirmado ao fim do período</span><strong>{{ privacidade.valoresVisiveis() ? moeda(extratoAtual.saldoConfirmadoFinal) : '••••••' }}</strong></div>
+          <div><span>Projetado ao fim do período</span><strong>{{ privacidade.valoresVisiveis() ? moeda(extratoAtual.saldoProjetadoFinal) : '••••••' }}</strong></div>
         </div>
 
         @if (extratoAtual.movimentos.length === 0) {
@@ -158,12 +158,12 @@
                   </span>
                 </div>
                 <div class="movement-value">
-                  <strong [class.negative]="negativo(movimento.valor)">{{ moeda(movimento.valor) }}</strong>
+                  <strong [class.negative]="privacidade.valoresVisiveis() && negativo(movimento.valor)">{{ privacidade.valoresVisiveis() ? moeda(movimento.valor) : '••••••' }}</strong>
                   <span [class.pending]="movimento.situacao === 'PREVISTO'">
                     {{ movimento.situacao === 'PREVISTO' ? 'Previsto' : 'Confirmado' }}
                   </span>
                   <small>Saldo {{ movimento.situacao === 'PREVISTO' ? 'projetado' : 'confirmado' }}:
-                    {{ moeda(movimento.situacao === 'PREVISTO' ? movimento.saldoProjetadoApos : movimento.saldoConfirmadoApos) }}
+                    {{ privacidade.valoresVisiveis() ? moeda(movimento.situacao === 'PREVISTO' ? movimento.saldoProjetadoApos : movimento.saldoConfirmadoApos) : '••••••' }}
                   </small>
                 </div>
               </article>

@@ -4,6 +4,7 @@ import { firstValueFrom, forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 import { mensagemDeErro } from '../../../../core/http/api-error';
+import { PrivacidadeValoresService } from '../../../../core/privacidade/privacidade-valores.service';
 import { ContaFinanceira, SaldoContaFinanceira, descricaoTipoConta } from '../../models/contas-financeiras.model';
 import { ContasFinanceirasService } from '../../services/contas-financeiras.service';
 import { exibirMoeda, valorNegativo } from '../../utils/formatacao-contas';
@@ -23,6 +24,7 @@ interface ContaComSaldo {
 })
 export class ContasListaPage implements OnInit {
   private readonly api = inject(ContasFinanceirasService);
+  readonly privacidade = inject(PrivacidadeValoresService);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private destruido = false;

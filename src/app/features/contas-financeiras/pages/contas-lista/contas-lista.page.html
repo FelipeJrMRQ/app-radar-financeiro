@@ -59,8 +59,8 @@
           }
           @if (item.saldo; as saldo) {
             <span class="balance-caption">{{ item.conta.ativo ? 'Saldo confirmado' : 'Saldo histórico confirmado' }}</span>
-            <strong class="account-balance" [class.negative]="negativo(saldo.saldoConfirmado)">
-              {{ moeda(saldo.saldoConfirmado) }}
+            <strong class="account-balance" [class.negative]="privacidade.valoresVisiveis() && negativo(saldo.saldoConfirmado)">
+              {{ privacidade.valoresVisiveis() ? moeda(saldo.saldoConfirmado) : '••••••' }}
             </strong>
           } @else {
             <span class="balance-caption">Saldo indisponível</span>
