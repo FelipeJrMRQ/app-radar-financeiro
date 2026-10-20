@@ -6,9 +6,9 @@
     <div class="cash-flow-actions">
       <button type="button" class="cash-flow-zero-toggle" (click)="alternarZeradas.emit()"
         [attr.aria-pressed]="ocultarContasZeradas()"
-        [attr.aria-label]="ocultarContasZeradas() ? 'Exibir contas com saldo zerado' : 'Ocultar contas com saldo zerado'">
+        [attr.aria-label]="ocultarContasZeradas() ? 'Exibir contas com saldo zerado' : 'Ocultar contas com saldo zerado'"
+        [attr.title]="ocultarContasZeradas() ? 'Exibir contas com saldo zerado' : 'Ocultar contas com saldo zerado'">
         <fa-icon [icon]="ocultarContasZeradas() ? iconeOlho : iconeOlhoFechado" aria-hidden="true"></fa-icon>
-        <span>{{ ocultarContasZeradas() ? 'Exibir zeradas' : 'Ocultar zeradas' }}</span>
       </button>
       <span class="cash-flow-count">{{ contasSelecionadas().length }} de {{ contas().length }} contas</span>
     </div>

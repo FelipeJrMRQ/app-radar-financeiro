@@ -424,3 +424,9 @@ h1 { margin:0 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; color
   .dashboard .category-doughnut-layout { padding-inline:13px; }
   .dashboard .category-doughnut-legend-item { gap:8px; }
 }
+
+/* Filtro compacto em ícone, com tooltip e rótulo acessível. */
+.dashboard .cash-flow-zero-toggle {
+  width:38px; height:38px; min-width:38px; display:inline-flex; align-items:center;
+  justify-content:center; padding:0; font-size:15px;
+}

@@ -44,13 +44,14 @@ describe('Fluxo de caixa consolidado', () => {
     const botao = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
       '.cash-flow-zero-toggle',
     );
-    expect(botao?.textContent).toContain('Ocultar zeradas');
+    expect(botao?.getAttribute('aria-label')).toContain('Ocultar contas com saldo zerado');
+    expect(botao?.querySelector('fa-icon')).not.toBeNull();
     botao?.click();
     expect(alternar).toHaveBeenCalled();
     fixture.componentRef.setInput('ocultarContasZeradas', true);
     fixture.componentRef.setInput('quantidadeOcultas', 2);
     fixture.detectChanges();
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Exibir zeradas');
+    expect(botao?.getAttribute('aria-label')).toContain('Exibir contas com saldo zerado');
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('2 conta(s) zerada(s)');
   });
 
