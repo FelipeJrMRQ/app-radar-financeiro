@@ -10,7 +10,8 @@ const manifest = JSON.parse(readFileSync(join(root, 'manifest.webmanifest'), 'ut
 assert.equal(manifest.id, '/');
 assert.equal(manifest.start_url, '/');
 assert.equal(manifest.scope, '/');
-assert.equal(manifest.display, 'fullscreen');
+assert.equal(manifest.display, 'standalone');
+assert.equal(manifest.short_name, 'Radar');
 assert.equal(manifest.theme_color, '#03111f');
 assert.equal(manifest.background_color, '#03111f');
 
@@ -57,4 +58,5 @@ for (const url of [
   });
   assert.equal(interceptada, false, 'O SW não deve interceptar ' + url);
 }
-console.log('PWA validado: manifesto fullscreen, PNGs reais, safe areas e API fora do cache.');
+console.log('PWA: validacao estrutural OK (standalone, icones, safe areas, SW sem cache de API).');
+console.log('Instalacao Android requer HTTPS valido e build de producao; este teste nao valida o ambiente de hospedagem.');

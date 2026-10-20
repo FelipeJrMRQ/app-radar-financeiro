@@ -17,6 +17,18 @@ npm start
 
 Acesse `http://localhost:4200`. O proxy do Angular recebe chamadas em `/api/*` e encaminha ao backend em `http://localhost:8080/*`. O proxy fica em `proxy.conf.json`, referenciado pelo `angular.json`. Em produção, o servidor HTTPS deve realizar o mesmo encaminhamento para `/api`, removendo o prefixo.
 
+## PWA no Android — instalação sem barra de endereço
+
+O manifesto é `standalone`, com nome curto **Radar** para a tela inicial, ícones PNG válidos e service worker de cache exclusivamente estático. **Instalação PWA não é igual a criar um atalho do Chrome.**
+
+- **Não instalar pelo endereço `http://<IP>:4200`**. HTTP em IP de rede não é origem confiável para instalar PWA; `localhost` só é exceção quando o browser acessa o próprio dispositivo.
+- **`ng serve` é para desenvolvimento**. O `src/main.ts` registra `/sw.js` somente quando `!isDevMode()`. Portanto, não serve como validação de instalação PWA no Android.
+- Para instalar corretamente, publicar `npm run build` em **HTTPS com certificado válido e domínio estável**, usando servidor com fallback para `index.html` nas rotas Angular e proxy seguro para `/api`. Não publicar o backend ou a porta 4200 diretamente na Internet.
+- No Chrome do Android, remover o atalho antigo, acessar a URL HTTPS e escolher **Instalar app** (ou a opção equivalente de instalação), não **Criar atalho**. A aplicação instalada deve abrir sem a barra de endereço.
+- `npm run test:pwa` verifica arquivos do build, manifesto e isolamento do cache, **não garante** HTTPS, instalação real ou funcionamento do service worker no aparelho.
+
+Passo a passo e checklist: [docs/pwa-android.md](docs/pwa-android.md).
+
 ## Segunda entrega — contas financeiras
 
 Rotas protegidas e mobile first:
