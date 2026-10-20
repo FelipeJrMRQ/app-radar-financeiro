@@ -147,7 +147,7 @@ export class FluxoCaixaCardComponent {
           legend: { display: false },
           tooltip: {
             // Cruzamentos interpolados não são datas financeiras nem valores realizados.
-            filter: (item) => Number.isInteger(item.parsed.x),
+            filter: (item) => Number.isInteger(item.parsed.x ?? NaN),
             displayColors: false,
             backgroundColor: '#faffff',
             titleColor: '#173447',
