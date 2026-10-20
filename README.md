@@ -429,3 +429,13 @@ O cartão **Fluxo de caixa consolidado** substitui as duas linhas SVG por uma ú
 **Requer backend** `chatgpt/fluxo-caixa-consolidado-multicontas` (rota `GET /relatorios/fluxo-caixa-consolidado` com filtros `contaId` repetidos).
 
 Comandos: `npm ci`, `npm run build` e `npm test -- --watch=false --browsers=ChromeHeadless`. Validar mudança de mês, seleção de contas, dias sem movimentação, previsão negativa, transferências entre contas e realização parcial; conferir layouts 320/375/430 px e desktop.
+
+## Despesas por categoria — rosca Chart.js
+
+O componente **Despesas por categoria** mostra um único gráfico `doughnut`, mantendo o tema claro e as duas colunas do painel. O gráfico e a legenda se organizam lado a lado quando o card permite; em larguras menores, ficam empilhados, preservando o mosaico responsivo.
+
+- A API existente `GET /relatorios/despesas-por-categoria` continua sendo a fonte dos valores **realizados** no período. Não há mudança no backend nem novos cálculos de despesas.
+- O centro do gráfico apresenta **Total realizado**; o tooltip e a legenda mostram nome, valor em reais e percentual da categoria.
+- As **cinco maiores categorias** permanecem separadas, e as demais entram em **Outras**. A agregação de apresentação usa inteiros de quatro casas decimais, evitando perdas de centavos ao agrupar.
+- O Chart.js utiliza a dependência já instalada, importada sob demanda; o painel mantém mensagens de erro e o estado sem despesas.
+- Para conferir o resultado: `npm ci`, `npm run build`, `npm test -- --watch=false --browsers=ChromeHeadless`. Validar uma categoria, cinco categorias, mais de cinco, período sem despesas e largura de 320–430px / desktop.
