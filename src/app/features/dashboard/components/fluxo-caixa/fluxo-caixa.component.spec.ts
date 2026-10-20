@@ -21,16 +21,19 @@ describe('Fluxo de caixa consolidado', () => {
     }).compileComponents();
   });
 
-  it('exibe contas e saldos negativos da API sem calcular valores no Angular', () => {
+  it('exibe nomes e seleção de contas sem repetir os saldos do card de contas', () => {
     const fixture = preparar();
     const raiz = fixture.nativeElement as HTMLElement;
     expect(raiz.textContent).toContain('Nubank');
     expect(raiz.textContent).toContain('Itaú');
     expect(raiz.textContent).toContain('2 de 2 contas');
-    expect(raiz.textContent).toContain('-R$');
     expect(raiz.querySelectorAll('input[type="checkbox"]').length).toBe(2);
-    expect(fixture.componentInstance.saldoNegativo('-0.0100')).toBeTrue();
-    expect(fixture.componentInstance.saldoNegativo('12.3400')).toBeFalse();
+    expect(raiz.querySelectorAll('.cash-flow-total').length).toBe(0);
+    expect(raiz.querySelectorAll('.cash-flow-account-value').length).toBe(0);
+    expect(raiz.querySelector('.cash-flow-footer')).toBeNull();
+    expect(raiz.textContent).not.toContain('Saldo confirmado hoje');
+    expect(raiz.textContent).not.toContain('Saldo ao fim do período');
+    expect(raiz.textContent).not.toContain('PLANEJAMENTO FINANCEIRO');
   });
 
   it('emite seleção múltipla mantendo as outras contas e permite selecionar todas', () => {
@@ -55,7 +58,7 @@ describe('Fluxo de caixa consolidado', () => {
     expect(raiz.querySelector('canvas')).toBeNull();
   });
 
-  it('apresenta uma única área de plotagem e saldo final negativo da API', () => {
+  it('mantém um único gráfico com saldo final acessível sem painel de totais duplicado', () => {
     const fixture = preparar();
     const fluxo: FluxoCaixaConsolidado = {
       dataInicio: '2026-10-19',
@@ -78,7 +81,9 @@ describe('Fluxo de caixa consolidado', () => {
     fixture.detectChanges();
     const raiz = fixture.nativeElement as HTMLElement;
     expect(raiz.querySelectorAll('.cash-flow-chart canvas').length).toBe(1);
-    expect(raiz.textContent).toContain('490,50');
-    expect(fixture.componentInstance.saldoFinalNegativo()).toBeTrue();
+    expect(raiz.querySelector('.cash-flow-chart canvas')?.getAttribute('aria-label'))
+      .toContain('490,50');
+    expect(raiz.querySelector('.cash-flow-total')).toBeNull();
+    expect(raiz.querySelector('.cash-flow-footer')).toBeNull();
   });
 });
