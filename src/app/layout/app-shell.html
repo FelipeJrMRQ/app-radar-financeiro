@@ -11,18 +11,11 @@
       <nav aria-label="Navegação financeira">
         <a routerLink="/" [routerLinkActiveOptions]="{ exact: true }"
            routerLinkActive="active" class="sidebar-link">
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
-            <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
-          </svg>
+          <fa-icon [icon]="iconeInicio" aria-hidden="true"></fa-icon>
           Início
         </a>
         <a routerLink="/lancamentos" routerLinkActive="active" class="sidebar-link">
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 4h12M8 10h12M8 16h12M4 4h.01M4 10h.01M4 16h.01"/>
-          </svg>
+          <fa-icon [icon]="iconeLancamentos" aria-hidden="true"></fa-icon>
           Lançamentos
         </a>
       </nav>
@@ -31,13 +24,9 @@
       <nav aria-label="Cadastros e configurações">
         <details class="sidebar-group" [class.section-active]="cadastrosAtivo()" open>
           <summary class="sidebar-group-trigger">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="5" width="18" height="15" rx="2"/>
-              <path d="M3 10h18M8 15h8"/>
-            </svg>
+            <fa-icon [icon]="iconeCadastros" aria-hidden="true"></fa-icon>
             <span>Cadastros</span>
-            <span class="group-chevron" aria-hidden="true">⌄</span>
+            <fa-icon class="group-chevron" [icon]="iconeExpandir" aria-hidden="true"></fa-icon>
           </summary>
           <div class="sidebar-subitems">
             <a routerLink="/cadastros" [routerLinkActiveOptions]="{ exact: true }"
@@ -49,13 +38,9 @@
         </details>
         <details class="sidebar-group" [class.section-active]="configuracoesAtivo()" open>
           <summary class="sidebar-group-trigger">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>
-              <circle cx="12" cy="12" r="4"/>
-            </svg>
+            <fa-icon [icon]="iconeConfiguracoes" aria-hidden="true"></fa-icon>
             <span>Configurações</span>
-            <span class="group-chevron" aria-hidden="true">⌄</span>
+            <fa-icon class="group-chevron" [icon]="iconeExpandir" aria-hidden="true"></fa-icon>
           </summary>
           <div class="sidebar-subitems">
             <a routerLink="/configuracoes" [routerLinkActiveOptions]="{ exact: true }"
@@ -77,7 +62,7 @@
           <span>{{ sessao.usuario()?.email }}</span>
         </div>
       </div>
-      <button type="button" class="side-logout" (click)="sair()">Sair da conta <span aria-hidden="true">↗</span></button>
+      <button type="button" class="side-logout" (click)="sair()">Sair da conta <fa-icon [icon]="iconeSair" aria-hidden="true"></fa-icon></button>
     </div>
   </aside>
 
@@ -127,42 +112,24 @@
   @if (!cadastroLancamentoAtivo()) {
     <a routerLink="/lancamentos/novo" class="mobile-fab"
        aria-label="Novo lançamento" title="Novo lançamento">
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 5v14M5 12h14"/>
-      </svg>
+      <fa-icon [icon]="iconeNovoLancamento" aria-hidden="true"></fa-icon>
     </a>
   }
 
   <nav class="mobile-bottom-nav" aria-label="Navegação principal">
     <a routerLink="/" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="active">
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
-        <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
-      </svg><span>Início</span>
+      <fa-icon [icon]="iconeInicio" aria-hidden="true"></fa-icon><span>Início</span>
     </a>
     <a routerLink="/lancamentos" routerLinkActive="active">
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M8 4h12M8 10h12M8 16h12M4 4h.01M4 10h.01M4 16h.01"/>
-      </svg><span>Lançamentos</span>
+      <fa-icon [icon]="iconeLancamentos" aria-hidden="true"></fa-icon><span>Lançamentos</span>
     </a>
     <a routerLink="/cadastros" [class.active]="cadastrosAtivo()"
        [attr.aria-current]="cadastrosAtivo() ? 'page' : null">
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="5" width="18" height="15" rx="2"/>
-        <path d="M3 10h18M8 15h8"/>
-      </svg><span>Cadastros</span>
+      <fa-icon [icon]="iconeCadastros" aria-hidden="true"></fa-icon><span>Cadastros</span>
     </a>
     <a routerLink="/configuracoes" [class.active]="configuracoesAtivo()"
        [attr.aria-current]="configuracoesAtivo() ? 'page' : null">
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>
-        <circle cx="12" cy="12" r="4"/>
-      </svg><span>Configurações</span>
+      <fa-icon [icon]="iconeConfiguracoes" aria-hidden="true"></fa-icon><span>Configurações</span>
     </a>
   </nav>
 </div>

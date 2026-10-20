@@ -43,7 +43,7 @@
 }
 .mobile-fab:hover { background: var(--rf-teal-600,#099587); }
 .mobile-fab:focus-visible { outline-offset: 4px; }
-.mobile-fab svg { width: 26px; height: 26px; }
+.mobile-fab fa-icon { font-size: 26px; line-height: 1; }
 
 .mobile-bottom-nav {
   display: flex; position: fixed; bottom: 0; right: 0; left: 0; z-index: 10;
@@ -56,7 +56,7 @@
   justify-content: center; color: #75899b; text-decoration: none; font-size: 11px; font-weight: 700;
 }
 .mobile-bottom-nav a.active { color: #117f75; }
-.mobile-bottom-nav svg { width: 22px; height: 22px; }
+.mobile-bottom-nav fa-icon { font-size: 21px; line-height: 1; }
 @media (min-width: 860px) {
   .app-layout { display: grid; grid-template-columns: 254px minmax(0, 1fr); }
   .sidebar {
@@ -75,7 +75,7 @@
   }
   .sidebar-link:hover, .sidebar-link.active { background: #1a4758; color: white; }
   .sidebar-link.active { box-shadow: inset 3px 0 0 #71ddbf; }
-  .sidebar-link svg { width: 20px; height: 20px; }
+  .sidebar-link fa-icon { width: 20px; min-width: 20px; font-size: 18px; text-align: center; }
   .sidebar-footer { margin-top: auto; border-top: 1px solid #2a4459; padding-top: 22px; }
   .side-profile { display: flex; align-items: center; gap: 10px; padding: 0 5px; min-width: 0; }
   .avatar { flex: 0 0 39px; height: 39px; display: grid; place-items: center; border-radius: 50%; background: #285569; color: #e8fff5; font-weight: 800; }
@@ -144,8 +144,8 @@
     cursor:pointer; list-style:none; }
   .sidebar-group-trigger::-webkit-details-marker { display:none; }
   .sidebar-group-trigger:hover,.sidebar-group-trigger:focus-visible { background:#1a4758; color:white; }
-  .sidebar-group-trigger svg { width:20px; height:20px; flex-shrink:0; }
-  .group-chevron { margin-left:auto; color:#a5bdc7; transition:transform .15s; }
+  .sidebar-group-trigger fa-icon:not(.group-chevron) { width:20px; flex-shrink:0; font-size:18px; text-align:center; }
+  .group-chevron { display:inline-flex; margin-left:auto; color:#a5bdc7; transition:transform .15s; }
   .sidebar-group[open] .group-chevron { transform:rotate(180deg); }
   .sidebar-subitems { display:flex; flex-direction:column; gap:2px; margin:1px 0 9px 31px;
     padding-left:11px; border-left:1px solid #426171; }

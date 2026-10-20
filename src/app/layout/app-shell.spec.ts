@@ -44,6 +44,32 @@ describe('Ação flutuante no layout mobile', () => {
     expect(privacidade.valoresVisiveis()).toBeFalse();
   });
 
+  it('renderiza ícones Font Awesome nos menus desktop e mobile', () => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+    const raiz = fixture.nativeElement as HTMLElement;
+    const conferir = (seletor: string, icone: string) => {
+      const svg = raiz.querySelector(`${seletor} fa-icon svg`);
+      expect(svg).withContext(seletor).not.toBeNull();
+      expect(svg?.getAttribute('data-icon')).withContext(seletor).toBe(icone);
+    };
+
+    conferir('.sidebar-link[href="/"]', 'table-cells-large');
+    conferir('.sidebar-link[href="/lancamentos"]', 'list-ul');
+    conferir('.sidebar-group:first-of-type .sidebar-group-trigger', 'folder-open');
+    conferir('.sidebar-group:nth-of-type(2) .sidebar-group-trigger', 'gear');
+    conferir('.mobile-bottom-nav a[href="/"]', 'table-cells-large');
+    conferir('.mobile-bottom-nav a[href="/lancamentos"]', 'list-ul');
+    conferir('.mobile-bottom-nav a[href="/cadastros"]', 'folder-open');
+    conferir('.mobile-bottom-nav a[href="/configuracoes"]', 'gear');
+    conferir('a.mobile-fab', 'plus');
+    expect(raiz.querySelectorAll('.sidebar-group-trigger fa-icon.group-chevron').length)
+      .toBe(2);
+    expect(raiz.querySelector('.side-logout fa-icon svg')?.getAttribute('data-icon'))
+      .toBe('right-from-bracket');
+    expect(raiz.querySelectorAll('.mobile-bottom-nav a').length).toBe(4);
+  });
+
   it('mantém consulta na navegação e usa o botão flutuante para criar', () => {
     const fixture = TestBed.createComponent(AppShell);
     fixture.detectChanges();
