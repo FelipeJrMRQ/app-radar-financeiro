@@ -9,8 +9,7 @@ import { PrivacidadeValoresService } from '../core/privacidade/privacidade-valor
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faArrowRightFromBracket, faChevronDown, faEye, faEyeSlash,
-  faArrowDown, faArrowRightArrowLeft, faArrowUp, faFolderOpen, faGear,
-  faListUl, faPlus, faTableCellsLarge,
+  faFolderOpen, faGear, faListUl, faPlus, faTableCellsLarge,
 } from '@fortawesome/free-solid-svg-icons';
 import { grupoNavegacao } from './navegacao-grupos';
 
@@ -33,9 +32,6 @@ export class AppShell {
   readonly iconeExpandir = faChevronDown;
   readonly iconeSair = faArrowRightFromBracket;
   readonly iconeNovoLancamento = faPlus;
-  readonly iconeReceita = faArrowDown;
-  readonly iconeDespesa = faArrowUp;
-  readonly iconeTransferencia = faArrowRightArrowLeft;
   readonly menuLancamentoAberto = signal(false);
   private readonly atrasoFechamentoMs = 1000;
   private temporizadorFechamento: ReturnType<typeof setTimeout> | null = null;

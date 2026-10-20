@@ -115,6 +115,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
   box-shadow:0 4px 12px rgba(5,61,70,.18);
   font:inherit; font-size:19px;
 }
+.app-layout .lancamento-speed-letra {
+  display:block;
+  font-family:inherit;
+  font-size:18px;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:0;
+  user-select:none;
+}
 .app-layout .lancamento-speed-opcao:hover .lancamento-speed-icone,
 .app-layout .lancamento-speed-opcao:focus-visible .lancamento-speed-icone {
   background:var(--rf-teal-600,#099587);

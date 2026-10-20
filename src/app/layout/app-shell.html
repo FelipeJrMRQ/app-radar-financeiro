@@ -131,7 +131,7 @@
              aria-label="Nova receita" (click)="fecharMenuLancamento()">
             <span class="lancamento-speed-descricao">Nova receita</span>
             <span class="lancamento-speed-icone">
-              <fa-icon [icon]="iconeReceita" aria-hidden="true"></fa-icon>
+              <span class="lancamento-speed-letra" aria-hidden="true">R</span>
             </span>
           </a>
           <a class="lancamento-speed-opcao" routerLink="/lancamentos/novo"
@@ -139,7 +139,7 @@
              aria-label="Nova despesa" (click)="fecharMenuLancamento()">
             <span class="lancamento-speed-descricao">Nova despesa</span>
             <span class="lancamento-speed-icone">
-              <fa-icon [icon]="iconeDespesa" aria-hidden="true"></fa-icon>
+              <span class="lancamento-speed-letra" aria-hidden="true">D</span>
             </span>
           </a>
           <div class="lancamento-speed-opcao indisponivel">
@@ -147,7 +147,7 @@
             <button type="button" class="lancamento-speed-icone" disabled
               aria-label="Nova transferência indisponível: em breve"
               title="Transferências serão implementadas em uma próxima etapa">
-              <fa-icon [icon]="iconeTransferencia" aria-hidden="true"></fa-icon>
+              <span class="lancamento-speed-letra" aria-hidden="true">T</span>
             </button>
           </div>
         </div>
