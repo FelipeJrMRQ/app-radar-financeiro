@@ -1,4 +1,5 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { PreferenciasFluxoCaixaService } from '../../services/preferencias-fluxo-caixa.service';
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
@@ -28,6 +29,7 @@ export class InicioPage implements OnInit {
   private readonly sessao = inject(AuthService);
   private readonly api = inject(PainelFinanceiroService);
   readonly preferencias = inject(PainelPreferenciasService);
+  readonly preferenciasFluxo = inject(PreferenciasFluxoCaixaService);
   private readonly destroyRef = inject(DestroyRef);
   private destruido = false;
   private versao = 0;
@@ -44,6 +46,18 @@ export class InicioPage implements OnInit {
   readonly painel = signal<PainelFinanceiro | null>(null);
   // null = primeira carga; [] = usuário desmarcou todas as contas.
   readonly contasGraficoIds = signal<number[] | null>(null);
+  readonly contasDesmarcadas = signal<number[]>([]);
+  readonly ocultarContasZeradas = signal(false);
+  readonly contasZeradas = computed(() => (this.painel()?.contas ?? [])
+    .filter(conta => Number(conta.saldoConfirmado) === 0 &&
+      Number(conta.saldoProjetado) === 0)
+    .map(conta => conta.contaFinanceiraId));
+  readonly contasVisiveis = computed(() => (this.painel()?.contas ?? [])
+    .filter(conta => !this.ocultarContasZeradas() ||
+      !this.contasZeradas().includes(conta.contaFinanceiraId)));
+  readonly contasEfetivas = computed(() => this.contasVisiveis()
+    .map(conta => conta.contaFinanceiraId)
+    .filter(id => !this.contasDesmarcadas().includes(id)));
   readonly fluxo = signal<FluxoCaixaConsolidado | null>(null);
   readonly carregandoFluxo = signal(false);
   readonly erroFluxo = signal<string | null>(null);
@@ -60,8 +74,14 @@ export class InicioPage implements OnInit {
   ngOnInit(): void { void this.iniciar(); }
 
   private async iniciar(): Promise<void> {
-    await this.preferencias.carregar();
-    if (!this.destruido) await this.carregar();
+    const [_, filtros] = await Promise.all([
+      this.preferencias.carregar(),
+      this.preferenciasFluxo.carregar(),
+    ]);
+    if (this.destruido) return;
+    this.ocultarContasZeradas.set(filtros.ocultarContasZeradas);
+    this.contasDesmarcadas.set([...new Set(filtros.contasDesmarcadas)]);
+    await this.carregar();
   }
 
   mudarMes(passo: number): void {
@@ -91,11 +111,7 @@ export class InicioPage implements OnInit {
       const dados = await firstValueFrom(this.api.consultar(inicio, fim));
       if (this.destruido || versao !== this.versao) return;
       this.painel.set(dados);
-      const idsDisponiveis = dados.contas.map(c => c.contaFinanceiraId);
-      const selecaoAnterior = this.contasGraficoIds();
-      this.contasGraficoIds.set(selecaoAnterior === null
-        ? idsDisponiveis
-        : selecaoAnterior.filter(id => idsDisponiveis.includes(id)));
+      this.contasGraficoIds.set(this.contasEfetivas());
       if (this.preferencias.estaVisivel('FLUXO_CAIXA')) void this.carregarFluxo();
       if (this.preferencias.estaVisivel('DESPESAS_CATEGORIA')) {
         void this.carregarCategorias(versao, inicio, fim);
@@ -112,8 +128,27 @@ export class InicioPage implements OnInit {
   }
 
   alterarContasGrafico(ids: number[]): void {
-    const permitidos = new Set(this.painel()?.contas.map(c => c.contaFinanceiraId) ?? []);
-    this.contasGraficoIds.set([...new Set(ids)].filter(id => permitidos.has(id)));
+    const selecionadas = new Set(ids);
+    const desmarcadas = new Set(this.contasDesmarcadas());
+    for (const conta of this.contasVisiveis()) {
+      if (selecionadas.has(conta.contaFinanceiraId)) desmarcadas.delete(conta.contaFinanceiraId);
+      else desmarcadas.add(conta.contaFinanceiraId);
+    }
+    this.contasDesmarcadas.set([...desmarcadas]);
+    this.atualizarFluxo();
+  }
+
+  alternarContasZeradas(): void {
+    this.ocultarContasZeradas.update(valor => !valor);
+    this.atualizarFluxo();
+  }
+
+  private atualizarFluxo(): void {
+    this.contasGraficoIds.set(this.contasEfetivas());
+    this.preferenciasFluxo.salvar({
+      ocultarContasZeradas: this.ocultarContasZeradas(),
+      contasDesmarcadas: this.contasDesmarcadas(),
+    });
     void this.carregarFluxo();
   }
 

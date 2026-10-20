@@ -19,6 +19,10 @@ export class FluxoCaixaCardComponent {
   readonly fluxo = input<FluxoCaixaConsolidado | null>(null);
   readonly carregandoFluxo = input(false);
   readonly erroFluxo = input<string | null>(null);
+  readonly ocultarContasZeradas = input(false);
+  readonly quantidadeOcultas = input(0);
+  readonly erroPreferencias = input<string | null>(null);
+  @Output() readonly alternarZeradas = new EventEmitter<void>();
   @Output() readonly selecaoAlterada = new EventEmitter<number[]>();
 
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('graficoFluxo');

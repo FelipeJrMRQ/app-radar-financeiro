@@ -84,7 +84,7 @@
         <app-saldos-contas-card rfMosaicoPainelItem [contas]="dados.contas.slice(0, 5)" [saldoConfirmado]="dados.saldoConfirmado" [saldoProjetado]="dados.saldoProjetado" />
       }
       @case ('FLUXO_CAIXA') {
-        <app-fluxo-caixa-card rfMosaicoPainelItem [contas]="dados.contas" [contasSelecionadas]="contasGraficoIds() ?? []" [fluxo]="fluxo()" [carregandoFluxo]="carregandoFluxo()" [erroFluxo]="erroFluxo()" (selecaoAlterada)="alterarContasGrafico($event)" />
+        <app-fluxo-caixa-card rfMosaicoPainelItem [contas]="contasVisiveis()" [contasSelecionadas]="contasGraficoIds() ?? []" [fluxo]="fluxo()" [carregandoFluxo]="carregandoFluxo()" [erroFluxo]="erroFluxo()" [ocultarContasZeradas]="ocultarContasZeradas()" [quantidadeOcultas]="ocultarContasZeradas() ? contasZeradas().length : 0" [erroPreferencias]="preferenciasFluxo.erro()" (selecaoAlterada)="alterarContasGrafico($event)" (alternarZeradas)="alternarContasZeradas()" />
       }
       @case ('DESPESAS_CATEGORIA') {
         <app-despesas-categoria-card rfMosaicoPainelItem [categorias]="categorias()" [erroCategorias]="erroCategorias()" />
