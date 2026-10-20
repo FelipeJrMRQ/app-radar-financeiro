@@ -33,6 +33,26 @@ describe('PainelFinanceiroService', () => {
     expect((await result).aReceberPeriodo).toBe(1250);
   });
 
+
+  it('consulta consolidado com todas as contas selecionadas em parâmetros repetidos', async () => {
+    const promise = firstValueFrom(api.fluxoCaixaConsolidado(
+      [13, 29], '2026-10-01', '2026-10-31'));
+    const req = http.expectOne((r) => r.url ===
+      '/api/espacos-financeiros/42/relatorios/fluxo-caixa-consolidado');
+    expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('dataInicio')).toBe('2026-10-01');
+    expect(req.request.params.get('dataFim')).toBe('2026-10-31');
+    expect(req.request.params.getAll('contaId')).toEqual(['13', '29']);
+    req.flush({
+      dataInicio: '2026-10-01', dataFim: '2026-10-31',
+      dataHoje: '2026-10-20', saldoHoje: -200, saldoFinal: 500,
+      contas: [], pontos: [{
+        data: '2026-10-20', saldo: -200, situacao: 'REALIZADO',
+      }],
+    });
+    expect((await promise).saldoHoje).toBe(-200);
+  });
+
   it('consulta fluxo de caixa por conta selecionada', async () => {
     const promise = firstValueFrom(api.fluxoCaixa(13, '2026-10-01', '2026-10-31'));
     const req = http.expectOne((r) => r.url ===
