@@ -1,0 +1,103 @@
+<section class="transferencias-page">
+  <header class="page-heading">
+    <div>
+      <span class="eyebrow">SUAS CONTAS FINANCEIRAS</span>
+      <h1>Transferências</h1>
+      <p>Movimentações entre contas próprias, realizadas ou previstas.</p>
+    </div>
+    <a routerLink="/transferencias/novo" class="button-primary">+ Nova transferência</a>
+  </header>
+
+  @if (mensagemSucesso()) {
+    <div class="success-message" role="status">{{ mensagemSucesso() }}</div>
+  }
+  <div class="periodo-selector" aria-label="Mês das transferências">
+    <button type="button" (click)="mudarMes(-1)" aria-label="Mês anterior">‹</button>
+    <strong aria-live="polite">{{ mesDescricao() }}</strong>
+    <button type="button" (click)="mudarMes(1)" aria-label="Próximo mês">›</button>
+  </div>
+
+  @if (carregando()) {
+    <div class="state-card" role="status">Consultando transferências…</div>
+  } @else if (erro()) {
+    <div class="state-card" role="alert">
+      <p>{{ erro() }}</p>
+      <button class="button-secondary" type="button" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else if (!exibicao().length) {
+    <div class="state-card empty">
+      <h2>Nenhuma transferência neste mês</h2>
+      <p>Movimente dinheiro entre contas cadastradas sem registrar receita ou despesa.</p>
+      <a routerLink="/transferencias/novo" class="button-primary">Registrar transferência</a>
+    </div>
+  } @else {
+    <p class="results-caption">{{ visiveis().length }} de {{ exibicao().length }} transferências</p>
+    <div class="movement-list">
+      @for (item of visiveis(); track item.id) {
+        <article class="movement">
+          <span class="movement-icon" aria-hidden="true">T</span>
+          <div class="movement-detail">
+            <strong>{{ item.descricao }}</strong>
+            <span>{{ item.contaOrigemNome }} → {{ item.contaDestinoNome }}</span>
+            <small>{{ data(item.dataTransferencia) }}</small>
+          </div>
+          <div class="movement-value">
+            <strong>{{ moeda(item.valor) }}</strong>
+            <span [class.previsto]="item.situacao === 'PREVISTO'">
+              {{ item.situacao === 'PREVISTO' ? 'Prevista' : 'Confirmada' }}
+            </span>
+            @if (item.situacao === 'CONFIRMADO' && item.valorEfetivo !== null
+              && String(item.valorEfetivo) !== String(item.valor)) {
+              <small>Efetivo: {{ moeda(item.valorEfetivo) }}</small>
+            }
+          </div>
+          <div class="movement-actions">
+            <a class="button-secondary" [routerLink]="['/transferencias', item.id, 'editar']"
+              [attr.aria-label]="'Editar ' + item.descricao">Editar</a>
+            @if (item.situacao === 'PREVISTO') {
+              <button type="button" class="button-secondary" (click)="prepararAcao(item, 'CONFIRMAR')">
+                Confirmar
+              </button>
+            }
+            <button type="button" class="button-secondary danger" (click)="prepararAcao(item, 'EXCLUIR')">
+              Excluir
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+    @if (visiveis().length < exibicao().length) {
+      <button type="button" class="button-secondary" (click)="mostrarMais()">Mostrar mais</button>
+    }
+  }
+
+  @if (selecionada(); as item) {
+    <div class="modal-backdrop" role="presentation" (click)="fecharAcao()"></div>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-transferencia-titulo">
+      <h2 id="modal-transferencia-titulo">
+        {{ acao() === 'EXCLUIR' ? 'Excluir transferência' : 'Confirmar transferência' }}
+      </h2>
+      <p><strong>{{ item.descricao }}</strong></p>
+      <p>{{ item.contaOrigemNome }} → {{ item.contaDestinoNome }} · {{ moeda(item.valor) }}</p>
+      @if (acao() === 'EXCLUIR') {
+        <p class="alerta">A exclusão retira a movimentação dos saldos e extratos.
+          Não exclua operações que aconteceram de verdade.</p>
+      } @else if (acao() === 'CONFIRMAR') {
+        <label for="transferencia-valor-efetivo">Valor efetivo (R$)</label>
+        <input id="transferencia-valor-efetivo" type="text" inputmode="numeric" rfMoedaBr
+          [formControl]="valorEfetivo" placeholder="R$ 0,00" />
+        <label for="transferencia-data-efetiva">Data efetiva</label>
+        <input id="transferencia-data-efetiva" type="date" [formControl]="dataEfetiva" />
+        <small class="field-hint">A data efetiva não pode ser futura.</small>
+      }
+      @if (erroAcao()) { <p class="error-message" role="alert">{{ erroAcao() }}</p> }
+      <div class="modal-actions">
+        <button type="button" class="button-secondary" [disabled]="operando()" (click)="fecharAcao()">Cancelar</button>
+        <button type="button" class="button-primary" [class.danger]="acao() === 'EXCLUIR'"
+          [disabled]="operando()" (click)="executarAcao()">
+          {{ operando() ? 'Processando…' : acao() === 'EXCLUIR' ? 'Excluir transferência' : 'Confirmar transferência' }}
+        </button>
+      </div>
+    </section>
+  }
+</section>
