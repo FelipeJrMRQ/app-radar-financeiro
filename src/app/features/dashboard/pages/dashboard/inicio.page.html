@@ -85,7 +85,7 @@
           [contas]="dados.contas" [saldoConfirmado]="dados.saldoConfirmado"
           [saldoProjetado]="dados.saldoProjetado"
           [contasSelecionadas]="contasGraficoIds() ?? []"
-          [contasSelecionaveis]="contasVisiveis().map(conta => conta.contaFinanceiraId)"
+          [contasSelecionaveis]="contasSelecionaveis()"
           (selecaoAlterada)="alterarContasGrafico($event)"
           [valoresVisiveis]="privacidade.valoresVisiveis()" />
       }

@@ -57,6 +57,8 @@ export class InicioPage implements OnInit {
   readonly contasVisiveis = computed(() => (this.painel()?.contas ?? [])
     .filter(conta => !this.ocultarContasZeradas() ||
       !this.contasZeradas().includes(conta.contaFinanceiraId)));
+  readonly contasSelecionaveis = computed(() => this.contasVisiveis()
+    .map(conta => conta.contaFinanceiraId));
   readonly contasEfetivas = computed(() => this.contasVisiveis()
     .map(conta => conta.contaFinanceiraId)
     .filter(id => !this.contasDesmarcadas().includes(id)));

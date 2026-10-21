@@ -18,6 +18,7 @@ describe('Card de saldos de caixa', () => {
     fixture.componentRef.setInput('saldoProjetado', '-891.08');
     fixture.componentRef.setInput('contasSelecionadas', [8, 9]);
     fixture.componentRef.setInput('contasSelecionaveis', [8, 9]);
+    fixture.componentRef.setInput('valoresVisiveis', true);
     fixture.detectChanges();
     return fixture;
   }
