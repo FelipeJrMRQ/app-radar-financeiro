@@ -1,0 +1,88 @@
+:host { display: block; min-height: 100dvh; }
+.auth-layout { display: grid; grid-template-columns: minmax(0, 1fr); min-height: 100dvh; }
+.auth-brand { display: none; }
+.auth-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100dvh;
+  padding: 18px 20px 24px;
+  background: var(--rf-surface, #fff);
+}
+.brand-signature {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 96px;
+}
+.brand-signature img { display: block; width: 112px; height: auto; object-fit: contain; }
+.auth-container {
+  width: 100%;
+  max-width: 440px;
+  margin: auto;
+  padding: 22px 0 34px;
+}
+.auth-legal {
+  margin: 0;
+  color: var(--rf-text-muted, #788894);
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.6;
+}
+@media (min-width: 850px) {
+  .auth-layout { grid-template-columns: minmax(360px, 47%) minmax(0, 1fr); }
+  .auth-brand {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    isolation: isolate;
+    position: relative;
+    min-width: 0;
+    padding: 46px clamp(36px, 4vw, 76px) 38px;
+    background:
+      linear-gradient(115deg, rgba(3, 17, 31, .96) 0%, rgba(3, 24, 39, .88) 52%, rgba(3, 24, 39, .35) 100%),
+      url('/assets/brand/fundo-autenticacao.webp') center / cover no-repeat,
+      var(--rf-navy-950, #03111f);
+    color: #fff;
+    overflow: hidden;
+  }
+  .brand-identity { display: flex; align-items: center; gap: 14px; font-size: 21px; font-weight: 730; letter-spacing: -.6px; }
+  .brand-identity strong { font-weight: 440; color: var(--rf-gold-300, #f1d48b); }
+  .brand-symbol { width: 55px; height: 55px; object-fit: contain; }
+  .brand-message { position: relative; max-width: 500px; padding: 50px 0; }
+  .brand-eyebrow { font-weight: 760; font-size: 11px; letter-spacing: 2.5px; color: #86ead7; }
+  h1 { font-size: clamp(38px, 3.45vw, 60px); font-weight: 720; line-height: 1.12; letter-spacing: -1.6px; margin: 24px 0; }
+  .brand-message p { font-size: 17px; line-height: 1.75; max-width: 400px; color: #d0dee2; }
+  .brand-emphasis {
+    display: block;
+    width: 88px;
+    height: 4px;
+    margin-top: 30px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--rf-teal-400, #32d5ba), var(--rf-gold-400, #d8ae60));
+  }
+  .brand-footer { margin: 0; font-size: 12px; color: #d1dce1; }
+  .auth-main { padding: 22px clamp(30px, 4vw, 68px) 34px; }
+  .brand-signature { height: 132px; }
+  .brand-signature img { width: 146px; }
+  .auth-container { padding: 30px 0; }
+}
+@media (max-height: 680px) and (min-width: 850px) {
+  .brand-message { padding: 20px 0; }
+  .brand-message h1 { font-size: 38px; }
+  .brand-signature { height: 88px; }
+  .brand-signature img { width: 105px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; }
+}
+
+/* Protege a tela de login do recorte e das barras gestuais em PWAs instalados. */
+@media (max-width: 849px) {
+  .auth-main {
+    padding-top: calc(18px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    padding-left: calc(20px + env(safe-area-inset-left, 0px));
+    padding-right: calc(20px + env(safe-area-inset-right, 0px));
+  }
+}

@@ -1,0 +1,90 @@
+<section class="panel cash-flow-panel" aria-labelledby="titulo-fluxo">
+  <header class="panel-head cash-flow-heading">
+    <div>
+      <h2 id="titulo-fluxo">Fluxo de caixa consolidado</h2>
+    </div>
+    <div class="cash-flow-actions">
+      <button type="button" class="cash-flow-zero-toggle" (click)="alternarZeradas.emit()"
+        [attr.aria-pressed]="ocultarContasZeradas()"
+        [attr.aria-label]="ocultarContasZeradas() ? 'Exibir contas com saldo zerado' : 'Ocultar contas com saldo zerado'"
+        [attr.title]="ocultarContasZeradas() ? 'Exibir contas com saldo zerado' : 'Ocultar contas com saldo zerado'">
+        <fa-icon [icon]="ocultarContasZeradas() ? iconeOlho : iconeOlhoFechado" aria-hidden="true"></fa-icon>
+      </button>
+      <span class="cash-flow-count">{{ contasSelecionadas().length }} de {{ contas().length }} contas</span>
+    </div>
+  </header>
+
+  @if (contas().length === 0) {
+    <p class="cash-flow-empty">
+      @if (quantidadeOcultas() > 0) {
+        Todas as contas estão ocultas pelo filtro de saldo zerado. Use "Exibir zeradas" para visualizá-las.
+      } @else {
+        Cadastre uma conta para visualizar seu fluxo de caixa.
+      }
+    </p>
+  } @else {
+    @if (!contasSelecionadas().length) {
+      <div class="cash-flow-empty">Selecione ao menos uma conta para visualizar a projeção.</div>
+    } @else if (carregandoFluxo()) {
+      <p class="cash-flow-empty" role="status">Calculando o fluxo de caixa das contas selecionadas…</p>
+    } @else if (erroFluxo()) {
+      <p class="cash-flow-empty" role="alert">{{ erroFluxo() }}</p>
+    } @else if (fluxo(); as dados) {
+      @if (dados.pontos.length > 0) {
+        <div class="cash-flow-chart">
+          <canvas #graficoFluxo role="img"
+            [attr.aria-label]="'Evolução diária consolidada de ' + dataCompleta(dados.dataInicio)
+              + ' a ' + dataCompleta(dados.dataFim)
+              + (valoresVisiveis() ? '. Saldo ao final: ' + moeda(dados.saldoFinal)
+                : '. Toque ou clique para consultar os valores de cada dia.')">
+            Gráfico de saldo financeiro diário.
+          </canvas>
+        </div>
+        <div class="cash-flow-chart-notes">
+          <span><i class="cash-flow-dot actual"></i> Realizado até hoje</span>
+          <span><i class="cash-flow-dot future"></i> Projeção futura</span>
+          <span><i class="cash-flow-dot negative"></i> Saldo negativo</span>
+        </div>
+        @if (temPendenciasAteHoje()) {
+          <p class="cash-flow-projection-note">
+            Pendências vencidas que ainda não foram realizadas também influenciam
+            a projeção a partir do próximo dia; não são tratadas como pagamentos efetuados.
+          </p>
+        }
+      } @else {
+        <p class="cash-flow-empty">Não existem dados financeiros para o período selecionado.</p>
+      }
+    } @else {
+      <p class="cash-flow-empty">O fluxo de caixa estará disponível após a atualização dos saldos.</p>
+    }
+
+    @if (erroPreferencias()) {
+      <p class="cash-flow-preferences-error" role="alert">{{ erroPreferencias() }}</p>
+    }
+    @if (quantidadeOcultas() > 0) {
+      <p class="cash-flow-hidden-note">{{ quantidadeOcultas() }} conta(s) zerada(s) oculta(s).</p>
+    }
+    <div class="cash-flow-accounts">
+      <div class="cash-flow-accounts-heading">
+        <div>
+          <strong>Contas consideradas</strong>
+        </div>
+        <button type="button" (click)="selecionarTodas()" [disabled]="contasSelecionadas().length === contas().length">
+          Selecionar todas
+        </button>
+      </div>
+      <div class="cash-flow-account-list" role="group" aria-label="Contas incluídas no fluxo de caixa">
+        @for (conta of contas(); track conta.contaFinanceiraId) {
+          <label class="cash-flow-account" [class.checked]="estaSelecionada(conta.contaFinanceiraId)">
+            <input type="checkbox"
+              [checked]="estaSelecionada(conta.contaFinanceiraId)"
+              (change)="alterarConta(conta.contaFinanceiraId, $event)" />
+            <i class="cash-flow-account-color" aria-hidden="true"></i>
+            <span class="cash-flow-account-name">{{ conta.nome }}</span>
+          </label>
+        }
+      </div>
+    </div>
+
+  }
+</section>

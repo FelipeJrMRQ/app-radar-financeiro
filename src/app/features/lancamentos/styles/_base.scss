@@ -1,0 +1,44 @@
+:host { display:block; min-width:0; }
+
+.lancamentos-page { max-width:1100px; margin:0 auto; min-width:0; }
+
+.page-heading { display:flex; flex-direction:column; gap:18px; margin-bottom:25px; }
+
+.eyebrow { color:var(--rf-teal-700,#087d73); font-size:11px; font-weight:800; letter-spacing:1.7px; }
+
+h1 { margin:10px 0 8px; font-size:clamp(27px,5vw,36px); color:#122d43; letter-spacing:-1px; }
+
+.button-primary, .button-secondary {
+  min-height:46px; padding:10px 17px; border-radius:10px; font:inherit; font-size:13px; font-weight:750;
+  cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;
+}
+
+.button-primary { color:white; border:1px solid var(--rf-teal-700,#087d73); background:var(--rf-teal-700,#087d73); }
+
+.button-primary:hover { background:#055f58; }
+
+.button-primary:disabled, .button-secondary:disabled { opacity:.6; cursor:wait; }
+
+.button-secondary { background:white; color:#205567; border:1px solid #d6e1e5; }
+
+.button-secondary:hover { background:#f2f8f7; }
+
+.state-card { display:flex; flex-direction:column; align-items:start; gap:15px; color:#607886; background:#fff; border:1px solid #e2e9ec; border-radius:14px; padding:25px; font-size:14px; line-height:1.6; }
+
+.state-card.empty { align-items:center; text-align:center; padding:40px 25px; }
+
+.state-card h2 { color:#1b3b50; font-size:19px; margin:0; }
+
+.state-card p { margin:0; }
+
+.success-message, .error-message { background:#e7f7ef; color:#176d57; border:1px solid #c2e9d5; border-radius:9px; padding:13px 15px; font-size:13px; line-height:1.6; }
+
+.error-message { background:#fff0f0; color:#a23940; border-color:#ecc2c7; margin-bottom:18px; }
+
+.success-message { margin-bottom:20px; }
+
+.back-link { display:inline-flex; align-items:center; min-height:44px; margin-bottom:12px; text-decoration:none; color:var(--rf-teal-700,#087d73); font-size:13px; font-weight:750; }
+
+@media (min-width:620px) {
+.page-heading { flex-direction:row; justify-content:space-between; align-items:center; }
+}

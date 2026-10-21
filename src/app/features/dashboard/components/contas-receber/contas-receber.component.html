@@ -1,0 +1,28 @@
+<section class="panel due-panel" aria-labelledby="titulo-receber">
+                <div class="panel-head"><div><h2 id="titulo-receber">Contas a receber</h2></div>
+                  <a routerLink="/lancamentos" class="panel-link"
+                     [queryParams]="{ tipo: 'RECEITA', mes: mesReferencia() }">Ver lançamentos →</a></div>
+                @if (itens().length === 0) {
+                  <p class="empty-data">Nenhum recebimento pendente neste período.</p>
+                } @else {
+                  <div class="due-list">
+                    @for (item of itens(); track item.lancamentoId) {
+                      <div class="due-row">
+                        <time class="date-block" [attr.datetime]="item.vencimento"
+                          [attr.title]="dataCompleta(item.vencimento)"
+                          [attr.aria-label]="'Vencimento: ' + dataCompleta(item.vencimento)">
+                          {{ data(item.vencimento) }}
+                        </time>
+                        <div class="due-description">
+                          <strong>{{ item.descricao }}</strong>
+                          @if (item.atrasado) { <span class="late-label">Atrasado</span> }
+                        </div>
+                        <div class="due-end"><strong class="due-value income-text">{{ valoresVisiveis() ? moeda(item.valorRestante) : '••••••' }}</strong>
+                        <app-lancamento-acoes [lancamentoId]="item.lancamentoId" (alterado)="alterado.emit()" />
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+                
+              </section>

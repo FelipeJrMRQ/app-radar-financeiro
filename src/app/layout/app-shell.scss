@@ -1,0 +1,159 @@
+:host { display: block; min-height: 100dvh; }
+.app-layout {
+  --mobile-nav-height: 65px;
+  --mobile-fab-size: 58px;
+  --mobile-fab-gap: 14px;
+  min-height: 100dvh;
+  background: #f5f8fa;
+}
+.sidebar { display: none; }
+.workspace { min-width: 0; }
+.mobile-header {
+  height: 72px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; background: white; border-bottom: 1px solid #e6edf0;
+}
+.mobile-logo { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; color: #173149; letter-spacing: -.6px; font-weight: 700; }
+.mobile-logo strong { color: #23817d; }
+.mobile-symbol, .sidebar-symbol {
+  display: block;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+.mobile-logout { border: 1px solid #dbe4e9; border-radius: 9px; background: white; color: #314d5d; padding: 10px 14px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.desktop-header { display: none; }
+.page-content { width: 100%; min-width: 0; max-width: 1340px; margin: 0 auto; padding: 26px 18px calc(var(--mobile-nav-height) + var(--mobile-fab-gap) + var(--mobile-fab-size) + 36px + env(safe-area-inset-bottom)); }
+
+.mobile-bottom-nav {
+  display: flex; position: fixed; bottom: 0; right: 0; left: 0; z-index: 10;
+  min-height: calc(65px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
+  align-items: center; justify-content: space-around;
+  background: white; border-top: 1px solid #e5edef; box-shadow: 0 -6px 22px rgba(20,47,67,.045);
+}
+.mobile-bottom-nav a {
+  display: flex; flex-direction: column; gap: 4px; align-items: center; min-width: 84px; min-height: 48px;
+  justify-content: center; color: #75899b; text-decoration: none; font-size: 11px; font-weight: 700;
+}
+.mobile-bottom-nav a.active { color: #117f75; }
+.mobile-bottom-nav fa-icon { font-size: 21px; line-height: 1; }
+@media (min-width: 860px) {
+  .app-layout { display: grid; grid-template-columns: 254px minmax(0, 1fr); }
+  .sidebar {
+    display: flex; flex-direction: column; min-height: 100dvh; height: 100dvh;
+    position: sticky; top: 0; padding: 32px 16px 20px; background: #10283f; color: white;
+  }
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 0 8px;
+    color: white; font-size: 18px; letter-spacing: -.6px; font-weight: 700;
+  }
+  .sidebar-brand strong { color: #90e5d1; font-weight: 450; }
+  .sidebar-section-title { display: block; margin: 68px 16px 14px; color: #92acbb; font-size: 10px; letter-spacing: 2px; font-weight: 800; }
+  .sidebar-link {
+    display: flex; gap: 12px; align-items: center; min-height: 48px; padding: 10px 15px;
+    color: #c7d9e3; text-decoration: none; font-size: 14px; font-weight: 650; border-radius: 9px;
+  }
+  .sidebar-link:hover, .sidebar-link.active { background: #1a4758; color: white; }
+  .sidebar-link.active { box-shadow: inset 3px 0 0 #71ddbf; }
+  .sidebar-link fa-icon { width: 20px; min-width: 20px; font-size: 18px; text-align: center; }
+  .sidebar-footer { margin-top: auto; border-top: 1px solid #2a4459; padding-top: 22px; }
+  .side-profile { display: flex; align-items: center; gap: 10px; padding: 0 5px; min-width: 0; }
+  .avatar { flex: 0 0 39px; height: 39px; display: grid; place-items: center; border-radius: 50%; background: #285569; color: #e8fff5; font-weight: 800; }
+  .profile-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .profile-text strong, .profile-text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .profile-text strong { font-size: 12px; }.profile-text span { font-size: 11px; color: #a2bbc6; }
+  .side-logout {
+    display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 18px;
+    padding: 12px; border: none; border-radius: 8px; background: transparent; color: #bcced7;
+    font: inherit; font-size: 12px; cursor: pointer; text-align: left;
+  }
+  .side-logout:hover { background: #1a4758; color: white; }
+  .mobile-header, .mobile-bottom-nav { display: none; }
+  .desktop-header {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 86px; padding: 16px clamp(30px,4vw,66px);
+    background: white; border-bottom: 1px solid #e6edf0;
+  }
+  .desktop-header > div { display: flex; flex-direction: column; gap: 4px; }
+  .header-kicker { color: #298d85; font-size: 10px; letter-spacing: 1.5px; font-weight: 800; }
+  .header-title { font-size: 18px; font-weight: 750; color: #16314b; }
+  .header-user { color: #667d8c; font-size: 12px; }
+  .page-content { padding: 42px clamp(30px,4vw,66px) 72px; }
+}
+
+/* Identidade visual Radar Financeiro: marca com contraste consistente. */
+.app-layout { background: var(--rf-background, #f7fafb); }
+.mobile-header, .desktop-header, .mobile-bottom-nav { background: var(--rf-surface, #fff); }
+.mobile-header { box-shadow: 0 1px 0 rgba(5, 27, 43, .04); }
+.mobile-logo { color: var(--rf-navy-900, #082338); }
+.mobile-logo strong { color: var(--rf-teal-700, #087d73); }
+.mobile-logo img { width: 38px; height: 38px; }
+.sidebar { background: linear-gradient(180deg, #051b2d 0%, #092d3a 100%); }
+.sidebar-brand { min-width: 0; }
+.sidebar-brand strong { color: var(--rf-gold-300, #f1d48b); }
+.sidebar-link.active {
+  background: rgba(26, 159, 138, .17);
+  box-shadow: inset 3px 0 0 var(--rf-gold-400, #d8ae60);
+}
+.sidebar-link:hover { background: rgba(31, 123, 117, .28); }
+.mobile-bottom-nav a.active { color: var(--rf-teal-700, #087d73); }
+@media (min-width: 860px) {
+  .sidebar-brand .sidebar-symbol { width: 43px; height: 43px; }
+}
+
+/* Mobile-first: 4 destinos acessíveis inclusive em largura de 320px. */
+.mobile-bottom-nav a {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: 3px;
+  font-size: 10px;
+}
+@media (max-width: 359px) {
+  .mobile-bottom-nav a { font-size: 9px; }
+}
+
+/* Menus agrupados: entradas de negócio separadas das preferências pessoais. */
+@media (min-width:860px) {
+  .sidebar { overflow-y:auto; overscroll-behavior:contain; }
+  .sidebar-navigation { padding-top:9px; }
+  .sidebar-navigation .sidebar-section-title { margin:30px 16px 10px; }
+  .sidebar-navigation .grouped-title { margin-top:25px; }
+  .sidebar-group { margin:2px 0; }
+  .sidebar-group-trigger { display:flex; align-items:center; gap:12px; border-radius:9px;
+    min-height:48px; padding:10px 15px; color:#c7d9e3; font-size:14px; font-weight:650;
+    cursor:pointer; list-style:none; }
+  .sidebar-group-trigger::-webkit-details-marker { display:none; }
+  .sidebar-group-trigger:hover,.sidebar-group-trigger:focus-visible { background:#1a4758; color:white; }
+  .sidebar-group-trigger fa-icon:not(.group-chevron) { width:20px; flex-shrink:0; font-size:18px; text-align:center; }
+  .group-chevron { display:inline-flex; margin-left:auto; color:#a5bdc7; transition:transform .15s; }
+  .sidebar-group[open] .group-chevron { transform:rotate(180deg); }
+  .sidebar-subitems { display:flex; flex-direction:column; gap:2px; margin:1px 0 9px 31px;
+    padding-left:11px; border-left:1px solid #426171; }
+  .sidebar-sublink { display:flex; align-items:center; justify-content:space-between;
+    min-height:37px; border-radius:8px; padding:7px 10px; color:#bbd0d8; font-size:12px;
+    text-decoration:none; line-height:1.4; }
+  a.sidebar-sublink:hover,a.sidebar-sublink.active { background:#1a4758; color:white; }
+  .sidebar-sublink.active { box-shadow:inset 2px 0 0 var(--rf-gold-400,#d8ae60); }
+  .coming-soon { color:#728e9c; cursor:default; }
+  .coming-soon small { font-size:9px; color:#90a5b1; white-space:nowrap; }
+  .sidebar-footer { margin-top:auto; }
+}
+
+@media (min-width:860px) {
+  .sidebar-group.section-active > .sidebar-group-trigger { color:#fff; background:rgba(26,159,138,.14); }
+}
+
+/* Feedback visível mesmo quando o card some depois de confirmar um lançamento. */
+.feedback-lancamento { position:fixed; bottom:calc(155px + env(safe-area-inset-bottom));
+  left:16px; right:16px; z-index:100; display:flex; align-items:center;
+  justify-content:space-between; gap:12px; padding:14px 15px;
+  border:1px solid #a8d6c8; border-radius:12px;
+  background:#e9f8f1; color:#12634e; font-size:14px; font-weight:700;
+  box-shadow:0 10px 28px rgba(11,52,48,.17); }
+.feedback-lancamento button { flex:0 0 36px; min-height:36px; border:0;
+  border-radius:8px; color:inherit; background:transparent;
+  font:inherit; font-size:24px; cursor:pointer; }
+.feedback-lancamento button:hover { background:#d5eee1; }
+@media(min-width:860px) {
+  .feedback-lancamento { left:auto; right:26px; bottom:26px; width:min(420px,calc(100vw - 52px)); }
+}

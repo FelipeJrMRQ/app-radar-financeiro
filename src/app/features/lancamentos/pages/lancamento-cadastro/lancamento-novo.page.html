@@ -1,0 +1,160 @@
+<section class="lancamentos-page">
+  <a class="back-link" routerLink="/lancamentos">← Voltar para lançamentos</a>
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">REGISTRO FINANCEIRO</span>
+      <h1>Novo lançamento</h1>
+      <p>Registre uma receita ou despesa na sua conta financeira.</p>
+    </div>
+  </div>
+
+  @if (carregando()) {
+    <div class="state-card" role="status">Preparando contas e categorias…</div>
+  } @else if (erroInicial()) {
+    <div class="state-card" role="alert">
+      {{ erroInicial() }}
+      <button class="button-secondary" type="button" (click)="carregarOpcoes()">Tentar novamente</button>
+    </div>
+  } @else if (contas().length === 0) {
+    <div class="state-card empty">
+      <h2>Você precisa cadastrar uma conta</h2>
+      <p>Antes do primeiro lançamento, registre a conta que receberá suas movimentações.</p>
+      <a routerLink="/contas/nova" class="button-primary">Cadastrar conta</a>
+    </div>
+  } @else {
+    <div class="form-card">
+      <div class="type-switch" role="group" aria-label="Tipo do lançamento">
+        <button type="button" [class.selected]="tipo() === 'DESPESA'"
+                [attr.aria-pressed]="tipo() === 'DESPESA'"
+                (click)="selecionarTipo('DESPESA')">↓ Despesa</button>
+        <button type="button" [class.selected]="tipo() === 'RECEITA'"
+                [attr.aria-pressed]="tipo() === 'RECEITA'"
+                (click)="selecionarTipo('RECEITA')">↑ Receita</button>
+      </div>
+      <p class="form-note">O tipo é definido pela categoria escolhida.</p>
+
+      <div class="modality-group" role="group" aria-label="Modalidade do lançamento">
+        <span>Como este lançamento será registrado?</span>
+        <div class="modality-options">
+          <button type="button" [class.active]="modalidade() === 'UNICO'"
+                  [attr.aria-pressed]="modalidade() === 'UNICO'"
+                  (click)="selecionarModalidade('UNICO')">Único</button>
+          <button type="button" [class.active]="modalidade() === 'RECORRENTE'"
+                  [attr.aria-pressed]="modalidade() === 'RECORRENTE'"
+                  (click)="selecionarModalidade('RECORRENTE')">Recorrente</button>
+          <button type="button" [class.active]="modalidade() === 'PARCELADO'"
+                  [attr.aria-pressed]="modalidade() === 'PARCELADO'"
+                  (click)="selecionarModalidade('PARCELADO')">Parcelado</button>
+        </div>
+        @if (modalidade() === 'RECORRENTE') {
+          <small>Repetição mensal automática. São geradas inicialmente até 12 ocorrências.</small>
+        } @else if (modalidade() === 'PARCELADO') {
+          <small>O valor total será dividido em parcelas mensais, mantendo a precisão em centavos.</small>
+        } @else {
+          <small>Uma única obrigação, que pode ficar pendente mesmo após o vencimento.</small>
+        }
+      </div>
+      @if (erro()) { <div class="error-message" role="alert">{{ erro() }}</div> }
+      @if (erroValidacao()) { <div class="error-message" role="alert">{{ erroValidacao() }}</div> }
+
+      <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+        <div class="field">
+          <label for="conta">Conta financeira</label>
+          <select id="conta" formControlName="contaFinanceiraId"
+                  [attr.aria-invalid]="form.controls.contaFinanceiraId.touched && form.controls.contaFinanceiraId.invalid">
+            <option [ngValue]="null">Selecione uma conta</option>
+            @for (conta of contas(); track conta.id) {
+              <option [ngValue]="conta.id">{{ conta.nome }}</option>
+            }
+          </select>
+          @if (form.controls.contaFinanceiraId.touched && form.controls.contaFinanceiraId.invalid) {
+            <small class="field-error">Selecione uma conta financeira.</small>
+          }
+        </div>
+        <div class="field">
+          <label for="categoria">Categoria de {{ tipo() === 'RECEITA' ? 'receita' : 'despesa' }}</label>
+          <select id="categoria" formControlName="categoriaId"
+                  [attr.aria-invalid]="form.controls.categoriaId.touched && form.controls.categoriaId.invalid">
+            <option [ngValue]="null">Selecione uma categoria</option>
+            @for (categoria of categoriasDisponiveis(); track categoria.id) {
+              <option [ngValue]="categoria.id">{{ categoria.nome }}</option>
+            }
+          </select>
+          @if (categoriasDisponiveis().length === 0) {
+            <small class="field-hint">Nenhuma categoria deste tipo. <a routerLink="/categorias">Criar categoria</a></small>
+          } @else if (form.controls.categoriaId.touched && form.controls.categoriaId.invalid) {
+            <small class="field-error">Escolha uma categoria.</small>
+          }
+        </div>
+        <div class="field">
+          <label for="descricao">Descrição</label>
+          <input id="descricao" type="text" maxlength="200" formControlName="descricao"
+                 placeholder="Ex.: Compra no mercado"
+                 [attr.aria-invalid]="form.controls.descricao.touched && form.controls.descricao.invalid" />
+          @if (form.controls.descricao.touched && (form.controls.descricao.invalid || !form.controls.descricao.value.trim())) {
+            <small class="field-error">Informe a descrição (até 200 caracteres).</small>
+          }
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <label for="valor">{{ modalidade() === 'PARCELADO' ? 'Valor total (R$)' : 'Valor (R$)' }}</label>
+            <input id="valor" type="text" inputmode="numeric" rfMoedaBr formControlName="valor"
+                   placeholder="R$ 0,00" aria-describedby="ajuda-valor"
+                   [attr.aria-invalid]="form.controls.valor.touched && form.controls.valor.invalid" />
+            <small id="ajuda-valor" class="field-hint">Digite somente os números: 9000 = R$ 90,00; 105035 = R$ 1.050,35.</small>
+            @if (form.controls.valor.touched && form.controls.valor.invalid) {
+              <small class="field-error">Informe um valor maior que zero, com até 4 casas decimais.</small>
+            }
+          </div>
+          <div class="field">
+            <label for="data">{{ modalidade() === 'RECORRENTE' ? 'Primeiro vencimento da recorrência' : modalidade() === 'PARCELADO' ? 'Primeiro vencimento' : 'Data de vencimento / recebimento' }}</label>
+            <input id="data" type="date" formControlName="dataLancamento"
+                   [attr.aria-invalid]="form.controls.dataLancamento.touched && form.controls.dataLancamento.invalid" />
+            @if (form.controls.dataLancamento.touched && form.controls.dataLancamento.invalid) {
+              <small class="field-error">Informe uma data válida.</small>
+            }
+          </div>
+        </div>
+        @if (modalidade() === 'UNICO') {
+          <div class="field">
+            <label for="situacao-inicial">Situação inicial</label>
+            <select id="situacao-inicial" formControlName="situacaoInicial">
+              <option value="PREVISTO">Pendente (a pagar ou receber)</option>
+              <option value="CONFIRMADO">Realizado (já pago ou recebido)</option>
+            </select>
+            <small class="field-hint">A data de vencimento não confirma automaticamente o pagamento.</small>
+          </div>
+        }
+        @if (modalidade() === 'RECORRENTE') {
+          <div class="field">
+            <label for="data-fim">Data de término <span>(opcional)</span></label>
+            <input id="data-fim" type="date" formControlName="dataFim" />
+            <small class="field-hint">Sem data final, a recorrência continua até ser encerrada.</small>
+          </div>
+        }
+        @if (modalidade() === 'PARCELADO') {
+          <div class="field">
+            <label for="quantidade-parcelas">Quantidade de parcelas</label>
+            <input id="quantidade-parcelas" type="number" inputmode="numeric"
+                   min="2" max="120" step="1" formControlName="quantidadeParcelas" />
+            <small class="field-hint">Entre 2 e 120 parcelas mensais; todas começam pendentes.</small>
+          </div>
+        }
+        <div class="field">
+          <label for="observacao">Observação <span>(opcional)</span></label>
+          <textarea id="observacao" formControlName="observacao" maxlength="500" rows="3"
+                    placeholder="Algum detalhe importante…"></textarea>
+        </div>
+        <p class="form-note">
+          O lançamento único só será realizado ao selecionar essa situação. Recorrências e parcelas começam pendentes até a baixa financeira.
+        </p>
+        <div class="form-actions">
+          <a class="button-secondary" routerLink="/lancamentos">Cancelar</a>
+          <button type="submit" class="button-primary" [disabled]="salvando()">
+            {{ salvando() ? 'Salvando…' : 'Salvar lançamento' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</section>

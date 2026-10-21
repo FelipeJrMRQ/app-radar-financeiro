@@ -1,0 +1,83 @@
+<section class="lancamentos-page">
+  <a class="back-link" routerLink="/lancamentos">← Voltar aos lançamentos</a>
+  <header class="page-heading"><div>
+    <span class="eyebrow">GESTÃO FINANCEIRA</span>
+    <h1>Editar lançamento</h1>
+    <p>Corrija um registro individual ou, quando permitido, as próximas ocorrências.</p>
+  </div></header>
+
+  @if (carregando()) {
+    <div class="state-card" role="status">Carregando dados…</div>
+  } @else if (erro() && !lancamento()) {
+    <div class="state-card" role="alert">{{ erro() }}
+      <button class="button-secondary" type="button" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else if (lancamento(); as atual) {
+    <div class="form-card">
+      <p class="form-note">
+        {{ modalidade() === 'PARCELADO' ? 'Parcelado' : modalidade() === 'RECORRENTE' ? 'Recorrente' : 'Único' }}
+        · {{ atual.situacao === 'CONFIRMADO' ? 'Confirmado' : 'Pendente' }}
+        @if (atual.numeroParcela) { · Parcela {{ atual.numeroParcela }}/{{ atual.quantidadeParcelas }} }
+      </p>
+      @if (erro()) { <p class="error-message" role="alert">{{ erro() }}</p> }
+      <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+        <div class="field">
+          <label for="ed-conta">Conta financeira</label>
+          <select id="ed-conta" formControlName="contaFinanceiraId">
+            @for (conta of contas(); track conta.id) {
+              <option [ngValue]="conta.id">{{ conta.nome }}</option>
+            }
+          </select>
+        </div>
+        <div class="field">
+          <label for="ed-cat">Categoria</label>
+          <select id="ed-cat" formControlName="categoriaId">
+            @for (cat of categoriasDisponiveis(); track cat.id) {
+              <option [ngValue]="cat.id">{{ cat.nome }}</option>
+            }
+          </select>
+        </div>
+        <div class="field">
+          <label for="ed-descricao">Descrição</label>
+          <input id="ed-descricao" formControlName="descricao" type="text" maxlength="200">
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <label for="ed-valor">Valor (R$)</label>
+            <input id="ed-valor" formControlName="valor" type="text" inputmode="numeric"
+                   rfMoedaBr placeholder="R$ 0,00">
+          </div>
+          <div class="field">
+            <label for="ed-data">Data do lançamento</label>
+            <input id="ed-data" formControlName="dataLancamento" type="date">
+          </div>
+        </div>
+        <div class="field">
+          <label for="ed-obs">Observação</label>
+          <textarea id="ed-obs" formControlName="observacao" maxlength="500" rows="3"></textarea>
+        </div>
+        @if (sequenciaElegivel()) {
+          <fieldset class="scope-options">
+            <legend>Onde aplicar as alterações?</legend>
+            <label><input type="radio" name="escopo" value="ATUAL" [checked]="escopo() === 'ATUAL'"
+                          (change)="definirEscopo('ATUAL')"> Somente este lançamento</label>
+            <label><input type="radio" name="escopo" value="SEGUINTES" [checked]="escopo() === 'SEGUINTES'"
+                          (change)="definirEscopo('SEGUINTES')"> Este e os próximos elegíveis</label>
+            <small>As operações em sequência exigem datas atuais ou futuras, lançamentos previstos e ausência de realizações.</small>
+          </fieldset>
+        } @else if (modalidade() !== 'UNICO') {
+          <p class="scope-note">Este registro só permite edição individual. Datas retroativas e registros realizados não podem iniciar uma alteração em sequência.</p>
+        }
+        @if (atual.situacao === 'CONFIRMADO') {
+          <p class="scope-note">Alterações que afetem valores já realizados podem ser restritas pela API. Use estornos para corrigir realizações financeiras.</p>
+        }
+        <div class="form-actions">
+          <a routerLink="/lancamentos" class="button-secondary">Cancelar</a>
+          <button type="submit" class="button-primary" [disabled]="salvando()">
+            {{ salvando() ? 'Salvando…' : 'Salvar alterações' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</section>

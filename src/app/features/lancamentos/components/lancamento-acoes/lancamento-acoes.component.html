@@ -1,0 +1,151 @@
+<div class="actions-root">
+  <button type="button" class="more-button" [class.active]="aberto()" [attr.aria-expanded]="aberto()"
+          [attr.aria-label]="'Ações do lançamento ' + lancamentoId()"
+          (click)="alternarMenu()" title="Ações do lançamento">
+    <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true">
+      <circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/>
+    </svg>
+  </button>
+  @if (aberto()) {
+    <button type="button" class="actions-backdrop" tabindex="-1"
+            aria-label="Fechar ações" (click)="fechar()"></button>
+    <div class="actions-panel" role="dialog" [attr.aria-label]="'Ações de ' + (atual()?.descricao || 'lançamento')">
+      @if (carregando()) {
+        <p role="status">Carregando lançamento…</p>
+      } @else if (atual(); as l) {
+        @if (!l.ativo) {
+          <p class="action-warning">Este lançamento está inativo.</p>
+          <button type="button" class="quiet" (click)="fechar()">Fechar</button>
+        } @else if (!acao()) {
+          <strong class="actions-heading">{{ l.descricao }}</strong>
+          <a class="action-link" [routerLink]="['/lancamentos', l.id, 'editar']"
+             (click)="fechar()">Editar</a>
+          @if (l.situacao === 'PREVISTO') {
+            <button type="button" [disabled]="salvando()" (click)="confirmarIntegral()">
+              {{ possuiRealizacoes() ? 'Quitar saldo restante'
+                : l.tipo === 'RECEITA' ? 'Confirmar recebimento' : 'Confirmar pagamento' }}
+            </button>
+            <button type="button" [disabled]="salvando()" (click)="escolher('PARCIAL')">
+              {{ l.tipo === 'RECEITA' ? 'Recebimento parcial' : 'Pagamento parcial' }}
+            </button>
+          }
+          @if (l.situacao === 'CONFIRMADO' && resumoAbertura() !== null && !possuiRealizacoes()) {
+            <button type="button" (click)="escolher('ESTORNAR_CONFIRMACAO')">Desfazer confirmação</button>
+          }
+          <button type="button" (click)="escolher('REALIZACOES')">Ver realizações</button>
+          <button type="button" class="destructive" (click)="escolher('EXCLUIR')">Excluir</button>
+          <button type="button" class="quiet" [disabled]="salvando()" (click)="fechar()">
+            {{ salvando() ? 'Confirmando…' : 'Fechar' }}
+          </button>
+        } @else {
+          <strong class="actions-heading">
+            {{ acao() === 'EXCLUIR' ? 'Excluir lançamento' :
+               acao() === 'ESTORNAR_CONFIRMACAO' ? 'Desfazer confirmação' :
+               acao() === 'PARCIAL' ? 'Realização parcial' : 'Realizações financeiras' }}
+          </strong>
+          <p class="action-help">{{ l.descricao }} · {{ formatarData(l.dataLancamento) }}</p>
+          @if (acao() === 'EXCLUIR') {
+            @if (resumoAbertura() === null) {
+              <div class="action-warning" role="alert">
+                <strong>Exclusão temporariamente indisponível</strong>
+                <p>Não foi possível verificar se existem pagamentos ou recebimentos vinculados.
+                  Por segurança, a exclusão está bloqueada até confirmar o histórico.</p>
+              </div>
+              <button type="button" class="quiet" [disabled]="carregando()"
+                      (click)="consultarRealizacoes()">Tentar consulta novamente</button>
+            } @else if (possuiRealizacoes()) {
+              @if (resumoAbertura(); as r) {
+                <div class="action-warning" role="status">
+                  <strong>Não é possível excluir este lançamento</strong>
+                  <p>Ele já possui {{ l.tipo === 'RECEITA' ? 'recebimentos' : 'pagamentos' }} registrados.</p>
+                  <p>{{ l.tipo === 'RECEITA' ? 'Recebido' : 'Pago' }}: {{ moeda(r.totalRealizado) }}
+                    · Saldo restante: {{ moeda(r.saldoRestante) }}</p>
+                  <p>O histórico financeiro deve ser preservado. Se algum registro foi feito por engano,
+                    consulte as realizações e estorne somente o registro incorreto.
+                    Não estorne valores reais apenas para excluir a obrigação.</p>
+                </div>
+              }
+            } @else {
+              <p class="action-warning">
+                A exclusão retira este lançamento dos saldos e relatórios.
+                Realizações financeiras ativas impedem a operação.
+              </p>
+              @if (podeSequencia()) {
+                <fieldset class="action-scope">
+                  <legend>Abrangência</legend>
+                  <label><input type="radio" [checked]="escopo() === 'ATUAL'"
+                        name="scope-{{ l.id }}" (change)="definirEscopo('ATUAL')"> Somente este</label>
+                  <label><input type="radio" [checked]="escopo() === 'SEGUINTES'"
+                        name="scope-{{ l.id }}" (change)="definirEscopo('SEGUINTES')"> Este e os próximos</label>
+                </fieldset>
+                @if (escopo() === 'SEGUINTES') {
+                  <p class="action-help">A API também verificará as demais ocorrências da sequência.</p>
+                }
+              } @else if (l.recorrenciaLancamentoId || l.parcelamentoLancamentoId) {
+                <p class="action-help">Lançamentos antigos só podem ser excluídos individualmente.</p>
+              }
+            }
+          } @else if (acao() === 'ESTORNAR_CONFIRMACAO') {
+            <p class="action-warning">
+              O lançamento voltará a ficar pendente e deixará de compor o saldo confirmado.
+              Esta ação afeta somente o registro selecionado.
+            </p>
+          } @else if (acao() === 'PARCIAL') {
+            <label class="action-field">Valor realizado (R$)
+              <input type="text" inputmode="numeric" rfMoedaBr [formControl]="valor"
+                     placeholder="R$ 0,00" />
+            </label>
+            <label class="action-field">Data efetiva
+              <input type="date" [formControl]="data"/>
+            </label>
+            <p class="action-help">A realização parcial afeta exclusivamente este lançamento.</p>
+          } @else if (acao() === 'REALIZACOES') {
+            @if (resumo(); as r) {
+              <p class="action-help">Realizado: {{ moeda(r.totalRealizado) }}
+                · Restante: {{ moeda(r.saldoRestante) }}</p>
+              @if (r.realizacoes.length === 0) {
+                <p class="action-help">Nenhuma realização parcial registrada.</p>
+              } @else {
+                @for (item of r.realizacoes; track item.id) {
+                  <div class="realizacao-item">
+                    <span>{{ formatarData(item.dataRealizacao) }} · {{ moeda(item.valor) }}</span>
+                    @if (aguardandoEstorno() === item.id) {
+                      <span class="estorno-buttons">
+                        <button type="button" class="destructive" [disabled]="salvando()"
+                                (click)="estornar(item.id)">Confirmar estorno</button>
+                        <button type="button" [disabled]="salvando()"
+                                (click)="aguardandoEstorno.set(null)">Cancelar</button>
+                      </span>
+                    } @else {
+                      <button type="button" class="destructive" [disabled]="salvando()"
+                              (click)="prepararEstorno(item.id)">Estornar</button>
+                    }
+                  </div>
+                }
+              }
+            }
+          }
+          @if ((acao() === 'EXCLUIR' && podeExcluir()) ||
+               acao() === 'ESTORNAR_CONFIRMACAO' || acao() === 'PARCIAL') {
+            <button type="button" class="commit-action" [disabled]="salvando()" (click)="executar()">
+              {{ salvando() ? 'Processando…' : acao() === 'EXCLUIR' ? 'Confirmar exclusão' : acao() === 'ESTORNAR_CONFIRMACAO' ? 'Desfazer confirmação' : 'Registrar realização' }}
+            </button>
+          }
+          <button class="quiet" type="button" [disabled]="salvando()" (click)="escolher('REALIZACOES')"
+                  [class.review-action]="acao() === 'EXCLUIR' && !podeExcluir()"
+                  [style.display]="acao() === 'REALIZACOES' ? 'none' : null">
+            {{ acao() === 'EXCLUIR' && !podeExcluir()
+              ? (l.tipo === 'RECEITA' ? 'Ver recebimentos e estornos' : 'Ver pagamentos e estornos')
+              : 'Ver realizações' }}
+          </button>
+          <button class="quiet" type="button" [disabled]="salvando()" (click)="escolher('REALIZACOES')"
+                  [style.display]="acao() !== 'REALIZACOES' ? 'none' : null">Atualizar realizações</button>
+          <button class="quiet" type="button" [disabled]="salvando()"
+                  (click)="acao.set(null)">Voltar às opções</button>
+        }
+      }
+      @if (erro()) { <p role="alert" class="action-error">{{ erro() }}</p> }
+      @if (mensagem()) { <p role="status" class="action-help">{{ mensagem() }}</p> }
+    </div>
+  }
+</div>

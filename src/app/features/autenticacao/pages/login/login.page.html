@@ -1,0 +1,48 @@
+<app-auth-shell>
+  <div class="auth-form">
+    <span class="eyebrow">BEM-VINDO DE VOLTA</span>
+    <h2>Acesse sua conta</h2>
+    <p class="subtitle">Entre com seus dados para continuar de onde parou.</p>
+
+    @if (cadastroConcluido) {
+      <p class="form-success" role="status">Conta criada com sucesso! Entre para começar.</p>
+    }
+    @if (erro()) {
+      <p class="form-error" role="alert">{{ erro() }}</p>
+    }
+
+    <form [formGroup]="formulario" (ngSubmit)="entrar()" novalidate>
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input id="email" type="email" formControlName="email" autocomplete="username"
+               inputmode="email" placeholder="seu@email.com"
+               [attr.aria-invalid]="formulario.controls.email.touched && formulario.controls.email.invalid" />
+        @if (formulario.controls.email.touched && formulario.controls.email.invalid) {
+          <small class="field-error">Informe um e-mail válido.</small>
+        }
+      </div>
+      <div class="field">
+        <label for="senha">Senha</label>
+        <div class="password-field">
+          <input id="senha" [type]="mostrarSenha() ? 'text' : 'password'"
+                 formControlName="senha" autocomplete="current-password" placeholder="Sua senha"
+                 [attr.aria-invalid]="formulario.controls.senha.touched && formulario.controls.senha.invalid" />
+          <button type="button" class="show-password" (click)="mostrarSenha.set(!mostrarSenha())"
+                  [attr.aria-label]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'">
+            {{ mostrarSenha() ? 'Ocultar' : 'Mostrar' }}
+          </button>
+        </div>
+        @if (formulario.controls.senha.touched && formulario.controls.senha.invalid) {
+          <small class="field-error">Informe sua senha.</small>
+        }
+      </div>
+      <button class="primary-button" type="submit" [disabled]="carregando()">
+        {{ carregando() ? 'Entrando...' : 'Entrar na minha conta' }}
+        <span aria-hidden="true">→</span>
+      </button>
+    </form>
+    <div class="form-footer">
+      Ainda não tem uma conta? <a routerLink="/cadastro">Crie sua conta</a>
+    </div>
+  </div>
+</app-auth-shell>

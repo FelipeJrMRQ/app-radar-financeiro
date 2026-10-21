@@ -1,0 +1,51 @@
+:host { display:block; min-width:0; }
+.personalizar-page { max-width:870px; margin:0 auto; min-width:0; }
+.back-link { min-height:44px; display:inline-flex; align-items:center; text-decoration:none; color:#087d73; font-size:13px; font-weight:700; }
+.heading { margin:13px 0 25px; }
+.eyebrow { display:block; font-size:10px; font-weight:800; color:#087d73; letter-spacing:1.7px; }
+h1 { margin:9px 0 10px; font-size:clamp(25px,4vw,35px); letter-spacing:-.9px; color:#19364b; }
+.heading p,.config-intro p { margin:0; color:#708493; line-height:1.6; font-size:13px; }
+.config-card { border:1px solid #e1e9ec; border-radius:16px; background:#fff; overflow:hidden; }
+.config-intro { display:flex; flex-direction:column; gap:10px; padding:22px 17px; border-bottom:1px solid #e9eff0; }
+.config-intro h2 { margin:0 0 7px; font-size:17px; color:#203a4d; }
+.quantity { font-size:11px; color:#588077; font-weight:750; }
+.preferences-list { list-style:none; margin:0; padding:8px 12px; }
+.preference-row { display:flex; align-items:center; gap:7px; min-height:75px; padding:11px 4px; border-bottom:1px solid #edf1f3; border-radius:6px; min-width:0; }
+.preference-row:last-child { border-bottom:0; }
+.preference-row.hidden-card .name { color:#8095a0; }
+.preference-row.dragging { opacity:.63; background:#e6f6ef; }
+.preference-row.drag-target { outline:2px dashed #28a18c; background:#f0faf7; }
+.drag-handle { width:34px; height:44px; flex-shrink:0; display:grid; place-items:center; cursor:grab; touch-action:none; border:0; border-radius:7px; background:transparent; color:#8098a3; font-size:27px; }
+.drag-handle:active { cursor:grabbing; background:#e4f2ef; color:#147c71; }
+.sequence { font-size:11px; color:#7c919f; flex:0 0 17px; text-align:center; }
+.name { color:#1e4054; font-size:12px; font-weight:750; line-height:1.4; min-width:0; flex:1; overflow-wrap:anywhere; }
+.arrow-actions { display:flex; align-items:center; gap:3px; }
+.arrow-actions button { flex-shrink:0; height:38px; width:28px; border:1px solid #dfe7e9; background:#fff; color:#155f66; border-radius:7px; font:inherit; font-weight:750; cursor:pointer; }
+.arrow-actions button:disabled { opacity:.3; cursor:default; }
+.visibility-toggle { display:flex; align-items:center; justify-content:center; flex-direction:column; gap:4px; flex-shrink:0; width:47px; cursor:pointer; }
+.visibility-toggle input { position:absolute; opacity:0; width:1px; height:1px; }
+.toggle-track { position:relative; width:43px; height:25px; background:#c4ced4; border-radius:20px; transition:background .15s; }
+.toggle-track::after { content:''; position:absolute; width:19px; height:19px; left:3px; top:3px; background:#fff; border-radius:50%; box-shadow:0 1px 3px #0002; transition:transform .15s; }
+.visibility-toggle input:checked + .toggle-track { background:#108b79; }
+.visibility-toggle input:checked + .toggle-track::after { transform:translateX(18px); }
+.visibility-toggle input:focus-visible + .toggle-track { outline:3px solid #d2a44f; outline-offset:2px; }
+.visible-text { color:#657d88; font-size:10px; font-weight:700; }
+.hint { margin:0; padding:13px 17px; border-top:1px solid #e9eff0; color:#758b97; font-size:12px; line-height:1.55; }
+.actions { display:flex; flex-direction:column-reverse; gap:10px; margin-top:19px; }
+.primary,.secondary { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:11px 18px; border-radius:10px; font:inherit; font-size:13px; font-weight:750; cursor:pointer; }
+.primary { border:1px solid #087d73; background:#087d73; color:white; }
+.secondary { border:1px solid #d9e3e8; color:#1b5561; background:#fff; }
+.primary:disabled,.secondary:disabled { opacity:.55; cursor:default; }
+.message { display:flex; flex-direction:column; align-items:flex-start; gap:12px; margin:15px 0; padding:15px; border-radius:10px; background:#f3f7f8; color:#537584; font-size:13px; line-height:1.55; }
+.message.error { background:#fff1f1; color:#a13a42; border:1px solid #f3d0d0; }
+.message.success { background:#e8f7ef; color:#126b56; border:1px solid #c6e8d6; }
+@media (min-width:650px) {
+  .config-intro { padding:26px; flex-direction:row; align-items:center; justify-content:space-between; }
+  .preferences-list { padding:10px 22px; }
+  .preference-row { gap:14px; min-height:72px; padding:12px 5px; }
+  .name { font-size:14px; }
+  .arrow-actions { gap:7px; }
+  .arrow-actions button { width:36px; height:42px; }
+  .visibility-toggle { flex-direction:row; width:90px; gap:9px; }
+  .actions { flex-direction:row; justify-content:space-between; }
+}

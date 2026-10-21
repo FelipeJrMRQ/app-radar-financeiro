@@ -1,0 +1,46 @@
+<section class="panel category-panel" aria-labelledby="titulo-categorias">
+  <div class="panel-head">
+    <h2 id="titulo-categorias">Despesas por categoria</h2>
+  </div>
+
+  @if (erroCategorias()) {
+    <p class="empty-data" role="alert">{{ erroCategorias() }}</p>
+  } @else if (dadosRosca().fatias.length === 0) {
+    <p class="empty-data">Sem despesas realizadas neste período.</p>
+  } @else {
+    @if (dadosRosca(); as dados) {
+      <div class="category-doughnut-layout">
+        <div class="category-doughnut-figure">
+          <canvas #graficoDespesas role="img"
+            [attr.aria-label]="'Distribuição das despesas realizadas por categoria. Total: '
+              + dados.totalFormatado">
+            Gráfico de rosca com a distribuição das despesas por categoria.
+          </canvas>
+          <div class="category-doughnut-center">
+            <span>Total realizado</span>
+            <strong>{{ dados.totalFormatado }}</strong>
+          </div>
+        </div>
+
+        <ul class="category-doughnut-legend" aria-label="Valores e percentuais por categoria">
+          @for (fatia of dados.fatias; track fatia.chave) {
+            <li class="category-doughnut-legend-item">
+              <span class="category-doughnut-color" [style.backgroundColor]="fatia.cor"
+                    aria-hidden="true"></span>
+              <div class="category-doughnut-legend-text">
+                <span>{{ fatia.nome }}</span>
+                <small>
+                  {{ fatia.percentualFormatado }}
+                  @if (fatia.quantidadeAgrupada > 1) {
+                    · {{ fatia.quantidadeAgrupada }} categorias
+                  }
+                </small>
+              </div>
+              <strong class="category-doughnut-legend-value">{{ fatia.valorFormatado }}</strong>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  }
+</section>

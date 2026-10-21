@@ -1,0 +1,176 @@
+<section class="contas-page">
+  <a routerLink="/contas" class="back-link">← Voltar para contas</a>
+  @if (avisoSucesso) {
+    <div class="feedback-card success" role="status">{{ avisoSucesso }}</div>
+  }
+  @if (carregandoConta()) {
+    <div class="feedback-card" role="status">Carregando os dados da conta…</div>
+  } @else if (erroConta()) {
+    <div class="feedback-card danger" role="alert">
+      <p>{{ erroConta() }}</p>
+      <button type="button" class="secondary-action" (click)="carregarConta()">Tentar novamente</button>
+    </div>
+  } @else if (conta(); as contaAtual) {
+    <div class="page-heading">
+      <div>
+        <p class="section-label">{{ tipoConta(contaAtual.tipo) }}</p>
+        <h1>{{ contaAtual.nome }}</h1>
+        <p class="page-description">Informações e movimentações desta conta.</p>
+      </div>
+      <div class="account-heading-actions">
+        <a [routerLink]="['/contas', contaAtual.id, 'editar']" class="primary-action">Editar conta</a>
+        <button type="button" class="secondary-action" (click)="carregarConta()">Atualizar saldo</button>
+      </div>
+    </div>
+
+    @if (saldo(); as saldoAtual) {
+      <div class="balance-grid">
+        <div class="summary-card major">
+          <span>Saldo confirmado</span>
+          <strong [class.negative]="privacidade.valoresVisiveis() && negativo(saldoAtual.saldoConfirmado)">{{ privacidade.valoresVisiveis() ? moeda(saldoAtual.saldoConfirmado) : '••••••' }}</strong>
+          <small>Saldo informado pelo servidor</small>
+        </div>
+        <div class="summary-card">
+          <span>Saldo inicial</span>
+          <strong [class.negative]="privacidade.valoresVisiveis() && negativo(contaAtual.saldoInicial)">{{ privacidade.valoresVisiveis() ? moeda(contaAtual.saldoInicial) : '••••••' }}</strong>
+          <small>Valor informado no cadastro</small>
+        </div>
+      </div>
+    }
+    <section class="manage-account" aria-labelledby="titulo-gestao-conta">
+      <div class="manage-heading">
+        <div>
+          <p class="section-label">GERENCIAMENTO</p>
+          <h2 id="titulo-gestao-conta">Gerenciar conta</h2>
+        </div>
+        <span class="account-status" [class.inactive]="!contaAtual.ativo">
+          {{ contaAtual.ativo ? 'Ativa' : 'Inativa' }}
+        </span>
+      </div>
+
+      @if (carregandoUso()) {
+        <p class="manage-help" role="status">Verificando vínculos e histórico financeiro…</p>
+      } @else if (erroUso()) {
+        <div class="inline-manage-error" role="alert">
+          <p>Não foi possível verificar o uso da conta: {{ erroUso() }}</p>
+          <button type="button" class="secondary-action" (click)="carregarUso()">Tentar novamente</button>
+        </div>
+      } @else if (uso(); as situacao) {
+        @if (situacao.utilizada) {
+          <p class="manage-help">
+            Esta conta já possui lançamentos ou outros vínculos financeiros, inclusive históricos.
+            Ela não pode ser excluída definitivamente. Você pode inativá-la para impedir novas operações,
+            mantendo os registros, saldos e extratos disponíveis.
+          </p>
+        } @else {
+          <p class="manage-help">
+            Esta conta não possui lançamentos, transferências, pagamentos, recorrências nem parcelamentos
+            vinculados. Ela pode ser excluída definitivamente.
+          </p>
+        }
+
+        <div class="manage-actions">
+          @if (contaAtual.ativo && situacao.utilizada) {
+            <button type="button" class="secondary-action" (click)="escolherAcao('INATIVAR')"
+                    [disabled]="executandoAcao()">Inativar conta</button>
+          }
+          @if (!contaAtual.ativo) {
+            <button type="button" class="primary-action" (click)="escolherAcao('REATIVAR')"
+                    [disabled]="executandoAcao()">Reativar conta</button>
+          }
+          @if (situacao.podeExcluirDefinitivamente) {
+            <button type="button" class="danger-action" (click)="escolherAcao('EXCLUIR')"
+                    [disabled]="executandoAcao()">Excluir definitivamente</button>
+          }
+        </div>
+
+        @if (acaoPendente(); as acao) {
+          <div class="account-confirmation" role="group" aria-label="Confirmação da operação">
+            <strong>
+              {{ acao === 'EXCLUIR' ? 'Excluir conta definitivamente?'
+                : acao === 'INATIVAR' ? 'Inativar esta conta?' : 'Reativar esta conta?' }}
+            </strong>
+            <p>
+              {{ acao === 'EXCLUIR'
+                ? 'A conta será removida permanentemente. Esta ação não poderá ser desfeita.'
+                : acao === 'INATIVAR'
+                  ? 'O histórico será preservado. Novos lançamentos, transferências e pagamentos não poderão usar esta conta enquanto estiver inativa. Movimentações previstas já existentes não serão apagadas.'
+                  : 'A conta voltará a estar disponível para novos lançamentos e transferências.' }}
+            </p>
+            <div class="confirmation-actions">
+              <button type="button" class="secondary-action" [disabled]="executandoAcao()"
+                      (click)="acaoPendente.set(null)">Cancelar</button>
+              <button type="button" [class.danger-action]="acao === 'EXCLUIR'"
+                      [class.primary-action]="acao !== 'EXCLUIR'"
+                      [disabled]="executandoAcao()" (click)="executarAcao()">
+                {{ executandoAcao() ? 'Processando…'
+                  : acao === 'EXCLUIR' ? 'Confirmar exclusão'
+                    : acao === 'INATIVAR' ? 'Confirmar inativação' : 'Confirmar reativação' }}
+              </button>
+            </div>
+          </div>
+        }
+        @if (erroAcao()) {
+          <div class="inline-manage-error" role="alert">{{ erroAcao() }}</div>
+        }
+      }
+    </section>
+    <section aria-labelledby="titulo-extrato" class="statement-section">
+      <div class="statement-heading">
+        <div>
+          <p class="section-label">MOVIMENTAÇÕES</p>
+          <h2 id="titulo-extrato">Extrato da conta</h2>
+        </div>
+        <div class="month-switcher" aria-label="Período do extrato">
+          <button type="button" (click)="alterarMes(-1)" aria-label="Mês anterior">‹</button>
+          <span aria-live="polite">{{ mesDescricao() }}</span>
+          <button type="button" (click)="alterarMes(1)" aria-label="Próximo mês">›</button>
+        </div>
+      </div>
+      @if (carregandoExtrato()) {
+        <div class="feedback-card" role="status">Carregando extrato…</div>
+      } @else if (erroExtrato()) {
+        <div class="feedback-card danger" role="alert">
+          <p>{{ erroExtrato() }}</p>
+          <button type="button" class="secondary-action" (click)="carregarExtrato()">Tentar novamente</button>
+        </div>
+      } @else if (extrato(); as extratoAtual) {
+        <div class="statement-balances">
+          <div><span>Confirmado antes do período</span><strong>{{ privacidade.valoresVisiveis() ? moeda(extratoAtual.saldoConfirmadoAnterior) : '••••••' }}</strong></div>
+          <div><span>Confirmado ao fim do período</span><strong>{{ privacidade.valoresVisiveis() ? moeda(extratoAtual.saldoConfirmadoFinal) : '••••••' }}</strong></div>
+          <div><span>Projetado ao fim do período</span><strong>{{ privacidade.valoresVisiveis() ? moeda(extratoAtual.saldoProjetadoFinal) : '••••••' }}</strong></div>
+        </div>
+
+        @if (extratoAtual.movimentos.length === 0) {
+          <div class="feedback-card empty">
+            <h3>Sem movimentações neste mês</h3>
+            <p>Não há lançamentos, transferências ou pagamentos de fatura registrados para este período.</p>
+          </div>
+        } @else {
+          <div class="movement-list">
+            @for (movimento of extratoAtual.movimentos; track $index) {
+              <article class="movement">
+                <div class="movement-description">
+                  <span class="movement-date">{{ data(movimento.data) }}</span>
+                  <h3>{{ movimento.descricao }}</h3>
+                  <span class="movement-category">
+                    {{ movimento.categoriaNome || descricaoMovimento(movimento) }}
+                  </span>
+                </div>
+                <div class="movement-value">
+                  <strong [class.negative]="negativo(movimento.valor)">{{ moeda(movimento.valor) }}</strong>
+                  <span [class.pending]="movimento.situacao === 'PREVISTO'">
+                    {{ movimento.situacao === 'PREVISTO' ? 'Previsto' : 'Confirmado' }}
+                  </span>
+                  <small>Saldo {{ movimento.situacao === 'PREVISTO' ? 'projetado' : 'confirmado' }}:
+                    {{ privacidade.valoresVisiveis() ? moeda(movimento.situacao === 'PREVISTO' ? movimento.saldoProjetadoApos : movimento.saldoConfirmadoApos) : '••••••' }}
+                  </small>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      }
+    </section>
+  }
+</section>

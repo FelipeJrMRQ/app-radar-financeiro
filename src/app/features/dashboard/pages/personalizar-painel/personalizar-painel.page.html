@@ -1,0 +1,75 @@
+<section class="personalizar-page">
+  <a routerLink="/" class="back-link">← Voltar ao painel</a>
+  <header class="heading">
+    <span class="eyebrow">PREFERÊNCIAS PESSOAIS</span>
+    <h1>Personalizar meu painel</h1>
+    <p>Escolha a ordem e os componentes que deseja visualizar. Esta configuração pertence apenas à sua conta.</p>
+  </header>
+
+  @if (carregando()) {
+    <div class="message" role="status">Carregando suas preferências…</div>
+  } @else {
+    @if (erroCarregamento()) {
+      <div class="message error" role="alert">
+        {{ erroCarregamento() }}
+        <button type="button" class="secondary" (click)="carregar()">Tentar novamente</button>
+      </div>
+    } @else {
+      <div class="config-card">
+        <div class="config-intro">
+          <div>
+            <h2>Componentes do dashboard</h2>
+            <p>Arraste pelo ícone de movimentação ou use as setas. Desative a chave para ocultar um card.</p>
+          </div>
+          <span class="quantity">{{ itens().length }} componentes</span>
+        </div>
+        <ol class="preferences-list" aria-label="Ordem dos componentes">
+          @for (item of itens(); track item.codigoComponente; let i = $index) {
+            <li class="preference-row" data-card-row
+                [class.dragging]="arrastando() === i"
+                [class.drag-target]="alvo() === i && arrastando() !== i"
+                [class.hidden-card]="!item.visivel">
+              <button type="button" class="drag-handle"
+                      [attr.aria-label]="'Arrastar ' + titulo[item.codigoComponente]"
+                      (pointerdown)="iniciarArraste($event, i)"
+                      (pointermove)="moverArraste($event)"
+                      (pointerup)="finalizarArraste($event)"
+                      (pointercancel)="cancelarArraste()"
+                      (lostpointercapture)="cancelarArraste()">
+                <span aria-hidden="true">⠿</span>
+              </button>
+              <span class="sequence" aria-label="Posição">{{ i + 1 }}</span>
+              <span class="name">{{ titulo[item.codigoComponente] }}</span>
+              <span class="arrow-actions">
+                <button type="button" [disabled]="i === 0 || salvando()"
+                        [attr.aria-label]="'Subir ' + titulo[item.codigoComponente]"
+                        (click)="subir(i)">↑</button>
+                <button type="button" [disabled]="i === itens().length - 1 || salvando()"
+                        [attr.aria-label]="'Descer ' + titulo[item.codigoComponente]"
+                        (click)="descer(i)">↓</button>
+              </span>
+              <label class="visibility-toggle">
+                <input type="checkbox" [checked]="item.visivel" [disabled]="salvando()"
+                       [attr.aria-label]="'Exibir ' + titulo[item.codigoComponente]"
+                       (change)="alternar(item.codigoComponente, $event)" />
+                <span class="toggle-track" aria-hidden="true"></span>
+                <span class="visible-text">{{ item.visivel ? 'Exibir' : 'Oculto' }}</span>
+              </label>
+            </li>
+          }
+        </ol>
+        <p class="hint">Componentes ocultos permanecem nesta lista e podem ser reativados a qualquer momento.</p>
+      </div>
+      @if (mensagem()) { <div role="status" class="message success">{{ mensagem() }}</div> }
+      @if (erroSalvar()) { <div role="alert" class="message error">{{ erroSalvar() }}</div> }
+      <div class="actions">
+        <button type="button" class="secondary" [disabled]="salvando()" (click)="restaurar()">
+          Restaurar padrão
+        </button>
+        <button type="button" class="primary" [disabled]="salvando() || !alterado()" (click)="salvar()">
+          {{ salvando() ? 'Salvando…' : 'Salvar preferências' }}
+        </button>
+      </div>
+    }
+  }
+</section>

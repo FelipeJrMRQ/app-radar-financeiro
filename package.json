@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:pwa": "node scripts/verify-pwa.mjs"
   },
   "prettier": {
     "printWidth": 100,
@@ -30,7 +31,10 @@
     "@angular/router": "^20.3.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "chart.js": "^4.5.1",
+    "@fortawesome/angular-fontawesome": "3.0.0",
+    "@fortawesome/free-solid-svg-icons": "7.0.0"
   },
   "devDependencies": {
     "@angular/build": "^20.3.8",

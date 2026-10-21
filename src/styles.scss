@@ -1,1 +1,179 @@
-/* You can add global styles to this file, and also import other style files */
+@use './app/features/dashboard/styles/dashboard';
+:root {
+  /* Tokens centrais para ajustes futuros da identidade sem alterar cada feature. */
+  --rf-navy-950: #03111f;
+  --rf-navy-900: #082338;
+  --rf-navy-800: #123b50;
+  --rf-teal-700: #087d73;
+  --rf-teal-600: #099587;
+  --rf-teal-400: #32d5ba;
+  --rf-gold-400: #d8ae60;
+  --rf-gold-300: #f1d48b;
+  --rf-background: #f6f9fa;
+  --rf-surface: #ffffff;
+  --rf-text-primary: #173149;
+  --rf-text-muted: #788894;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  color: var(--rf-text-primary);
+  background: var(--rf-background);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { min-width: 320px; }
+body { min-width: 320px; margin: 0; }
+button, input { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 3px solid #37ac98; outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* Diagnóstico contextual do painel em caso de indisponibilidade da API. */
+.dashboard-state.error { display:grid; gap:12px; }
+.dashboard-state.error p { margin:0; }
+.dashboard-error-links { display:flex; flex-wrap:wrap; gap:10px; }
+.dashboard-error-links a { display:inline-flex; align-items:center; text-decoration:none; }
+
+/* Fullscreen PWA: áreas seguras para notch, barra de gestos e tela horizontal. */
+@media (max-width: 859px) {
+  .mobile-header {
+    height: calc(72px + env(safe-area-inset-top, 0px));
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-right: calc(20px + env(safe-area-inset-right, 0px));
+    padding-left: calc(20px + env(safe-area-inset-left, 0px));
+  }
+  .page-content {
+    padding-right: calc(18px + env(safe-area-inset-right, 0px));
+    padding-left: calc(18px + env(safe-area-inset-left, 0px));
+  }
+  .mobile-bottom-nav {
+    padding-right: env(safe-area-inset-right, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+}
+
+/* O controle do cabeçalho é global para não ultrapassar o budget do AppShell. */
+.app-layout .privacidade-controles { display:flex; align-items:center; justify-content:flex-end; gap:10px; min-width:0; }
+.app-layout .toggle-privacidade {
+  width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center;
+  border:1px solid #c6dfd8; border-radius:11px; background:#f1f9f6;
+  color:#0b7969; cursor:pointer; flex-shrink:0; font-size:17px;
+}
+.app-layout .toggle-privacidade:hover { background:#dff3ec; }
+.app-layout .toggle-privacidade:focus-visible { outline:3px solid #0b7969; outline-offset:2px; }
+.app-layout .toggle-privacidade[aria-pressed="true"] { background:#e3f5ef; }
+@media (min-width:860px) {
+  .app-layout .desktop-header > .privacidade-controles { flex-direction:row; align-items:center; gap:14px; }
+}
+@media (max-width:420px) {
+  .app-layout .mobile-header {
+    padding-left:calc(12px + env(safe-area-inset-left, 0px));
+    padding-right:calc(12px + env(safe-area-inset-right, 0px));
+  }
+  .app-layout .mobile-logo { gap:5px; font-size:13px; }
+  .app-layout .mobile-logout { padding:8px 10px; }
+  .app-layout .privacidade-controles { gap:6px; }
+  .app-layout .toggle-privacidade { width:38px; height:38px; }
+}
+/* Speed dial Radar: referência apenas funcional, cores e proporções do projeto. */
+.app-layout .lancamento-speed-dial {
+  position:fixed; z-index:30;
+  right:calc(18px + env(safe-area-inset-right));
+  bottom:calc(65px + 14px + env(safe-area-inset-bottom));
+  display:flex; flex-direction:column; align-items:flex-end;
+  pointer-events:none;
+}
+.app-layout .lancamento-fab,
+.app-layout .lancamento-speed-opcao { pointer-events:auto; }
+.app-layout .lancamento-fab {
+  display:grid; place-items:center; width:58px; height:58px; padding:0;
+  border:2px solid rgba(255,255,255,.9); border-radius:50%;
+  background:var(--rf-teal-700,#087d73); color:white;
+  box-shadow:0 8px 22px rgba(5,61,70,.28);
+  cursor:pointer; font-size:25px;
+  transition:background .16s ease, transform .16s ease;
+}
+.app-layout .lancamento-fab:hover,
+.app-layout .lancamento-fab:focus-visible { background:var(--rf-teal-600,#099587); }
+.app-layout .lancamento-speed-dial.aberto .lancamento-fab { transform:rotate(45deg); }
+.app-layout .lancamento-speed-opcoes {
+  position:absolute; bottom:100%; right:0; display:flex; flex-direction:column;
+  align-items:flex-end; gap:10px; padding-bottom:12px; min-width:220px;
+  animation:radar-atalhos-entrar .14s ease-out both;
+}
+.app-layout .lancamento-speed-opcao {
+  --rf-acao-cor:var(--rf-teal-700,#087d73);
+  --rf-acao-cor-hover:var(--rf-teal-600,#099587);
+  display:flex; flex-direction:row; align-items:center; justify-content:flex-end;
+  gap:10px; min-height:46px; text-decoration:none; color:inherit;
+}
+.app-layout .lancamento-speed-opcao.despesa {
+  --rf-acao-cor:#c0392b;
+  --rf-acao-cor-hover:#a93226;
+}
+.app-layout .lancamento-speed-opcao.transferencia {
+  --rf-acao-cor:#2563a6;
+  --rf-acao-cor-hover:#1d528b;
+}
+.app-layout .lancamento-speed-icone {
+  display:grid; place-items:center; flex:0 0 46px; width:46px; height:46px; padding:0;
+  border:1px solid rgba(255,255,255,.85); border-radius:50%;
+  background:var(--rf-acao-cor); color:#fff;
+  box-shadow:0 4px 12px rgba(5,61,70,.18);
+  font:inherit; font-size:19px;
+}
+.app-layout .lancamento-speed-letra {
+  display:block;
+  font-family:inherit;
+  font-size:18px;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:0;
+  user-select:none;
+}
+.app-layout .lancamento-speed-opcao:hover .lancamento-speed-icone,
+.app-layout .lancamento-speed-opcao:focus-visible .lancamento-speed-icone {
+  background:var(--rf-acao-cor-hover);
+}
+.app-layout .lancamento-speed-descricao {
+  display:inline-block; max-width:170px;
+  background:var(--rf-navy-900,#082338); color:#fff; border-radius:6px;
+  padding:7px 9px; font-size:12px; font-weight:600; line-height:1.2;
+  white-space:nowrap; box-shadow:0 3px 10px rgba(5,27,43,.12);
+}
+.app-layout .lancamento-speed-opcao.indisponivel { cursor:default; }
+.app-layout .lancamento-speed-opcao.indisponivel .lancamento-speed-icone {
+  opacity:.72; cursor:not-allowed; box-shadow:none;
+}
+.app-layout .lancamento-speed-opcao.indisponivel .lancamento-speed-descricao { opacity:.75; }
+@keyframes radar-atalhos-entrar {
+  from { opacity:0; transform:translateY(8px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@media (min-width:860px) {
+  .app-layout .lancamento-speed-dial { right:24px; bottom:24px; }
+  .app-layout .lancamento-fab { width:56px; height:56px; font-size:23px; }
+  .app-layout .lancamento-speed-descricao {
+    opacity:0; visibility:hidden; transition:opacity .12s ease;
+  }
+  .app-layout .lancamento-speed-opcao:hover .lancamento-speed-descricao,
+  .app-layout .lancamento-speed-opcao:focus-within .lancamento-speed-descricao,
+  .app-layout .lancamento-speed-opcao:focus-visible .lancamento-speed-descricao {
+    opacity:1; visibility:visible;
+  }
+  .app-layout .feedback-lancamento.tem-acao-flutuante { bottom:96px; }
+  .app-layout .feedback-lancamento.menu-atalhos-aberto { bottom:270px; }
+}
+@media (max-width:859px) {
+  .app-layout .feedback-lancamento.menu-atalhos-aberto {
+    bottom:calc(365px + env(safe-area-inset-bottom));
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .app-layout .lancamento-speed-opcoes { animation:none; }
+  .app-layout .lancamento-fab,
+  .app-layout .lancamento-speed-descricao { transition:none; }
+}

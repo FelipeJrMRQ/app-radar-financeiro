@@ -1,0 +1,174 @@
+<div class="app-layout">
+  <aside class="sidebar" aria-label="Menu principal">
+    <a class="sidebar-brand" routerLink="/">
+      <img class="sidebar-symbol" src="/assets/brand/simbolo-radar.webp" alt="" aria-hidden="true" width="160" height="160" />
+      <span>radar<strong>financeiro</strong></span>
+    </a>
+
+
+    <div class="sidebar-navigation">
+      <span class="sidebar-section-title">PRINCIPAL</span>
+      <nav aria-label="Navegação financeira">
+        <a routerLink="/" [routerLinkActiveOptions]="{ exact: true }"
+           routerLinkActive="active" class="sidebar-link">
+          <fa-icon [icon]="iconeInicio" aria-hidden="true"></fa-icon>
+          Início
+        </a>
+        <a routerLink="/lancamentos" routerLinkActive="active" class="sidebar-link">
+          <fa-icon [icon]="iconeLancamentos" aria-hidden="true"></fa-icon>
+          Lançamentos
+        </a>
+      </nav>
+
+      <span class="sidebar-section-title grouped-title">GERENCIAMENTO</span>
+      <nav aria-label="Cadastros e configurações">
+        <details class="sidebar-group" [class.section-active]="cadastrosAtivo()" open>
+          <summary class="sidebar-group-trigger">
+            <fa-icon [icon]="iconeCadastros" aria-hidden="true"></fa-icon>
+            <span>Cadastros</span>
+            <fa-icon class="group-chevron" [icon]="iconeExpandir" aria-hidden="true"></fa-icon>
+          </summary>
+          <div class="sidebar-subitems">
+            <a routerLink="/cadastros" [routerLinkActiveOptions]="{ exact: true }"
+               routerLinkActive="active" class="sidebar-sublink">Visão geral</a>
+            <a routerLink="/contas" routerLinkActive="active" class="sidebar-sublink">Contas financeiras</a>
+            <a routerLink="/categorias" routerLinkActive="active" class="sidebar-sublink">Categorias</a>
+            <span class="sidebar-sublink coming-soon">Cartões <small>Em breve</small></span>
+          </div>
+        </details>
+        <details class="sidebar-group" [class.section-active]="configuracoesAtivo()" open>
+          <summary class="sidebar-group-trigger">
+            <fa-icon [icon]="iconeConfiguracoes" aria-hidden="true"></fa-icon>
+            <span>Configurações</span>
+            <fa-icon class="group-chevron" [icon]="iconeExpandir" aria-hidden="true"></fa-icon>
+          </summary>
+          <div class="sidebar-subitems">
+            <a routerLink="/configuracoes" [routerLinkActiveOptions]="{ exact: true }"
+               routerLinkActive="active" class="sidebar-sublink">Visão geral</a>
+            <a routerLink="/configuracoes/painel" routerLinkActive="active"
+               class="sidebar-sublink">Personalizar painel</a>
+            <a routerLink="/configuracoes/perfil" routerLinkActive="active"
+               class="sidebar-sublink">Meu perfil</a>
+          </div>
+        </details>
+      </nav>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="side-profile">
+        <span class="avatar" aria-hidden="true">{{ (sessao.usuario()?.nome || 'U').charAt(0).toUpperCase() }}</span>
+        <div class="profile-text">
+          <strong>{{ sessao.usuario()?.nome }}</strong>
+          <span>{{ sessao.usuario()?.email }}</span>
+        </div>
+      </div>
+      <button type="button" class="side-logout" (click)="sair()">Sair da conta <fa-icon [icon]="iconeSair" aria-hidden="true"></fa-icon></button>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="mobile-header">
+      <a class="mobile-logo" routerLink="/" aria-label="Radar Financeiro - início">
+        <img class="mobile-symbol" src="/assets/brand/simbolo-radar.webp" alt="" aria-hidden="true" width="160" height="160" />
+        <span>radar<strong>financeiro</strong></span>
+      </a>
+      <div class="privacidade-controles">
+        <button type="button" class="toggle-privacidade" (click)="privacidade.alternar()"
+        [attr.aria-label]="privacidade.valoresVisiveis() ? 'Ocultar valores financeiros' : 'Mostrar valores financeiros'"
+        [attr.title]="privacidade.valoresVisiveis() ? 'Ocultar valores financeiros' : 'Mostrar valores financeiros'"
+        [attr.aria-pressed]="privacidade.valoresVisiveis()">
+        <fa-icon [icon]="privacidade.valoresVisiveis() ? iconeOlhoFechado : iconeOlho"
+          aria-hidden="true"></fa-icon>
+      </button>
+        <button type="button" class="mobile-logout" (click)="sair()">Sair</button>
+      </div>
+    </header>
+
+    <header class="desktop-header">
+      <div><span class="header-kicker">SEU PAINEL</span><span class="header-title">Radar Financeiro</span></div>
+      <div class="privacidade-controles">
+        <button type="button" class="toggle-privacidade" (click)="privacidade.alternar()"
+        [attr.aria-label]="privacidade.valoresVisiveis() ? 'Ocultar valores financeiros' : 'Mostrar valores financeiros'"
+        [attr.title]="privacidade.valoresVisiveis() ? 'Ocultar valores financeiros' : 'Mostrar valores financeiros'"
+        [attr.aria-pressed]="privacidade.valoresVisiveis()">
+        <fa-icon [icon]="privacidade.valoresVisiveis() ? iconeOlhoFechado : iconeOlho"
+          aria-hidden="true"></fa-icon>
+      </button>
+        <span class="header-user">{{ sessao.usuario()?.email }}</span>
+      </div>
+    </header>
+
+    <main class="page-content" id="conteudo"><router-outlet /></main>
+  </div>
+
+
+  @if (feedbackOperacoes.mensagem(); as mensagem) {
+    <div class="feedback-lancamento" [class.tem-acao-flutuante]="!cadastroLancamentoAtivo()"
+         [class.menu-atalhos-aberto]="menuLancamentoAberto()" role="status" aria-live="polite">
+      <span>{{ mensagem }}</span>
+      <button type="button" (click)="feedbackOperacoes.limpar()" aria-label="Fechar mensagem">×</button>
+    </div>
+  }
+
+  @if (!cadastroLancamentoAtivo()) {
+    <div #areaAcoes class="lancamento-speed-dial" [class.aberto]="menuLancamentoAberto()"
+         (pointerenter)="aoEntrarPonteiro($event)" (pointerleave)="aoSairPonteiro($event)"
+         (focusout)="aoPerderFoco($event)">
+      <button #botaoAcoes class="lancamento-fab" type="button"
+        aria-label="Ações rápidas financeiras"
+        aria-controls="acoes-rapidas-lancamento"
+        [attr.aria-expanded]="menuLancamentoAberto()"
+        (pointerenter)="aoEntrarPonteiro($event)"
+        (click)="alternarMenuLancamento()">
+        <fa-icon [icon]="iconeNovoLancamento" aria-hidden="true"></fa-icon>
+      </button>
+      @if (menuLancamentoAberto()) {
+        <div class="lancamento-speed-opcoes" id="acoes-rapidas-lancamento"
+             aria-label="Ações rápidas financeiras"
+             (pointerenter)="aoEntrarPonteiro($event)">
+          <a class="lancamento-speed-opcao receita" routerLink="/lancamentos/novo"
+             [queryParams]="{ tipo: 'RECEITA' }"
+             aria-label="Nova receita" (click)="fecharMenuLancamento()">
+            <span class="lancamento-speed-descricao">Nova receita</span>
+            <span class="lancamento-speed-icone">
+              <span class="lancamento-speed-letra" aria-hidden="true">R</span>
+            </span>
+          </a>
+          <a class="lancamento-speed-opcao despesa" routerLink="/lancamentos/novo"
+             [queryParams]="{ tipo: 'DESPESA' }"
+             aria-label="Nova despesa" (click)="fecharMenuLancamento()">
+            <span class="lancamento-speed-descricao">Nova despesa</span>
+            <span class="lancamento-speed-icone">
+              <span class="lancamento-speed-letra" aria-hidden="true">D</span>
+            </span>
+          </a>
+          <div class="lancamento-speed-opcao transferencia indisponivel">
+            <span class="lancamento-speed-descricao">Transferência · em breve</span>
+            <button type="button" class="lancamento-speed-icone" disabled
+              aria-label="Nova transferência indisponível: em breve"
+              title="Transferências serão implementadas em uma próxima etapa">
+              <span class="lancamento-speed-letra" aria-hidden="true">T</span>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <nav class="mobile-bottom-nav" aria-label="Navegação principal">
+    <a routerLink="/" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="active">
+      <fa-icon [icon]="iconeInicio" aria-hidden="true"></fa-icon><span>Início</span>
+    </a>
+    <a routerLink="/lancamentos" routerLinkActive="active">
+      <fa-icon [icon]="iconeLancamentos" aria-hidden="true"></fa-icon><span>Lançamentos</span>
+    </a>
+    <a routerLink="/cadastros" [class.active]="cadastrosAtivo()"
+       [attr.aria-current]="cadastrosAtivo() ? 'page' : null">
+      <fa-icon [icon]="iconeCadastros" aria-hidden="true"></fa-icon><span>Cadastros</span>
+    </a>
+    <a routerLink="/configuracoes" [class.active]="configuracoesAtivo()"
+       [attr.aria-current]="configuracoesAtivo() ? 'page' : null">
+      <fa-icon [icon]="iconeConfiguracoes" aria-hidden="true"></fa-icon><span>Configurações</span>
+    </a>
+  </nav>
+</div>

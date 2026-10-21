@@ -1,0 +1,80 @@
+<section class="contas-page">
+  <div class="page-heading">
+    <div>
+      <p class="section-label">CONTAS E SALDOS</p>
+      <h1>Contas financeiras</h1>
+      <p class="page-description">Consulte suas contas e os saldos informados pela API.</p>
+    </div>
+    <a class="primary-action" routerLink="/contas/nova">+ Nova conta</a>
+  </div>
+
+  @if (resultado) {
+    <div class="accounts-success" role="status">{{ resultado }}</div>
+  }
+
+  @if (!carregando() && !erro()) {
+    <div class="account-filters" role="group" aria-label="Situação das contas">
+      <button type="button" [class.selected]="!mostrarInativas()"
+              [attr.aria-pressed]="!mostrarInativas()"
+              (click)="mostrarInativas.set(false)">Ativas</button>
+      <button type="button" [class.selected]="mostrarInativas()"
+              [attr.aria-pressed]="mostrarInativas()"
+              (click)="mostrarInativas.set(true)">Inativas</button>
+    </div>
+  }
+
+  @if (carregando()) {
+    <div class="feedback-card" role="status">Carregando suas contas e saldos…</div>
+  } @else if (erro()) {
+    <div class="feedback-card danger" role="alert">
+      <p>{{ erro() }}</p>
+      <button type="button" class="secondary-action" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else if (contas().length === 0) {
+    <div class="feedback-card empty">
+      <h2>Nenhuma conta cadastrada</h2>
+      <p>Adicione sua primeira conta corrente, carteira ou poupança para começar.</p>
+      <a routerLink="/contas/nova" class="primary-action">Cadastrar primeira conta</a>
+    </div>
+  } @else if (visiveis().length === 0) {
+    <div class="feedback-card empty">
+      <h2>{{ mostrarInativas() ? 'Nenhuma conta inativa' : 'Nenhuma conta ativa' }}</h2>
+      <p>{{ mostrarInativas() ? 'As contas inativadas aparecerão aqui para consulta ou reativação.'
+        : 'Você pode cadastrar uma nova conta ou consultar suas contas inativas.' }}</p>
+      @if (!mostrarInativas()) {
+        <a routerLink="/contas/nova" class="primary-action">Criar conta financeira</a>
+      }
+    </div>
+  } @else {
+    <div class="accounts-grid">
+      @for (item of visiveis(); track item.conta.id) {
+        <article class="account-card" [class.inactive]="!item.conta.ativo">
+          <div class="account-header">
+            <span class="account-icon" aria-hidden="true"><img src="/assets/brand/icone-carteira.webp" alt="" width="160" height="160" loading="lazy" /></span>
+            <span class="account-type">{{ tipo(item.conta.tipo) }}</span>
+          </div>
+          <h2>{{ item.conta.nome }}</h2>
+          @if (!item.conta.ativo) {
+            <span class="inactive-label">Inativa · histórico preservado</span>
+          }
+          @if (item.saldo; as saldo) {
+            <span class="balance-caption">{{ item.conta.ativo ? 'Saldo confirmado' : 'Saldo histórico confirmado' }}</span>
+            <strong class="account-balance" [class.negative]="privacidade.valoresVisiveis() && negativo(saldo.saldoConfirmado)">
+              {{ privacidade.valoresVisiveis() ? moeda(saldo.saldoConfirmado) : '••••••' }}
+            </strong>
+          } @else {
+            <span class="balance-caption">Saldo indisponível</span>
+            <p class="balance-error" role="status">{{ item.erroSaldo }}</p>
+          }
+          <a [routerLink]="['/contas', item.conta.id]" class="account-link">
+            {{ item.conta.ativo ? 'Ver conta e extrato' : 'Consultar ou reativar conta' }}
+            <span aria-hidden="true">→</span>
+          </a>
+        </article>
+      }
+    </div>
+    <div class="refresh-actions">
+      <button type="button" class="secondary-action" (click)="carregar()">Atualizar saldos</button>
+    </div>
+  }
+</section>

@@ -1,0 +1,56 @@
+@use '../../styles/base';
+.accounts-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 15px; }
+
+.account-card {
+  display: flex; flex-direction: column; min-width: 0; padding: 23px; border: 1px solid #e0e9ed;
+  background: white; border-radius: 15px;
+}
+
+.account-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+
+.account-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: #e5f6f0; color: #116d61; font-size: 20px; }
+
+.account-type { font-size: 11px; color: #718898; }
+
+.account-card h2 { color: #203b52; font-size: 17px; margin: 17px 0 23px; overflow-wrap: anywhere; }
+
+.balance-caption { font-size: 12px; color: #778d9b; }
+
+.account-balance { display: block; margin: 7px 0 23px; font-size: clamp(22px, 4vw, 29px); color: #173c4b; letter-spacing: -.9px; overflow-wrap: anywhere; }
+
+.account-balance.negative, .negative { color: #bd4049 !important; }
+
+.balance-error { font-size: 12px; color: #a14548; margin: 8px 0 18px; line-height: 1.6; }
+
+.account-link { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 15px; border-top: 1px solid #eef1f2; color: var(--rf-teal-700, #087d73); font-size: 13px; font-weight: 750; text-decoration: none; min-height: 44px; }
+
+.account-link:hover { text-decoration: underline; }
+
+.refresh-actions { display: flex; justify-content: flex-end; margin-top: 20px; }
+
+@media (min-width: 580px) {
+.accounts-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+
+@media (min-width: 1020px) {
+.accounts-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+}
+
+/* Ícone da marca: visual decorativo; rótulo textual da conta permanece no cartão. */
+.account-icon img { display: block; width: 39px; height: 39px; object-fit: contain; }
+
+.account-filters { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 20px; }
+.account-filters button {
+  min-height:44px; padding:10px 19px; border-radius:99px; cursor:pointer;
+  border:1px solid #d6e5e8; background:#fff; color:#547381; font:inherit; font-size:13px; font-weight:750;
+}
+.account-filters button.selected { background:#125f60; color:#fff; border-color:#125f60; }
+.account-card.inactive { background:#f9fbfb; border-color:#d8e3e8; }
+.inactive-label {
+  align-self:flex-start; border-radius:99px; padding:4px 9px; background:#eaeef1;
+  color:#526a77; font-size:11px; font-weight:750; margin-top:-13px; margin-bottom:16px;
+}
+.accounts-success {
+  padding:13px 16px; border-radius:10px; border:1px solid #cbe6d9;
+  background:#e9f8ef; color:#126247; font-size:13px; margin-bottom:18px;
+}

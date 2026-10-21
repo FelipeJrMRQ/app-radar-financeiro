@@ -1,0 +1,87 @@
+<section class="contas-page">
+  <a [routerLink]="voltar()" class="back-link">← Voltar para contas</a>
+  <div class="page-heading">
+    <div>
+      <p class="section-label">{{ editando ? 'EDIÇÃO DA CONTA' : 'CADASTRO' }}</p>
+      <h1>{{ editando ? 'Editar conta financeira' : 'Nova conta financeira' }}</h1>
+      <p class="page-description">
+        {{ editando ? 'Corrija os dados cadastrados sem perder o histórico financeiro.'
+          : 'Preencha os dados iniciais de sua conta.' }}
+      </p>
+    </div>
+  </div>
+
+  @if (carregando()) {
+    <div class="feedback-card" role="status">Carregando dados da conta…</div>
+  } @else if (erroCarregamento()) {
+    <div class="feedback-card danger" role="alert">
+      <p>{{ erroCarregamento() }}</p>
+      <button type="button" class="secondary-action" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else {
+    <div class="form-panel">
+      @if (editando && !contaAtiva()) {
+        <p class="state-hint" role="status">Esta conta está inativa. Você pode corrigir seus dados,
+          mas precisará reativá-la para cadastrar novas movimentações.</p>
+      }
+      @if (erro()) {
+        <div class="inline-error" role="alert">{{ erro() }}</div>
+      }
+      <form [formGroup]="formulario" (ngSubmit)="salvar()" novalidate>
+        <div class="form-field">
+          <label for="nome">Nome da conta</label>
+          <input id="nome" formControlName="nome" type="text" autocomplete="off"
+                 placeholder="Ex.: Conta principal" maxlength="150"
+                 [attr.aria-invalid]="formulario.controls.nome.touched && formulario.controls.nome.invalid" />
+          @if (formulario.controls.nome.touched && formulario.controls.nome.invalid) {
+            <small class="field-error">Informe um nome com até 150 caracteres.</small>
+          }
+        </div>
+        <div class="form-field">
+          <label for="tipo">Tipo de conta</label>
+          <select id="tipo" formControlName="tipo">
+            @for (opcao of tipos; track opcao.valor) {
+              <option [value]="opcao.valor">{{ opcao.descricao }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="saldo-inicial">Saldo inicial (R$)</label>
+          <input id="saldo-inicial" formControlName="saldoInicial" rfMoedaBr
+                 [rfMoedaBrPermiteNegativo]="true"
+                 type="text" inputmode="decimal" autocomplete="off" placeholder="R$ 0,00"
+                 [attr.aria-invalid]="formulario.controls.saldoInicial.touched && formulario.controls.saldoInicial.invalid"
+                 aria-describedby="ajuda-saldo" />
+          <small id="ajuda-saldo" class="field-hint">
+            Digite somente os números: 9000 = R$ 90,00. Para saldo negativo, comece com o sinal de menos.
+          </small>
+          @if (formulario.controls.saldoInicial.touched && formulario.controls.saldoInicial.invalid) {
+            <small class="field-error">Informe um valor válido com até 4 casas decimais.</small>
+          }
+        </div>
+
+        @if (editando && saldoAlterado()) {
+          <div class="saldo-warning" role="group" aria-labelledby="titulo-aviso-saldo">
+            <strong id="titulo-aviso-saldo">Atenção à correção do saldo inicial</strong>
+            <p>O saldo inicial é a base dos cálculos financeiros. Corrigi-lo altera os saldos atuais,
+              projetados e históricos exibidos nos extratos. Isso não registra um novo pagamento,
+              recebimento ou transferência.</p>
+            <label class="confirm-checkbox">
+              <input type="checkbox" [checked]="confirmouMudancaSaldo()"
+                     (change)="marcarConfirmacaoSaldo($event)" />
+              <span>Entendo o impacto e confirmo que estou corrigindo o valor informado no cadastro.</span>
+            </label>
+          </div>
+        }
+
+        <div class="form-actions">
+          <a [routerLink]="voltar()" class="secondary-action cancel-link">Cancelar</a>
+          <button type="submit" class="primary-action"
+                  [disabled]="salvando() || (editando && saldoAlterado() && !confirmouMudancaSaldo())">
+            {{ salvando() ? 'Salvando…' : editando ? 'Salvar alterações' : 'Criar conta' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</section>
