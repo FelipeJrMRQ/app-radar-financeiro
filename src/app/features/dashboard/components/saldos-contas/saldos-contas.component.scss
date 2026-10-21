@@ -1,0 +1,124 @@
+/* Tabela compacta e alinhada em desktop e celular, sem alterar outros cards. */
+:host { display:block; min-width:0; }
+.cash-balances-panel { min-height:0; overflow:hidden; }
+.cash-balances-heading { align-items:center; padding:17px 18px 10px; }
+.cash-balances-heading .panel-link { padding-top:0; }
+.cash-balances-grid { min-width:0; }
+.cash-balances-columns,
+.cash-balances-row,
+.cash-balances-total {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(76px,96px) minmax(76px,96px);
+  gap:8px;
+  align-items:center;
+  padding:8px 16px;
+}
+.cash-balances-columns {
+  font-size:11px;
+  font-weight:650;
+  color:#607b89;
+  padding-top:6px;
+  padding-bottom:6px;
+}
+.cash-balances-column-title { text-align:right; }
+.cash-balances-all { display:flex; align-items:center; width:max-content; }
+.cash-balances-panel input[type=checkbox] {
+  width:15px;
+  height:15px;
+  margin:0;
+  flex:0 0 15px;
+  accent-color:var(--rf-teal-700,#087d73);
+  cursor:pointer;
+}
+.cash-balances-panel input[type=checkbox]:disabled { cursor:not-allowed; }
+.cash-balances-list { max-height:300px; overflow-y:auto; overscroll-behavior:contain; }
+.cash-balances-row { min-height:37px; }
+.cash-balances-row:hover { background:#f7fbfa; }
+.cash-balances-account {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+  color:#1e4051;
+  cursor:pointer;
+}
+.cash-balances-account.account-disabled { cursor:default; }
+.cash-balances-bank-icon {
+  display:grid;
+  flex:0 0 22px;
+  width:22px;
+  height:22px;
+  place-items:center;
+  border-radius:50%;
+  background:#e4f3ef;
+  color:#087d73;
+  border:1px solid #cde5dd;
+  font-size:11px;
+  font-weight:800;
+}
+.cash-balances-bank-icon.alternate {
+  background:#e9f2fb;
+  border-color:#d4e4f4;
+  color:#2869a0;
+}
+.cash-balances-account-name {
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:12px;
+  font-weight:600;
+}
+.cash-balances-amount {
+  text-align:right;
+  white-space:nowrap;
+  font-size:11px;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+  color:#32536a;
+}
+.cash-balances-amount.positive { color:#078468; }
+.cash-balances-amount.negative { color:#bc4854; }
+.cash-balances-total {
+  min-height:49px;
+  margin-top:6px;
+  padding-top:13px;
+  padding-bottom:13px;
+  border-top:1px solid #e1e9eb;
+  background:#f4f7f7;
+}
+.cash-balances-total-name { color:#17384a; font-size:12px; font-weight:800; }
+.cash-balances-note {
+  padding:8px 16px 13px;
+  margin:0;
+  color:#748c98;
+  font-size:10px;
+  line-height:1.5;
+}
+@media(min-width:640px) {
+  .cash-balances-columns,
+  .cash-balances-row,
+  .cash-balances-total {
+    grid-template-columns:minmax(0,1fr) minmax(85px,115px) minmax(85px,115px);
+    gap:12px;
+    padding-left:20px;
+    padding-right:20px;
+  }
+  .cash-balances-amount { font-size:12px; }
+  .cash-balances-account-name { font-size:13px; }
+  .cash-balances-panel input[type=checkbox] { width:16px; height:16px; flex-basis:16px; }
+}
+@media(max-width:370px) {
+  .cash-balances-columns,
+  .cash-balances-row,
+  .cash-balances-total {
+    grid-template-columns:minmax(0,1fr) minmax(70px,83px) minmax(70px,83px);
+    gap:6px;
+    padding-left:10px;
+    padding-right:10px;
+  }
+  .cash-balances-bank-icon { width:18px; height:18px; flex-basis:18px; }
+  .cash-balances-account { gap:5px; }
+  .cash-balances-amount { font-size:10px; }
+  .cash-balances-column-title { font-size:10px; }
+}

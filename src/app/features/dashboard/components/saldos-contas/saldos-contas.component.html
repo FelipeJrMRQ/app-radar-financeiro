@@ -1,22 +1,79 @@
-<section class="panel account-panel" aria-labelledby="titulo-saldos">
-                <div class="panel-head"><div><h2 id="titulo-saldos">Saldos das contas</h2></div><a class="panel-link" routerLink="/contas">Ver contas →</a></div>
-                <div class="account-head-row"><span>Conta</span><span>Confirmado</span><span>Projetado</span></div>
-                @if (contas().length === 0) {
-                  <div class="empty-data">Nenhuma conta cadastrada. <a routerLink="/contas/nova">Criar conta</a></div>
-                } @else {
-                  <div class="account-list">
-                    @for (conta of contas(); track conta.contaFinanceiraId) {
-                      <div class="account-row">
-                        <span class="account-name"><span class="account-indicator" aria-hidden="true"></span>{{ conta.nome }}</span>
-                        <strong class="account-value"><span class="account-value-label">Confirmado</span>{{ valoresVisiveis() ? moeda(conta.saldoConfirmado) : '••••••' }}</strong>
-                        <strong class="account-value"><span class="account-value-label">Projetado</span>{{ valoresVisiveis() ? moeda(conta.saldoProjetado) : '••••••' }}</strong>
-                      </div>
-                    }
-                  </div>
-                }
-                <footer class="panel-total account-footer">
-                  <span class="account-footer-label">Total</span>
-                  <strong class="account-value"><span class="account-value-label">Confirmado</span>{{ valoresVisiveis() ? moeda(saldoConfirmado()) : '••••••' }}</strong>
-                  <strong class="account-value"><span class="account-value-label">Projetado</span>{{ valoresVisiveis() ? moeda(saldoProjetado()) : '••••••' }}</strong>
-                </footer>
-              </section>
+<section class="panel account-panel cash-balances-panel" aria-labelledby="titulo-saldos">
+  <header class="panel-head cash-balances-heading">
+    <h2 id="titulo-saldos">Saldos de caixa</h2>
+    <a class="panel-link" routerLink="/contas">Ver contas →</a>
+  </header>
+
+  @if (!contas().length) {
+    <div class="empty-data">
+      Nenhuma conta cadastrada. <a routerLink="/contas/nova">Criar conta</a>
+    </div>
+  } @else {
+    <div class="cash-balances-grid" role="group" aria-label="Saldos de caixa por conta">
+      <div class="cash-balances-columns">
+        <label class="cash-balances-all" title="Selecionar contas no gráfico de fluxo de caixa">
+          <input type="checkbox"
+            aria-label="Selecionar todas as contas disponíveis no fluxo de caixa"
+            [checked]="todasSelecionadas()"
+            [indeterminate]="parcialmenteSelecionadas()"
+            [disabled]="contasSelecionaveis().length === 0"
+            (change)="alternarTodas($event)" />
+        </label>
+        <span class="cash-balances-column-title">Confirmado</span>
+        <span class="cash-balances-column-title">Projetado</span>
+      </div>
+
+      <div class="account-list cash-balances-list">
+        @for (conta of contas(); track conta.contaFinanceiraId; let i = $index) {
+          <div class="cash-balances-row">
+            <label class="cash-balances-account"
+              [class.account-disabled]="!podeSelecionar(conta.contaFinanceiraId)"
+              [attr.title]="!podeSelecionar(conta.contaFinanceiraId)
+                ? 'Conta oculta pelo filtro de saldo zerado do gráfico'
+                : 'Incluir ou retirar do gráfico de fluxo de caixa'">
+              <input type="checkbox"
+                [attr.aria-label]="'Incluir ' + conta.nome + ' no gráfico de fluxo de caixa'"
+                [checked]="estaSelecionada(conta.contaFinanceiraId)"
+                [disabled]="!podeSelecionar(conta.contaFinanceiraId)"
+                (change)="alterarConta(conta.contaFinanceiraId, $event)" />
+              <span class="cash-balances-bank-icon" [class.alternate]="i % 2 === 1"
+                aria-hidden="true">{{ conta.nome.trim().charAt(0).toUpperCase() }}</span>
+              <span class="cash-balances-account-name">{{ conta.nome }}</span>
+            </label>
+            <strong class="cash-balances-amount"
+              [class.positive]="valoresVisiveis() && valorPositivo(conta.saldoConfirmado)"
+              [class.negative]="valoresVisiveis() && valorNegativo(conta.saldoConfirmado)"
+              [attr.aria-label]="'Saldo confirmado de ' + conta.nome + ': '
+                + (valoresVisiveis() ? moeda(conta.saldoConfirmado) : 'valor oculto')">
+              {{ valoresVisiveis() ? moeda(conta.saldoConfirmado) : '••••••' }}
+            </strong>
+            <strong class="cash-balances-amount"
+              [class.positive]="valoresVisiveis() && valorPositivo(conta.saldoProjetado)"
+              [class.negative]="valoresVisiveis() && valorNegativo(conta.saldoProjetado)"
+              [attr.aria-label]="'Saldo projetado de ' + conta.nome + ': '
+                + (valoresVisiveis() ? moeda(conta.saldoProjetado) : 'valor oculto')">
+              {{ valoresVisiveis() ? moeda(conta.saldoProjetado) : '••••••' }}
+            </strong>
+          </div>
+        }
+      </div>
+
+      <footer class="cash-balances-total">
+        <span class="cash-balances-total-name">Total</span>
+        <strong class="cash-balances-amount"
+          [class.positive]="valoresVisiveis() && valorPositivo(saldoConfirmado())"
+          [class.negative]="valoresVisiveis() && valorNegativo(saldoConfirmado())">
+          {{ valoresVisiveis() ? moeda(saldoConfirmado()) : '••••••' }}
+        </strong>
+        <strong class="cash-balances-amount"
+          [class.positive]="valoresVisiveis() && valorPositivo(saldoProjetado())"
+          [class.negative]="valoresVisiveis() && valorNegativo(saldoProjetado())">
+          {{ valoresVisiveis() ? moeda(saldoProjetado()) : '••••••' }}
+        </strong>
+      </footer>
+    </div>
+    <p class="cash-balances-note">
+      A seleção controla o gráfico. O total considera todas as contas financeiras.
+    </p>
+  }
+</section>

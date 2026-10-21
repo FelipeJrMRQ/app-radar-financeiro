@@ -81,7 +81,13 @@
         <app-contas-pagar-card rfMosaicoPainelItem [itens]="aPagar()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" />
       }
       @case ('SALDOS_CONTAS') {
-        <app-saldos-contas-card rfMosaicoPainelItem [contas]="dados.contas.slice(0, 5)" [saldoConfirmado]="dados.saldoConfirmado" [saldoProjetado]="dados.saldoProjetado" [valoresVisiveis]="privacidade.valoresVisiveis()" />
+        <app-saldos-contas-card rfMosaicoPainelItem
+          [contas]="dados.contas" [saldoConfirmado]="dados.saldoConfirmado"
+          [saldoProjetado]="dados.saldoProjetado"
+          [contasSelecionadas]="contasGraficoIds() ?? []"
+          [contasSelecionaveis]="contasVisiveis().map(conta => conta.contaFinanceiraId)"
+          (selecaoAlterada)="alterarContasGrafico($event)"
+          [valoresVisiveis]="privacidade.valoresVisiveis()" />
       }
       @case ('FLUXO_CAIXA') {
         <app-fluxo-caixa-card rfMosaicoPainelItem [contas]="contasVisiveis()" [contasSelecionadas]="contasGraficoIds() ?? []" [fluxo]="fluxo()" [carregandoFluxo]="carregandoFluxo()" [erroFluxo]="erroFluxo()" [ocultarContasZeradas]="ocultarContasZeradas()" [quantidadeOcultas]="ocultarContasZeradas() ? contasZeradas().length : 0" [erroPreferencias]="preferenciasFluxo.erro()" (selecaoAlterada)="alterarContasGrafico($event)" (alternarZeradas)="alternarContasZeradas()" [valoresVisiveis]="privacidade.valoresVisiveis()" />
