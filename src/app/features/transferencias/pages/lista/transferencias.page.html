@@ -46,8 +46,7 @@
             <span [class.previsto]="item.situacao === 'PREVISTO'">
               {{ item.situacao === 'PREVISTO' ? 'Prevista' : 'Confirmada' }}
             </span>
-            @if (item.situacao === 'CONFIRMADO' && item.valorEfetivo !== null
-              && String(item.valorEfetivo) !== String(item.valor)) {
+            @if (item.situacao === 'CONFIRMADO' && item.valorEfetivo !== null) {
               <small>Efetivo: {{ moeda(item.valorEfetivo) }}</small>
             }
           </div>
