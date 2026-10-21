@@ -30,6 +30,11 @@ export class SaldosContasCardComponent {
   readonly totalProjetado = computed(() =>
     somarSaldos(this.contasSelecionadas().map(conta => conta.saldoProjetado)));
 
+  readonly confirmadoPositivo = computed(() => this.totalConfirmado() > 0n);
+  readonly confirmadoNegativo = computed(() => this.totalConfirmado() < 0n);
+  readonly projetadoPositivo = computed(() => this.totalProjetado() > 0n);
+  readonly projetadoNegativo = computed(() => this.totalProjetado() < 0n);
+
   readonly moeda = formatarMoeda;
   readonly moedaTotal = formatarSomaSaldos;
 

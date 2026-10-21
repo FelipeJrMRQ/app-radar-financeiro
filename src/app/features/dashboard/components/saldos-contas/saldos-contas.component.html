@@ -56,13 +56,13 @@
       <footer class="cash-balances-total">
         <span class="cash-balances-total-name">Total</span>
         <strong class="cash-balances-amount"
-          [class.positive]="valoresVisiveis() && totalConfirmado() > 0n"
-          [class.negative]="valoresVisiveis() && totalConfirmado() < 0n">
+          [class.positive]="valoresVisiveis() && confirmadoPositivo()"
+          [class.negative]="valoresVisiveis() && confirmadoNegativo()">
           {{ valoresVisiveis() ? moedaTotal(totalConfirmado()) : '••••••' }}
         </strong>
         <strong class="cash-balances-amount"
-          [class.positive]="valoresVisiveis() && totalProjetado() > 0n"
-          [class.negative]="valoresVisiveis() && totalProjetado() < 0n">
+          [class.positive]="valoresVisiveis() && projetadoPositivo()"
+          [class.negative]="valoresVisiveis() && projetadoNegativo()">
           {{ valoresVisiveis() ? moedaTotal(totalProjetado()) : '••••••' }}
         </strong>
       </footer>
