@@ -1,8 +1,9 @@
-import { Component, computed, EventEmitter, input, Output } from '@angular/core';
+import { Component, computed, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { ValorFinanceiroApi, formatarMoeda } from '../../../../shared/valor-monetario';
 import { SaldoContaPainel } from '../../models/painel-financeiro.model';
+import { formatarSomaSaldos, somarSaldos } from '../../utils/saldos-selecionados';
 
 @Component({
   selector: 'app-saldos-contas-card',
@@ -13,52 +14,39 @@ import { SaldoContaPainel } from '../../models/painel-financeiro.model';
 })
 export class SaldosContasCardComponent {
   readonly contas = input.required<SaldoContaPainel[]>();
-  readonly saldoConfirmado = input.required<ValorFinanceiroApi>();
-  readonly saldoProjetado = input.required<ValorFinanceiroApi>();
   readonly valoresVisiveis = input(false);
 
-  // Reutiliza as preferências do gráfico de fluxo de caixa: não cria seleção paralela.
-  readonly contasSelecionadas = input<number[]>([]);
-  readonly contasSelecionaveis = input<number[]>([]);
-  @Output() readonly selecaoAlterada = new EventEmitter<number[]>();
+  // Seleção local e exclusiva dos totais deste card; não interfere no fluxo de caixa.
+  private readonly desmarcadas = signal<ReadonlySet<number>>(new Set<number>());
+  readonly contasSelecionadas = computed(() => this.contas()
+    .filter(conta => !this.desmarcadas().has(conta.contaFinanceiraId)));
+  readonly todasSelecionadas = computed(() =>
+    this.contas().length > 0 && this.contasSelecionadas().length === this.contas().length);
+  readonly parcialmenteSelecionadas = computed(() =>
+    this.contasSelecionadas().length > 0 && !this.todasSelecionadas());
 
-  readonly todasSelecionadas = computed(() => {
-    const permitidas = this.contasSelecionaveis();
-    return permitidas.length > 0 &&
-      permitidas.every(id => this.contasSelecionadas().includes(id));
-  });
-  readonly parcialmenteSelecionadas = computed(() => {
-    const selecionadas = this.contasSelecionadas();
-    const permitidas = this.contasSelecionaveis();
-    return permitidas.some(id => selecionadas.includes(id)) && !this.todasSelecionadas();
-  });
+  readonly totalConfirmado = computed(() =>
+    somarSaldos(this.contasSelecionadas().map(conta => conta.saldoConfirmado)));
+  readonly totalProjetado = computed(() =>
+    somarSaldos(this.contasSelecionadas().map(conta => conta.saldoProjetado)));
 
   readonly moeda = formatarMoeda;
+  readonly moedaTotal = formatarSomaSaldos;
 
   estaSelecionada(id: number): boolean {
-    return this.contasSelecionadas().includes(id);
-  }
-
-  podeSelecionar(id: number): boolean {
-    return this.contasSelecionaveis().includes(id);
+    return !this.desmarcadas().has(id);
   }
 
   alterarConta(id: number, evento: Event): void {
-    if (!this.podeSelecionar(id)) return;
-    const selecionadas = new Set(this.contasSelecionadas());
-    if ((evento.target as HTMLInputElement).checked) selecionadas.add(id);
-    else selecionadas.delete(id);
-    this.selecaoAlterada.emit([...selecionadas]);
+    const novaSelecao = new Set(this.desmarcadas());
+    if ((evento.target as HTMLInputElement).checked) novaSelecao.delete(id);
+    else novaSelecao.add(id);
+    this.desmarcadas.set(novaSelecao);
   }
 
   alternarTodas(evento: Event): void {
-    const selecionadas = new Set(this.contasSelecionadas());
     const marcar = (evento.target as HTMLInputElement).checked;
-    for (const id of this.contasSelecionaveis()) {
-      if (marcar) selecionadas.add(id);
-      else selecionadas.delete(id);
-    }
-    this.selecaoAlterada.emit([...selecionadas]);
+    this.desmarcadas.set(new Set(marcar ? [] : this.contas().map(conta => conta.contaFinanceiraId)));
   }
 
   valorNegativo(valor: ValorFinanceiroApi): boolean {

@@ -11,12 +11,11 @@
   } @else {
     <div class="cash-balances-grid" role="group" aria-label="Saldos de caixa por conta">
       <div class="cash-balances-columns">
-        <label class="cash-balances-all" title="Selecionar contas no gráfico de fluxo de caixa">
+        <label class="cash-balances-all" title="Selecionar contas incluídas nos totais de caixa">
           <input type="checkbox"
-            aria-label="Selecionar todas as contas disponíveis no fluxo de caixa"
+            aria-label="Selecionar todas as contas para os totais de caixa"
             [checked]="todasSelecionadas()"
             [indeterminate]="parcialmenteSelecionadas()"
-            [disabled]="contasSelecionaveis().length === 0"
             (change)="alternarTodas($event)" />
         </label>
         <span class="cash-balances-column-title">Confirmado</span>
@@ -27,14 +26,10 @@
         @for (conta of contas(); track conta.contaFinanceiraId; let i = $index) {
           <div class="cash-balances-row">
             <label class="cash-balances-account"
-              [class.account-disabled]="!podeSelecionar(conta.contaFinanceiraId)"
-              [attr.title]="!podeSelecionar(conta.contaFinanceiraId)
-                ? 'Conta oculta pelo filtro de saldo zerado do gráfico'
-                : 'Incluir ou retirar do gráfico de fluxo de caixa'">
+              title="Incluir ou retirar dos totais de caixa">
               <input type="checkbox"
-                [attr.aria-label]="'Incluir ' + conta.nome + ' no gráfico de fluxo de caixa'"
+                [attr.aria-label]="'Incluir ' + conta.nome + ' nos totais de caixa'"
                 [checked]="estaSelecionada(conta.contaFinanceiraId)"
-                [disabled]="!podeSelecionar(conta.contaFinanceiraId)"
                 (change)="alterarConta(conta.contaFinanceiraId, $event)" />
               <span class="cash-balances-bank-icon" [class.alternate]="i % 2 === 1"
                 aria-hidden="true">{{ conta.nome.trim().charAt(0).toUpperCase() }}</span>
@@ -61,19 +56,19 @@
       <footer class="cash-balances-total">
         <span class="cash-balances-total-name">Total</span>
         <strong class="cash-balances-amount"
-          [class.positive]="valoresVisiveis() && valorPositivo(saldoConfirmado())"
-          [class.negative]="valoresVisiveis() && valorNegativo(saldoConfirmado())">
-          {{ valoresVisiveis() ? moeda(saldoConfirmado()) : '••••••' }}
+          [class.positive]="valoresVisiveis() && totalConfirmado() > 0n"
+          [class.negative]="valoresVisiveis() && totalConfirmado() < 0n">
+          {{ valoresVisiveis() ? moedaTotal(totalConfirmado()) : '••••••' }}
         </strong>
         <strong class="cash-balances-amount"
-          [class.positive]="valoresVisiveis() && valorPositivo(saldoProjetado())"
-          [class.negative]="valoresVisiveis() && valorNegativo(saldoProjetado())">
-          {{ valoresVisiveis() ? moeda(saldoProjetado()) : '••••••' }}
+          [class.positive]="valoresVisiveis() && totalProjetado() > 0n"
+          [class.negative]="valoresVisiveis() && totalProjetado() < 0n">
+          {{ valoresVisiveis() ? moedaTotal(totalProjetado()) : '••••••' }}
         </strong>
       </footer>
     </div>
     <p class="cash-balances-note">
-      A seleção controla o gráfico. O total considera todas as contas financeiras.
+      Os totais somam somente as contas marcadas.
     </p>
   }
 </section>

@@ -82,11 +82,7 @@
       }
       @case ('SALDOS_CONTAS') {
         <app-saldos-contas-card rfMosaicoPainelItem
-          [contas]="dados.contas" [saldoConfirmado]="dados.saldoConfirmado"
-          [saldoProjetado]="dados.saldoProjetado"
-          [contasSelecionadas]="contasGraficoIds() ?? []"
-          [contasSelecionaveis]="contasSelecionaveis()"
-          (selecaoAlterada)="alterarContasGrafico($event)"
+          [contas]="dados.contas"
           [valoresVisiveis]="privacidade.valoresVisiveis()" />
       }
       @case ('FLUXO_CAIXA') {
