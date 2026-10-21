@@ -57,7 +57,9 @@ describe('TransferenciaFormPage', () => {
       contaOrigemId: 1, contaDestinoId: 2, valor: '1234.56',
       dataTransferencia: '2026-10-21', descricao: 'Reserva mensal', observacao: null,
     });
-    expect(navigate).toHaveBeenCalledWith(['/transferencias'], { queryParams: { resultado: 'criada' } });
+    expect(navigate).toHaveBeenCalledWith(['/transferencias'], {
+      queryParams: { resultado: 'criada', mes: '2026-10' },
+    });
     fixture.destroy();
   });
 });

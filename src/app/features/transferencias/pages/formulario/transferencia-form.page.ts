@@ -120,7 +120,10 @@ export class TransferenciaFormPage implements OnInit {
       }
       if (!this.destruir.destroyed) {
         await this.router.navigate(['/transferencias'], {
-          queryParams: { resultado: this.editando ? 'editada' : 'criada' },
+          queryParams: {
+            resultado: this.editando ? 'editada' : 'criada',
+            mes: dados.dataTransferencia.slice(0, 7),
+          },
         });
       }
     } catch (erro) {

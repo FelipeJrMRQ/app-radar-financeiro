@@ -29,7 +29,7 @@ export class TransferenciasPage implements OnInit {
   readonly operando = signal(false);
   readonly erroAcao = signal<string | null>(null);
   readonly lista = signal<Transferencia[]>([]);
-  readonly mes = signal(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  readonly mes = signal(this.mesInicial());
   readonly mesDescricao = computed(() => new Intl.DateTimeFormat('pt-BR',
     { month: 'long', year: 'numeric' }).format(this.mes()));
   readonly exibicao = computed(() => {
@@ -47,6 +47,15 @@ export class TransferenciasPage implements OnInit {
   readonly data = formatarDataLocal;
   readonly moeda = formatarMoeda;
   readonly mensagemSucesso = signal<string | null>(null);
+
+  private mesInicial(): Date {
+    const parametro = this.rota.snapshot.queryParamMap.get('mes');
+    if (parametro && /^\d{4}-(0[1-9]|1[0-2])$/.test(parametro)) {
+      return new Date(Number(parametro.slice(0, 4)), Number(parametro.slice(5, 7)) - 1, 1);
+    }
+    const hoje = new Date();
+    return new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  }
 
   ngOnInit(): void {
     const resultado = this.rota.snapshot.queryParamMap.get('resultado');

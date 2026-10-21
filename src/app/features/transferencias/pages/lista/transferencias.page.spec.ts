@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { dataHojeLocal } from '../../../../shared/valor-monetario';
@@ -31,6 +31,15 @@ describe('TransferenciasPage', () => {
         { provide: TransferenciasService, useValue: { listar, confirmar, excluir } },
       ],
     }).compileComponents();
+  });
+
+  it('respeita o mês solicitado na navegação após cadastrar', () => {
+    TestBed.overrideProvider(ActivatedRoute, {
+      useValue: { snapshot: { queryParamMap: convertToParamMap({ mes: '2027-03' }) } },
+    });
+    const pagina = TestBed.createComponent(TransferenciasPage).componentInstance;
+    expect(pagina.mes().getFullYear()).toBe(2027);
+    expect(pagina.mes().getMonth()).toBe(2);
   });
 
   it('mostra transferência como movimentação entre contas, não receita/despesa', async () => {
