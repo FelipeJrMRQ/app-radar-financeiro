@@ -8,7 +8,7 @@ import { MoedaBrInputDirective } from '../../../../shared/directives/moeda-br-in
 import { dataHojeLocal, decimalPositivo, formatarDataLocal, formatarMoeda } from '../../../../shared/valor-monetario';
 import { ContaFinanceira } from '../../../contas-financeiras/models/contas-financeiras.model';
 import { ContasFinanceirasService } from '../../../contas-financeiras/services/contas-financeiras.service';
-import { CartaoCredito, CompraCartao, FaturaCartao, FaturaResumo, PagamentoFatura, ResumoPagamentos } from '../../models/cartao.model';
+import { CartaoCredito, CompraCartao, FaturaCartao, PagamentoFatura, ResumoPagamentos } from '../../models/cartao.model';
 import { CartoesService } from '../../services/cartoes.service';
 
 function valorValido(c: AbstractControl): ValidationErrors | null {
@@ -29,6 +29,7 @@ export class CartaoDetalhePage implements OnInit {
   private readonly cartaoTexto = this.rota.snapshot.paramMap.get('cartaoId');
   readonly cartaoId = Number(this.cartaoTexto);
   private readonly fb = inject(FormBuilder).nonNullable;
+  private revisaoFatura = 0;
   readonly privacidade = inject(PrivacidadeValoresService);
   readonly moeda = formatarMoeda;
   readonly data = formatarDataLocal;
@@ -42,9 +43,19 @@ export class CartaoDetalhePage implements OnInit {
   readonly sucesso = signal<string | null>(null);
   readonly cartao = signal<CartaoCredito | null>(null);
   readonly compras = signal<CompraCartao[]>([]);
-  readonly faturas = signal<FaturaResumo[]>([]);
   readonly contas = signal<ContaFinanceira[]>([]);
   readonly competencia = signal(dataHojeLocal().slice(0, 7));
+  readonly competenciaDescricao = computed(() => {
+    const [ano, mes] = this.competencia().split('-').map(Number);
+    return new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' })
+      .format(new Date(ano, mes - 1, 1));
+  });
+  readonly cicloEmAberto = computed(() =>
+    !!this.fatura()?.dataFechamento && this.fatura()!.dataFechamento >= this.hoje);
+  readonly saldoRestanteExato = computed(() => {
+    const restante = this.pagamentos()?.saldoRestante;
+    return restante == null ? null : String(restante);
+  });
   readonly fatura = signal<FaturaCartao | null>(null);
   readonly pagamentos = signal<ResumoPagamentos | null>(null);
   readonly limiteCompras = signal(20);
@@ -76,21 +87,19 @@ export class CartaoDetalhePage implements OnInit {
       const dados = await firstValueFrom(forkJoin({
         cartao: this.api.buscar(this.cartaoId),
         compras: this.api.listarCompras(this.cartaoId),
-        faturas: this.api.listarFaturas(this.cartaoId),
         contas: this.contasApi.listar(),
       }));
       if (this.destruir.destroyed) return;
       this.cartao.set(dados.cartao);
       this.compras.set(dados.compras.filter(c => c.ativo)
         .sort((a, b) => b.dataCompra.localeCompare(a.dataCompra) || b.id - a.id));
-      this.faturas.set(dados.faturas);
       this.contas.set(dados.contas.filter(c => c.ativo));
-      if (dados.faturas.some(f => f.competencia.startsWith(this.competencia()))) {
-        await this.consultarFatura();
-      } else {
-        this.fatura.set(null);
-        this.pagamentos.set(null);
-      }
+      const hoje = this.hoje;
+      const [ano, mes] = hoje.slice(0, 7).split('-').map(Number);
+      const diaFechamento = Math.min(dados.cartao.diaFechamento, new Date(ano, mes, 0).getDate());
+      if (Number(hoje.slice(8, 10)) > diaFechamento)
+        this.competencia.set(this.competenciaComDeslocamento(1));
+      await this.consultarFatura();
     } catch (e) {
       if (!this.destruir.destroyed) this.erro.set(mensagemDeErro(e));
     } finally {
@@ -100,25 +109,23 @@ export class CartaoDetalhePage implements OnInit {
 
   mostrarMaisCompras(): void { this.limiteCompras.update(v => v + 20); }
 
-  atualizarCompetencia(e: Event): void {
-    const valor = (e.target as HTMLInputElement).value;
-    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(valor)) return;
-    this.competencia.set(valor);
+  private competenciaComDeslocamento(passo: number): string {
+    const [ano, mes] = this.competencia().split('-').map(Number);
+    return new Date(Date.UTC(ano, mes - 1 + passo, 1)).toISOString().slice(0, 7);
+  }
+
+  mudarMes(passo: number): void {
+    if (this.operando()) return;
+    this.competencia.set(this.competenciaComDeslocamento(passo));
     this.fatura.set(null);
     this.pagamentos.set(null);
     this.erroFatura.set(null);
-    if (this.faturas().some(f => f.competencia.startsWith(valor))) void this.consultarFatura();
-  }
-
-  selecionarCompetencia(valor: string): void {
-    this.competencia.set(valor.slice(0, 7));
-    this.fatura.set(null);
-    this.pagamentos.set(null);
     void this.consultarFatura();
   }
 
   async consultarFatura(): Promise<void> {
-    if (this.carregandoFatura() || this.operando()) return;
+    if (this.operando()) return;
+    const revisao = ++this.revisaoFatura;
     this.carregandoFatura.set(true);
     this.erroFatura.set(null);
     const comp = this.competencia();
@@ -127,38 +134,19 @@ export class CartaoDetalhePage implements OnInit {
         fatura: this.api.buscarFatura(this.cartaoId, comp),
         pagamentos: this.api.listarPagamentos(this.cartaoId, comp),
       }));
-      if (this.destruir.destroyed || comp !== this.competencia()) return;
+      if (this.destruir.destroyed || revisao !== this.revisaoFatura) return;
       this.fatura.set(dados.fatura);
       this.pagamentos.set(dados.pagamentos);
     } catch (e) {
-      if (!this.destruir.destroyed && comp === this.competencia()) {
+      if (!this.destruir.destroyed && revisao === this.revisaoFatura) {
         this.fatura.set(null);
         this.pagamentos.set(null);
         this.erroFatura.set(mensagemDeErro(e));
       }
     } finally {
-      if (!this.destruir.destroyed) this.carregandoFatura.set(false);
+      if (!this.destruir.destroyed && revisao === this.revisaoFatura)
+        this.carregandoFatura.set(false);
     }
-  }
-
-  async gerarFatura(): Promise<void> {
-    if (this.operando() || this.carregandoFatura()) return;
-    this.operando.set(true); this.erroFatura.set(null);
-    const comp = this.competencia();
-    try {
-      await firstValueFrom(this.api.gerarFatura(this.cartaoId, comp));
-      if (this.destruir.destroyed) return;
-      this.sucesso.set('Fatura gerada. Os valores foram calculados pelo servidor.');
-      const faturas = await firstValueFrom(this.api.listarFaturas(this.cartaoId));
-      if (this.destruir.destroyed) return;
-      this.faturas.set(faturas);
-    } catch (e) {
-      if (!this.destruir.destroyed) this.erroFatura.set(mensagemDeErro(e));
-      return;
-    } finally {
-      if (!this.destruir.destroyed) this.operando.set(false);
-    }
-    await this.consultarFatura();
   }
 
   async pagar(): Promise<void> {
@@ -179,6 +167,34 @@ export class CartaoDetalhePage implements OnInit {
       this.pagamentos.set(resultado);
       this.formPagamento.patchValue({ valorPago: '' });
       this.sucesso.set('Pagamento registrado pela API e refletido no saldo da conta financeira.');
+    } catch (e) {
+      if (!this.destruir.destroyed) this.erroFatura.set(mensagemDeErro(e));
+    } finally {
+      if (!this.destruir.destroyed) this.operando.set(false);
+    }
+  }
+
+  async quitarSaldo(): Promise<void> {
+    this.formPagamento.controls.contaFinanceiraId.markAsTouched();
+    const dados = this.formPagamento.getRawValue();
+    const restante = this.saldoRestanteExato();
+    if (this.operando() || !restante || !decimalPositivo(restante) ||
+      !dados.contaFinanceiraId || dados.dataPagamento > this.hoje ||
+      !this.contas().some(c => c.id === dados.contaFinanceiraId)) return;
+
+    this.operando.set(true);
+    this.erroFatura.set(null);
+    try {
+      // Usa o saldo integral EXATO da API, nunca o valor arredondado na tela.
+      const resumo = await firstValueFrom(this.api.pagarParcialmente(
+        this.cartaoId, this.competencia(), {
+          contaFinanceiraId: dados.contaFinanceiraId, valorPago: restante,
+          dataPagamento: dados.dataPagamento,
+        }));
+      if (this.destruir.destroyed) return;
+      this.pagamentos.set(resumo);
+      this.formPagamento.patchValue({ valorPago: '' });
+      this.sucesso.set('Pagamento integral registrado com valor exato.');
     } catch (e) {
       if (!this.destruir.destroyed) this.erroFatura.set(mensagemDeErro(e));
     } finally {
@@ -212,11 +228,12 @@ export class CartaoDetalhePage implements OnInit {
       if (this.destruir.destroyed) return;
       this.cancelarCompra.set(null);
       this.compras.update(lista => lista.filter(c => c.id !== compra.id));
-      this.sucesso.set('Compra cancelada. Atualize a fatura para conferir os valores.');
+      this.sucesso.set('Compra cancelada; valores da fatura atualizados.');
     } catch (e) {
       if (!this.destruir.destroyed) this.erro.set(mensagemDeErro(e));
     } finally {
       if (!this.destruir.destroyed) this.operando.set(false);
     }
+    if (!this.destruir.destroyed && !this.erro()) await this.consultarFatura();
   }
 }
