@@ -78,7 +78,8 @@
         <app-contas-receber-card rfMosaicoPainelItem [itens]="aReceber()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" [valoresVisiveis]="privacidade.valoresVisiveis()" />
       }
       @case ('CONTAS_PAGAR') {
-        <app-contas-pagar-card rfMosaicoPainelItem [itens]="aPagar()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" />
+        <app-contas-pagar-card rfMosaicoPainelItem [itens]="aPagar()"
+          [faturas]="dados.faturasPagar ?? []" [mesReferencia]="mesReferencia()" (alterado)="carregar()" />
       }
       @case ('SALDOS_CONTAS') {
         <app-saldos-contas-card rfMosaicoPainelItem

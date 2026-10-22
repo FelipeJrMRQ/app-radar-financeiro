@@ -539,3 +539,32 @@ h1 { margin:0 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; color
     margin-left: auto;
   }
 }
+
+/* Vencimentos de fatura: ação contextual sem simular lançamento comum. */
+.dashboard .rf-fatura-origem {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--rf-theme-muted, #637986);
+}
+.dashboard .rf-fatura-detalhes {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--rf-theme-accent, #087d73);
+}
+.dashboard .rf-fatura-detalhes:hover { text-decoration: underline; }
+.dashboard .rf-fatura-detalhes:focus-visible {
+  outline: 2px solid var(--rf-theme-accent, #087d73);
+  outline-offset: 2px;
+}
+.dashboard .due-end:has(.rf-fatura-detalhes) {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px 12px;
+}

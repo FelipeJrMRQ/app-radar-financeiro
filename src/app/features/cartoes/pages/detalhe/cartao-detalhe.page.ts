@@ -75,6 +75,10 @@ export class CartaoDetalhePage implements OnInit {
   });
 
   ngOnInit(): void {
+    const competenciaSolicitada = this.rota.snapshot.queryParamMap.get('competencia');
+    if (competenciaSolicitada && /^\d{4}-(0[1-9]|1[0-2])$/.test(competenciaSolicitada)) {
+      this.competencia.set(competenciaSolicitada);
+    }
     const resultado = this.rota.snapshot.queryParamMap.get('resultado');
     if (resultado === 'compra-criada') this.sucesso.set('Compra registrada com sucesso.');
     if (resultado === 'compra-editada') this.sucesso.set('Compra atualizada com sucesso.');
@@ -103,7 +107,8 @@ export class CartaoDetalhePage implements OnInit {
       const hoje = this.hoje;
       const [ano, mes] = hoje.slice(0, 7).split('-').map(Number);
       const diaFechamento = Math.min(dados.cartao.diaFechamento, new Date(ano, mes, 0).getDate());
-      if (Number(hoje.slice(8, 10)) > diaFechamento)
+      if (!this.rota.snapshot.queryParamMap.get('competencia')
+          && Number(hoje.slice(8, 10)) > diaFechamento)
         this.competencia.set(this.competenciaComDeslocamento(1));
       await this.consultarFatura();
     } catch (e) {

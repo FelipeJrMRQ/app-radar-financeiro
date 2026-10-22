@@ -19,6 +19,16 @@ export interface PendenciaPainel {
   valorRestante: ValorFinanceiroApi;
   atrasado: boolean;
 }
+export interface FaturaPendentePainel {
+  cartaoCreditoId: number;
+  cartaoCreditoNome: string;
+  competencia: string;
+  vencimento: string;
+  valorOriginal: ValorFinanceiroApi;
+  valorRestante: ValorFinanceiroApi;
+  atrasado: boolean;
+  previa: boolean;
+}
 export interface PainelFinanceiro {
   dataInicio: string;
   dataFim: string;
@@ -30,6 +40,8 @@ export interface PainelFinanceiro {
   saldoProjetado: ValorFinanceiroApi;
   contas: SaldoContaPainel[];
   proximosVencimentos: PendenciaPainel[];
+  /** Faturas previstas/pendentes, por cartão, sem lançamento bancário artificial. */
+  faturasPagar?: FaturaPendentePainel[];
 }
 export interface PontoFluxo {
   data: string;

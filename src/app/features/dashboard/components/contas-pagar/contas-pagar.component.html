@@ -1,28 +1,40 @@
 <section class="panel due-panel" aria-labelledby="titulo-pagar">
-                <div class="panel-head"><div><h2 id="titulo-pagar">Contas a pagar</h2></div>
-                  <a routerLink="/lancamentos" class="panel-link"
-                     [queryParams]="{ tipo: 'DESPESA', mes: mesReferencia() }">Ver lançamentos →</a></div>
-                @if (itens().length === 0) {
-                  <p class="empty-data">Nenhum pagamento pendente neste período.</p>
-                } @else {
-                  <div class="due-list">
-                    @for (item of itens(); track item.lancamentoId) {
-                      <div class="due-row">
-                        <time class="date-block" [attr.datetime]="item.vencimento"
-                          [attr.title]="dataCompleta(item.vencimento)"
-                          [attr.aria-label]="'Vencimento: ' + dataCompleta(item.vencimento)">
-                          {{ data(item.vencimento) }}
-                        </time>
-                        <div class="due-description">
-                          <strong>{{ item.descricao }}</strong>
-                          @if (item.atrasado) { <span class="late-label">Atrasado</span> }
-                        </div>
-                        <div class="due-end"><strong class="due-value expense-text">{{ moeda(item.valorRestante) }}</strong>
-                        <app-lancamento-acoes [lancamentoId]="item.lancamentoId" (alterado)="alterado.emit()" />
-                        </div>
-                      </div>
-                    }
-                  </div>
-                }
-                
-              </section>
+  <div class="panel-head">
+    <div><h2 id="titulo-pagar">Contas a pagar</h2></div>
+    <a routerLink="/lancamentos" class="panel-link"
+       [queryParams]="{ tipo: 'DESPESA', mes: mesReferencia() }">Ver lançamentos →</a>
+  </div>
+  @if (obrigacoes().length === 0) {
+    <p class="empty-data">Nenhum pagamento pendente neste período.</p>
+  } @else {
+    <div class="due-list">
+      @for (item of obrigacoes(); track item.chave) {
+        <div class="due-row">
+          <time class="date-block" [attr.datetime]="item.vencimento"
+            [attr.title]="dataCompleta(item.vencimento)"
+            [attr.aria-label]="'Vencimento: ' + dataCompleta(item.vencimento)">
+            {{ data(item.vencimento) }}
+          </time>
+          <div class="due-description">
+            <strong>{{ item.descricao }}</strong>
+            @if (item.origem === 'FATURA_CARTAO') {
+              <span class="rf-fatura-origem">{{ item.previa ? 'Prévia da fatura' : 'Fatura do cartão' }}</span>
+            }
+            @if (item.atrasado) { <span class="late-label">Atrasado</span> }
+          </div>
+          <div class="due-end">
+            <strong class="due-value expense-text">{{ moeda(item.valorRestante) }}</strong>
+            @if (item.origem === 'LANCAMENTO') {
+              <app-lancamento-acoes [lancamentoId]="item.lancamentoId" (alterado)="alterado.emit()" />
+            } @else {
+              <a class="rf-fatura-detalhes"
+                [routerLink]="['/cartoes', item.cartaoCreditoId]"
+                [queryParams]="{ competencia: item.competencia }"
+                [attr.aria-label]="'Detalhes da ' + item.descricao">Detalhes →</a>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</section>
