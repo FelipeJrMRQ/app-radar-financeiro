@@ -19,16 +19,36 @@ describe('Card de saldos de caixa', () => {
     return fixture;
   }
 
-  it('mantém três colunas alinhadas e total ao final, inclusive no celular', async () => {
+  it('exibe somente uma coluna de valores, confirmado por padrão', async () => {
     const fixture = await montar();
-    const raiz = fixture.nativeElement as HTMLElement;
-    expect(raiz.querySelector('#titulo-saldos')?.textContent).toBe('Saldos de caixa');
-    expect(raiz.querySelectorAll('.cash-balances-row').length).toBe(2);
-    expect(raiz.querySelectorAll('.cash-balances-row .cash-balances-amount').length).toBe(4);
-    expect(raiz.querySelector('.cash-balances-total')?.textContent).toContain('Total');
-    expect(raiz.querySelectorAll('.cash-balances-column-title').length).toBe(2);
-    expect(raiz.querySelector('.account-list')?.getAttribute('tabindex')).toBeNull();
-    expect(raiz.querySelector('.cash-balances-total .negative')?.textContent).toContain('891,08');
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelectorAll('.cash-balances-row').length).toBe(2);
+    expect(root.querySelectorAll('.cash-balances-row .cash-balances-amount').length).toBe(2);
+    expect(root.querySelectorAll('.cash-balances-total .cash-balances-amount').length).toBe(1);
+    expect(root.querySelectorAll('.cash-balances-column-title').length).toBe(0);
+    expect(root.querySelector('.cash-balances-switch')?.textContent).toContain('Confirmado');
+    expect(root.querySelector('.cash-balances-total')?.textContent).toContain('169,59');
+    expect(root.textContent).not.toContain('891,08');
+    fixture.destroy();
+  });
+
+  it('alterna entre confirmado e projetado sem fazer nova consulta ou alterar as contas', async () => {
+    const fixture = await montar();
+    const root = fixture.nativeElement as HTMLElement;
+    const component = fixture.componentInstance;
+    const controle = root.querySelector<HTMLButtonElement>('.cash-balances-switch')!;
+    expect(component.tipoSaldo()).toBe('CONFIRMADO');
+    controle.click();
+    fixture.detectChanges();
+    expect(component.tipoSaldo()).toBe('PROJETADO');
+    expect(controle.textContent).toContain('Projetado');
+    expect(root.querySelector('.cash-balances-total .negative')?.textContent).toContain('891,08');
+    expect(root.querySelectorAll('.cash-balances-row .cash-balances-amount').length).toBe(2);
+    expect(component.contasSelecionadas().length).toBe(2);
+    expect(controle.getAttribute('aria-label')).toContain('Mostrar saldo confirmado');
+    controle.click();
+    fixture.detectChanges();
+    expect(root.querySelector('.cash-balances-total')?.textContent).toContain('169,59');
     fixture.destroy();
   });
 
@@ -37,9 +57,13 @@ describe('Card de saldos de caixa', () => {
     fixture.componentRef.setInput('valoresVisiveis', false);
     fixture.detectChanges();
     const raiz = fixture.nativeElement as HTMLElement;
-    expect(raiz.querySelectorAll('.cash-balances-amount').length).toBe(6);
+    expect(raiz.querySelectorAll('.cash-balances-amount').length).toBe(3);
     expect(raiz.textContent).not.toContain('169,59');
     expect(raiz.textContent).not.toContain('891,08');
+    (raiz.querySelector('.cash-balances-switch') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(raiz.textContent).not.toContain('891,08');
+    expect(raiz.textContent).not.toContain('169,59');
     expect(raiz.querySelector('.cash-balances-amount')?.getAttribute('aria-label'))
       .toContain('valor oculto');
     fixture.destroy();
@@ -76,6 +100,9 @@ describe('Card de saldos de caixa', () => {
     expect(component.totalConfirmado()).toBe(1695900n);
     expect(component.totalProjetado()).toBe(-8910800n);
     expect(footer?.textContent).toContain('169,59');
+    expect(footer?.textContent).not.toContain('891,08');
+    (root.querySelector('.cash-balances-switch') as HTMLButtonElement).click();
+    fixture.detectChanges();
     expect(footer?.textContent).toContain('891,08');
     fixture.destroy();
   });
@@ -113,6 +140,9 @@ describe('Card de saldos de caixa', () => {
     expect(component.totalProjetado()).toBe(-100000n);
     const footer = (fixture.nativeElement as HTMLElement).querySelector('.cash-balances-total');
     expect(footer?.textContent).toContain('0,30');
+    expect(footer?.textContent).not.toContain('10,00');
+    ((fixture.nativeElement as HTMLElement).querySelector('.cash-balances-switch') as HTMLButtonElement).click();
+    fixture.detectChanges();
     expect(footer?.textContent).toContain('10,00');
     fixture.destroy();
   });

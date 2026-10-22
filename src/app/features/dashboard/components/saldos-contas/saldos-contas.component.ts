@@ -16,6 +16,21 @@ export class SaldosContasCardComponent {
   readonly contas = input.required<SaldoContaPainel[]>();
   readonly valoresVisiveis = input(false);
 
+  // O saldo confirmado (atual) é exibido inicialmente. A projeção é
+  // uma alternativa de consulta, sem alterar a seleção das contas.
+  readonly tipoSaldo = signal<'CONFIRMADO' | 'PROJETADO'>('CONFIRMADO');
+  readonly nomeTipoSaldo = computed(() => this.tipoSaldo() === 'CONFIRMADO' ? 'Confirmado' : 'Projetado');
+  readonly proximoTipoSaldo = computed(() => this.tipoSaldo() === 'CONFIRMADO' ? 'projetado' : 'confirmado');
+
+  alternarTipoSaldo(): void {
+    this.tipoSaldo.update(tipo => tipo === 'CONFIRMADO' ? 'PROJETADO' : 'CONFIRMADO');
+  }
+
+  valorExibido(conta: SaldoContaPainel): ValorFinanceiroApi {
+    return this.tipoSaldo() === 'CONFIRMADO' ? conta.saldoConfirmado : conta.saldoProjetado;
+  }
+
+
   // Seleção local e exclusiva dos totais deste card; não interfere no fluxo de caixa.
   private readonly desmarcadas = signal<ReadonlySet<number>>(new Set<number>());
   readonly contasSelecionadas = computed(() => this.contas()
@@ -29,6 +44,8 @@ export class SaldosContasCardComponent {
     somarSaldos(this.contasSelecionadas().map(conta => conta.saldoConfirmado)));
   readonly totalProjetado = computed(() =>
     somarSaldos(this.contasSelecionadas().map(conta => conta.saldoProjetado)));
+  readonly totalExibido = computed(() =>
+    this.tipoSaldo() === 'CONFIRMADO' ? this.totalConfirmado() : this.totalProjetado());
 
   readonly confirmadoPositivo = computed(() => this.totalConfirmado() > 0n);
   readonly confirmadoNegativo = computed(() => this.totalConfirmado() < 0n);

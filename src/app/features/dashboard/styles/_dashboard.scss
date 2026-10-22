@@ -620,3 +620,19 @@ h1 { margin:0 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; color
     gap: 7px;
   }
 }
+
+/* Tipografia mobile equivalente à legenda de Despesas por categoria (12px).
+   O dashboard desktop mantém sua densidade atual. */
+@media (max-width: 639px) {
+  .dashboard .due-panel .date-block,
+  .dashboard .due-panel .due-description strong,
+  .dashboard .due-panel .due-end .due-value {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .dashboard .due-panel .rf-fatura-origem,
+  .dashboard .due-panel .rf-fatura-detalhes {
+    font-size: 12px;
+  }
+  .dashboard .due-panel .due-row { min-height: 47px; }
+}
