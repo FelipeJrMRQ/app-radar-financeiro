@@ -1,0 +1,82 @@
+<section class="cartoes-page">
+  <a class="cartoes-back" [routerLink]="['/cartoes', cartaoId]">← Voltar ao cartão</a>
+  <header class="cartoes-heading">
+    <div>
+      <span class="cartoes-eyebrow">LANÇAMENTO EM CRÉDITO</span>
+      <h1>{{ editando ? 'Editar compra' : 'Nova compra' }}</h1>
+      <p>{{ cartao()?.nome || 'Cartão de crédito' }} · registre o valor total, mesmo que seja parcelado.</p>
+    </div>
+  </header>
+
+  @if (carregando()) { <div class="cartoes-empty" role="status">Carregando…</div> }
+  @else {
+    <div class="cartoes-form-card">
+      @if (erro()) { <p class="cartoes-error" role="alert">{{ erro() }}</p> }
+      @if (categorias().length === 0) {
+        <p class="cartoes-note">Cadastre uma categoria de despesa antes de registrar uma compra.</p>
+        <a class="cartoes-secondary" routerLink="/categorias">Ir às categorias</a>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+          <div class="cartoes-field">
+            <label for="compra-descricao">Descrição</label>
+            <input id="compra-descricao" formControlName="descricao" maxlength="200"
+              placeholder="Ex.: Supermercado" />
+            @if (form.controls.descricao.touched && (form.controls.descricao.invalid || !form.controls.descricao.value.trim())) {
+              <small class="cartoes-field-error">Informe uma descrição de até 200 caracteres.</small>
+            }
+          </div>
+          <div class="cartoes-field-grid">
+            <div class="cartoes-field">
+              <label for="compra-categoria">Categoria de despesa</label>
+              <select id="compra-categoria" formControlName="categoriaId">
+                <option [ngValue]="null">Selecione uma categoria</option>
+                @for (categoria of categorias(); track categoria.id) {
+                  <option [ngValue]="categoria.id">{{ categoria.nome }}</option>
+                }
+              </select>
+              @if (form.controls.categoriaId.touched && form.controls.categoriaId.invalid) {
+                <small class="cartoes-field-error">Selecione uma categoria de despesa.</small>
+              }
+            </div>
+            <div class="cartoes-field">
+              <label for="compra-data">Data da compra</label>
+              <input id="compra-data" type="date" formControlName="dataCompra"
+                [max]="hoje" />
+              @if (form.controls.dataCompra.touched && form.controls.dataCompra.invalid) {
+                <small class="cartoes-field-error">Informe uma data válida.</small>
+              }
+            </div>
+          </div>
+          <div class="cartoes-field-grid">
+            <div class="cartoes-field">
+              <label for="compra-valor">Valor total da compra</label>
+              <input id="compra-valor" type="text" inputmode="numeric" rfMoedaBr
+                formControlName="valorTotal" placeholder="R$ 0,00" />
+              @if (form.controls.valorTotal.touched && form.controls.valorTotal.invalid) {
+                <small class="cartoes-field-error">Informe um valor positivo.</small>
+              }
+            </div>
+            <div class="cartoes-field">
+              <label for="compra-parcelas">Número de parcelas</label>
+              <input id="compra-parcelas" type="number" formControlName="quantidadeParcelas"
+                min="1" max="120" [readOnly]="editando" />
+              <small>1 = à vista no cartão; de 2 a 120 = parcelada.</small>
+            </div>
+          </div>
+          <div class="cartoes-field">
+            <label for="compra-observacao">Observações (opcional)</label>
+            <textarea id="compra-observacao" formControlName="observacao" maxlength="500" rows="3"></textarea>
+          </div>
+          <p class="cartoes-note">A compra é uma despesa no cartão. O pagamento da fatura movimenta a conta
+            financeira e não deve duplicar a despesa. A API distribui o valor entre parcelas sem perda de centavos.</p>
+          <div class="cartoes-acoes">
+            <a class="cartoes-secondary" [routerLink]="['/cartoes', cartaoId]">Cancelar</a>
+            <button class="cartoes-primary" type="submit" [disabled]="salvando()">
+              {{ salvando() ? 'Salvando…' : editando ? 'Salvar alterações' : 'Registrar compra' }}
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  }
+</section>
