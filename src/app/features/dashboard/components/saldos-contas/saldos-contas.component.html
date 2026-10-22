@@ -54,8 +54,8 @@
         <span class="cash-balances-total-name">Total</span>
         <strong class="cash-balances-amount"
           aria-live="polite"
-          [class.positive]="valoresVisiveis() && totalExibido() > 0n"
-          [class.negative]="valoresVisiveis() && totalExibido() < 0n"
+          [class.positive]="valoresVisiveis() && totalExibidoPositivo()"
+          [class.negative]="valoresVisiveis() && totalExibidoNegativo()"
           [attr.aria-label]="'Total ' + nomeTipoSaldo().toLowerCase() + ': '
             + (valoresVisiveis() ? moedaTotal(totalExibido()) : 'valor oculto')">
           {{ valoresVisiveis() ? moedaTotal(totalExibido()) : '••••••' }}

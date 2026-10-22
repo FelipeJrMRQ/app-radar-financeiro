@@ -46,6 +46,8 @@ export class SaldosContasCardComponent {
     somarSaldos(this.contasSelecionadas().map(conta => conta.saldoProjetado)));
   readonly totalExibido = computed(() =>
     this.tipoSaldo() === 'CONFIRMADO' ? this.totalConfirmado() : this.totalProjetado());
+  readonly totalExibidoPositivo = computed(() => this.totalExibido() > 0n);
+  readonly totalExibidoNegativo = computed(() => this.totalExibido() < 0n);
 
   readonly confirmadoPositivo = computed(() => this.totalConfirmado() > 0n);
   readonly confirmadoNegativo = computed(() => this.totalConfirmado() < 0n);
