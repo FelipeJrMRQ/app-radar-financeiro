@@ -100,3 +100,29 @@
 @media(max-width:620px){.cartoes-card,.cartoes-form-card,.cartoes-panel{padding:17px;}
   .cartoes-modal{top:auto;bottom:calc(14px + env(safe-area-inset-bottom));left:13px;right:13px;
     transform:none;width:auto;max-height:calc(100dvh - 95px);}}
+
+/* Meses de fatura: mesma navegacao usada em Lancamentos e dashboard. */
+.cartoes-fatura-cabecalho {
+  display:flex; flex-wrap:wrap; justify-content:space-between;
+  align-items:center; gap:16px; margin-bottom:18px;
+}
+.cartoes-fatura-cabecalho h2 {margin:5px 0 8px;}
+.cartoes-periodo {
+  display:flex; align-items:center; justify-content:space-between;
+  min-height:52px; gap:12px; width:min(100%,340px);
+  padding:5px; border:1px solid var(--card-border);
+  background:var(--card-bg); border-radius:12px;
+}
+.cartoes-periodo strong {
+  flex:1; min-width:0; font-size:14px;
+  text-align:center; text-transform:capitalize; color:var(--card-text);
+}
+.cartoes-periodo button {
+  flex:0 0 43px; width:43px; min-height:42px; border:0;
+  border-radius:9px; background:var(--card-raised); color:var(--card-text);
+  font-size:25px; cursor:pointer;
+}
+.cartoes-periodo button:hover:not(:disabled) {color:var(--card-accent);background:var(--card-accent-soft);}
+.cartoes-periodo button:disabled {opacity:.45;cursor:default;}
+.cartoes-situacao-ciclo {display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;}
+@media(max-width:620px){.cartoes-periodo{width:100%;}}
