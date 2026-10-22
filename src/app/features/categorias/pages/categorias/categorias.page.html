@@ -65,13 +65,15 @@
   } @else {
     <div class="category-grid">
       @for (categoria of filtradas(); track categoria.id) {
-        <article class="category-card">
+        <article class="category-card"
+          [class.receita]="categoria.tipo === 'RECEITA'"
+          [class.despesa]="categoria.tipo === 'DESPESA'">
           <span class="category-icon" [class.receita]="categoria.tipo === 'RECEITA'" aria-hidden="true">
             {{ categoria.tipo === 'RECEITA' ? '↗' : '↙' }}
           </span>
           <div class="category-description">
             <h2>{{ categoria.nome }}</h2>
-            <span>{{ categoria.tipo === 'RECEITA' ? 'Receita' : 'Despesa' }}</span>
+            <span class="category-type">{{ categoria.tipo === 'RECEITA' ? 'Receita' : 'Despesa' }}</span>
           </div>
           <span class="scope" [class.custom]="categoria.escopo === 'ESPACO'">
             {{ categoria.escopo === 'SISTEMA' ? 'Padrão' : 'Personalizada' }}

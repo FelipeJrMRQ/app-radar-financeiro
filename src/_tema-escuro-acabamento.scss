@@ -1,0 +1,232 @@
+/*
+ * Acabamento por feature do modo escuro. Mantém o tema claro intacto.
+ * Proibido aplicar estas regras a .summary-card ou .category-icon globalmente:
+ * os estados têm semânticas diferentes em cada domínio.
+ */
+
+/* Contas financeiras: resumo, extrato, indicadores e ações. */
+html[data-theme='dark'] .app-layout .contas-page {
+  .summary-card {
+    background: var(--rf-theme-surface);
+    border-color: var(--rf-theme-border);
+    color: var(--rf-theme-text);
+  }
+  .summary-card.major {
+    background: #19362f;
+    border-color: #376b59;
+  }
+  .summary-card span,
+  .summary-card small {
+    color: var(--rf-theme-muted);
+  }
+  .summary-card strong {
+    color: var(--rf-theme-text);
+  }
+  .summary-card.major strong {
+    color: #84ead0;
+  }
+  .summary-card strong.negative,
+  .statement-balances strong.negative,
+  .movement-value strong.negative {
+    color: var(--rf-theme-negative);
+  }
+  .statement-heading h2,
+  .manage-heading h2 {
+    color: var(--rf-theme-text);
+  }
+  .month-switcher {
+    background: var(--rf-theme-surface);
+    border-color: var(--rf-theme-border);
+  }
+  .month-switcher span {
+    color: var(--rf-theme-text);
+  }
+  .month-switcher button {
+    background: var(--rf-theme-raised);
+    color: var(--rf-theme-accent);
+  }
+  .month-switcher button:hover {
+    background: var(--rf-theme-accent-soft);
+  }
+  .statement-balances > div {
+    background: var(--rf-theme-surface);
+    border-color: var(--rf-theme-border);
+  }
+  .statement-balances span {
+    color: var(--rf-theme-muted);
+  }
+  .statement-balances strong {
+    color: var(--rf-theme-text);
+  }
+  .movement-list,
+  .movement {
+    background: var(--rf-theme-surface);
+    border-color: var(--rf-theme-border);
+  }
+  .movement-date,
+  .movement-category,
+  .movement-value small {
+    color: var(--rf-theme-muted);
+  }
+  .movement-description h3 {
+    color: var(--rf-theme-text);
+  }
+  .movement-value strong:not(.negative) {
+    color: #84ead0;
+  }
+  .movement-value > span {
+    background: var(--rf-theme-accent-soft);
+    color: #a9efd9;
+  }
+  .movement-value > span.pending {
+    background: var(--rf-theme-warning-soft);
+    color: var(--rf-theme-warning);
+  }
+  .feedback-card,
+  .feedback-card.empty {
+    background: var(--rf-theme-surface);
+    color: var(--rf-theme-muted);
+    border-color: var(--rf-theme-border);
+  }
+  .feedback-card :is(h2,h3) {
+    color: var(--rf-theme-text);
+  }
+  .manage-account {
+    background: var(--rf-theme-surface);
+    border-color: var(--rf-theme-border);
+  }
+  .manage-help { color: var(--rf-theme-muted); }
+  .account-status {
+    background: var(--rf-theme-accent-soft);
+    color: #aff0d7;
+  }
+  .account-status.inactive {
+    background: var(--rf-theme-raised);
+    color: var(--rf-theme-muted);
+  }
+  .danger-action {
+    background: var(--rf-theme-negative-soft);
+    color: #ffa4aa;
+    border-color: #99555f;
+  }
+  .danger-action:hover {
+    background: #58333d;
+  }
+  .account-confirmation {
+    background: var(--rf-theme-warning-soft);
+    color: #f6d59c;
+    border-color: #6c5738;
+  }
+  .inline-manage-error {
+    background: var(--rf-theme-negative-soft);
+    color: var(--rf-theme-negative);
+    border-color: #764653;
+  }
+  .account-card {
+    background: var(--rf-theme-surface);
+    border-color: var(--rf-theme-border);
+  }
+  .account-card.inactive { background: var(--rf-theme-subtle); }
+  .account-card h2,
+  .account-balance:not(.negative) { color: var(--rf-theme-text); }
+  .balance-caption,
+  .account-type { color: var(--rf-theme-muted); }
+  .account-link { border-color: var(--rf-theme-border); color: var(--rf-theme-accent); }
+  .account-filters button:not(.selected) {
+    background: var(--rf-theme-raised);
+    color: var(--rf-theme-text);
+    border-color: var(--rf-theme-border);
+  }
+}
+
+/*
+ * Categorias: tipo sinalizado pela seta, pela palavra e por uma borda/cor.
+ * Preserva verde-petróleo para receita e âmbar-coral para despesa.
+ */
+html[data-theme='dark'] .app-layout .categorias-page {
+  .category-card {
+    background: var(--rf-theme-surface);
+    border-color: var(--rf-theme-border);
+    border-inline-start: 3px solid transparent;
+  }
+  .category-card.receita { border-inline-start-color: #52cdb4; }
+  .category-card.despesa { border-inline-start-color: #f29b76; }
+  .category-card .category-description h2 {
+    color: var(--rf-theme-text);
+  }
+  .category-card .category-icon:not(.receita) {
+    background: #45332e;
+    color: #ffaf8f;
+    border: 1px solid #735043;
+  }
+  .category-card .category-icon.receita {
+    background: #19453e;
+    color: #84ead0;
+    border: 1px solid #366f60;
+  }
+  .category-card.despesa .category-type {
+    color: #ffaf8f;
+    font-weight: 750;
+  }
+  .category-card.receita .category-type {
+    color: #84ead0;
+    font-weight: 750;
+  }
+  .category-card .scope {
+    background: var(--rf-theme-raised);
+    color: var(--rf-theme-muted);
+    border: 1px solid var(--rf-theme-border);
+  }
+  .category-card .scope.custom {
+    background: var(--rf-theme-accent-soft);
+    color: #b1ecd8;
+    border-color: #3b695d;
+  }
+  .filter-bar button:not(.selected) {
+    background: var(--rf-theme-raised);
+    color: var(--rf-theme-text);
+    border-color: var(--rf-theme-border);
+  }
+}
+
+/* Perfil: cabeçalho e rodapé não podem conservar branco no tema escuro. */
+html[data-theme='dark'] .app-layout .perfil-page {
+  .profile-card {
+    background: var(--rf-theme-surface);
+    border-color: var(--rf-theme-border);
+    color: var(--rf-theme-text);
+  }
+  .profile-heading {
+    background: var(--rf-theme-raised);
+    border-bottom-color: var(--rf-theme-border);
+  }
+  .profile-heading h2 {
+    color: var(--rf-theme-text);
+  }
+  .profile-heading span:not(.profile-avatar) {
+    color: var(--rf-theme-muted);
+  }
+  .profile-avatar {
+    background: var(--rf-theme-accent-soft);
+    color: #b1f1dd;
+    border: 1px solid #3a705e;
+  }
+  .profile-fields {
+    background: var(--rf-theme-surface);
+  }
+  .profile-fields div {
+    border-bottom-color: var(--rf-theme-border);
+  }
+  .profile-fields dt {
+    color: var(--rf-theme-muted);
+  }
+  .profile-fields dd {
+    color: var(--rf-theme-text);
+  }
+  .read-only-note {
+    background: var(--rf-theme-subtle);
+    color: var(--rf-theme-muted);
+    border-top: 1px solid var(--rf-theme-border);
+  }
+  .back-link { color: var(--rf-theme-accent); }
+}
