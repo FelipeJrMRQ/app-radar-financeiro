@@ -112,10 +112,21 @@ html[data-theme='dark'] .app-layout :is(
 }
 html[data-theme='dark'] .app-layout :is(
   .secondary-action, .button-secondary, .secondary,
-  .more-button, .arrow-actions button
+  .arrow-actions button
 ) {
   background: var(--rf-theme-raised);
   border-color: var(--rf-theme-border);
+}
+/* O botão de opções dos lançamentos é compartilhado por todas as telas.
+   Sem borda ou fundo em repouso; mantém realce de interação. */
+html[data-theme='dark'] .app-layout app-lancamento-acoes .more-button {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+html[data-theme='dark'] .app-layout app-lancamento-acoes .more-button:is(:hover, :focus-visible, .active) {
+  background: var(--rf-theme-accent-soft);
+  border-color: transparent;
 }
 html[data-theme='dark'] :is(.app-layout, .auth-main) :is(
   button, input, select, textarea, a

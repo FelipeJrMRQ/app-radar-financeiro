@@ -2,7 +2,7 @@
 .actions-root { position:relative; display:flex; align-items:center; }
 .more-button { min-width:38px; min-height:42px; display:grid; place-items:center;
  border:1px solid transparent; background:transparent; color:#537685; border-radius:9px; cursor:pointer; }
-.more-button:hover,.more-button:focus-visible,.more-button.active { background:#e6f3ef; border-color:#b7dad1; color:#076a5e; }
+.more-button:hover,.more-button:focus-visible,.more-button.active { background:#e6f3ef; border-color:transparent; color:#076a5e; }
 .actions-panel { position:absolute; top:100%; right:0; z-index:30; width:min(300px,calc(100vw - 36px));
  background:white; border:1px solid #dce8e8; border-radius:13px; box-shadow:0 10px 35px #133f4b28;
  padding:13px; display:flex; flex-direction:column; gap:5px; color:#25485a; text-align:left; font-size:13px; }
