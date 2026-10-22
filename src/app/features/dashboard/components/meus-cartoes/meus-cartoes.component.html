@@ -4,7 +4,19 @@
       <h2 id="titulo-meus-cartoes">Meus cartões</h2>
       <p class="rf-cartoes-subtitulo">Faturas e crédito dos cartões cadastrados</p>
     </div>
-    <a routerLink="/cartoes" class="panel-link">Ver cartões →</a>
+    @if (!carregando() && !erro() && cartoes().length > 1) {
+      <nav class="rf-cartoes-navegacao" aria-label="Alternar entre cartões">
+        <button type="button" (click)="navegar(-1)" aria-label="Cartão anterior">
+          <span aria-hidden="true">‹</span>
+        </button>
+        <span class="rf-cartoes-indicador" aria-live="polite">
+          {{ indiceAtual() + 1 }} de {{ cartoes().length }}
+        </span>
+        <button type="button" (click)="navegar(1)" aria-label="Próximo cartão">
+          <span aria-hidden="true">›</span>
+        </button>
+      </nav>
+    }
   </header>
 
   @if (carregando()) {
@@ -21,7 +33,7 @@
     </div>
   } @else {
     <div class="rf-cartoes-lista">
-      @for (cartao of cartoes(); track cartao.cartaoCreditoId) {
+      @if (cartaoAtual(); as cartao) {
         <article class="rf-cartao-item">
           <div class="rf-cartao-cabecalho">
             <div class="rf-cartao-nome">

@@ -486,3 +486,56 @@ h1 { margin:0 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; color
   .dashboard .rf-cartao-item {padding:13px;}
   .dashboard .rf-cartao-valores {grid-template-columns:minmax(0,1fr);}
 }
+
+
+/* Navegação entre cartões: apenas um item por vez, sem alterar o mosaico. */
+.dashboard .rf-cartoes-navegacao {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: nowrap;
+  min-width: 0;
+  background: var(--rf-theme-surface, #fff);
+  border: 1px solid var(--rf-theme-border, #dce7eb);
+  border-radius: 11px;
+  padding: 4px;
+}
+.dashboard .rf-cartoes-navegacao button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--rf-theme-raised, #eff6f7);
+  color: var(--rf-theme-text, #173149);
+  font: inherit;
+  font-size: 25px;
+  cursor: pointer;
+}
+.dashboard .rf-cartoes-navegacao button:hover {
+  color: var(--rf-theme-accent, #087d73);
+  background: var(--rf-theme-accent-soft, #e4f5ef);
+}
+.dashboard .rf-cartoes-navegacao button:focus-visible {
+  outline: 2px solid var(--rf-theme-accent, #087d73);
+  outline-offset: 2px;
+}
+.dashboard .rf-cartoes-indicador {
+  font-size: 12px;
+  font-weight: 750;
+  color: var(--rf-theme-text, #173149);
+  white-space: nowrap;
+  text-align: center;
+  min-width: 42px;
+}
+@media (max-width: 440px) {
+  .dashboard .rf-meus-cartoes > .panel-head {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .dashboard .rf-cartoes-navegacao {
+    margin-left: auto;
+  }
+}

@@ -57,6 +57,110 @@ describe('Meus cartões no dashboard', () => {
     expect(raiz.querySelector('.rf-cartao-progresso')?.getAttribute('aria-valuenow')).toBeNull();
   });
 
+  const outroCartao: CartaoPainel = {
+    ...cartao, cartaoCreditoId: 9, nome: 'Cartão Itaú',
+    totalFatura: '850.00', limiteDisponivelEstimado: '4500.00',
+    percentualUtilizacao: 25,
+  };
+
+  it('mostra somente um cartão por vez e alterna pelos controles, sem navegar para outra página', () => {
+    const fixture = TestBed.createComponent(MeusCartoesCardComponent);
+    fixture.componentRef.setInput('cartoes', [cartao, outroCartao]);
+    fixture.componentRef.setInput('competencia', '2026-10');
+    fixture.detectChanges();
+    const raiz = fixture.nativeElement as HTMLElement;
+
+    expect(raiz.querySelectorAll('.rf-cartao-item').length).toBe(1);
+    expect(raiz.textContent).toContain('Cartão de teste');
+    expect(raiz.textContent).not.toContain('Cartão Itaú');
+    expect(raiz.textContent).toContain('1 de 2');
+    expect(raiz.querySelector('a[href="/cartoes/7"]')).not.toBeNull();
+    expect(raiz.querySelector('a[href="/cartoes"]')).toBeNull();
+
+    (raiz.querySelector('button[aria-label="Próximo cartão"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(raiz.querySelectorAll('.rf-cartao-item').length).toBe(1);
+    expect(raiz.textContent).toContain('Cartão Itaú');
+    expect(raiz.textContent).not.toContain('Cartão de teste');
+    expect(raiz.textContent).toContain('2 de 2');
+    expect(raiz.querySelector('a[href="/cartoes/9"]')).not.toBeNull();
+
+    (raiz.querySelector('button[aria-label="Próximo cartão"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(raiz.textContent).toContain('1 de 2');
+    expect(raiz.textContent).toContain('Cartão de teste');
+
+    (raiz.querySelector('button[aria-label="Cartão anterior"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(raiz.textContent).toContain('2 de 2');
+    expect(raiz.textContent).toContain('Cartão Itaú');
+  });
+
+  it('oculta a navegação quando só há um cartão', () => {
+    const fixture = TestBed.createComponent(MeusCartoesCardComponent);
+    fixture.componentRef.setInput('cartoes', [cartao]);
+    fixture.componentRef.setInput('competencia', '2026-10');
+    fixture.detectChanges();
+    const raiz = fixture.nativeElement as HTMLElement;
+    expect(raiz.querySelector('.rf-cartoes-navegacao')).toBeNull();
+    expect(raiz.querySelectorAll('.rf-cartao-item').length).toBe(1);
+    expect(raiz.querySelector('a[href="/cartoes/7"]')).not.toBeNull();
+  });
+
+  it('preserva cartão escolhido ao atualizar dados e competência', () => {
+    const fixture = TestBed.createComponent(MeusCartoesCardComponent);
+    fixture.componentRef.setInput('cartoes', [cartao, outroCartao]);
+    fixture.componentRef.setInput('competencia', '2026-10');
+    fixture.detectChanges();
+    const raiz = fixture.nativeElement as HTMLElement;
+    (raiz.querySelector('button[aria-label="Próximo cartão"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(raiz.textContent).toContain('Cartão Itaú');
+
+    fixture.componentRef.setInput('cartoes', [
+      { ...outroCartao, totalFatura: '950.00', competencia: '2026-11-01' },
+      { ...cartao, competencia: '2026-11-01' },
+    ]);
+    fixture.componentRef.setInput('competencia', '2026-11');
+    fixture.detectChanges();
+    expect(raiz.querySelectorAll('.rf-cartao-item').length).toBe(1);
+    expect(raiz.textContent).toContain('Cartão Itaú');
+    expect(raiz.textContent).toContain('1 de 2');
+    expect(raiz.querySelector('a[href="/cartoes/9"]')).not.toBeNull();
+    expect((raiz.textContent ?? '').replaceAll('\u00A0', ' ')).toContain('R$ 950,00');
+  });
+
+  it('retorna ao primeiro cartão se o selecionado foi removido', () => {
+    const fixture = TestBed.createComponent(MeusCartoesCardComponent);
+    fixture.componentRef.setInput('cartoes', [cartao, outroCartao]);
+    fixture.componentRef.setInput('competencia', '2026-10');
+    fixture.detectChanges();
+    const raiz = fixture.nativeElement as HTMLElement;
+    (raiz.querySelector('button[aria-label="Próximo cartão"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    fixture.componentRef.setInput('cartoes', [cartao]);
+    fixture.detectChanges();
+    expect(raiz.textContent).toContain('Cartão de teste');
+    expect(raiz.querySelector('.rf-cartoes-navegacao')).toBeNull();
+    expect(raiz.querySelector('a[href="/cartoes/7"]')).not.toBeNull();
+  });
+
+  it('mantém a privacidade ao trocar de cartão', () => {
+    const fixture = TestBed.createComponent(MeusCartoesCardComponent);
+    fixture.componentRef.setInput('cartoes', [cartao, outroCartao]);
+    fixture.componentRef.setInput('competencia', '2026-10');
+    fixture.componentRef.setInput('valoresVisiveis', false);
+    fixture.detectChanges();
+    const raiz = fixture.nativeElement as HTMLElement;
+    (raiz.querySelector('button[aria-label="Próximo cartão"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(raiz.textContent).toContain('Cartão Itaú');
+    expect(raiz.textContent).not.toContain('850,00');
+    expect(raiz.textContent).not.toContain('4.500,00');
+    expect(raiz.textContent).toContain('••••••');
+    expect(raiz.querySelector('.rf-cartao-progresso')?.getAttribute('aria-valuenow')).toBeNull();
+  });
+
   it('oferece cadastro quando não há cartões', () => {
     const fixture = TestBed.createComponent(MeusCartoesCardComponent);
     fixture.componentRef.setInput('cartoes', []);
