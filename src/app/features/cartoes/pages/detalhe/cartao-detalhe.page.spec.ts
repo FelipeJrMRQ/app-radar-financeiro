@@ -73,6 +73,7 @@ describe('Fatura com navegação mensal', () => {
     const fixture = TestBed.createComponent(CartaoDetalhePage);
     fixture.detectChanges();
     await fixture.whenStable();
+    fixture.detectChanges();
     const raiz = fixture.nativeElement as HTMLElement;
     const comp = fixture.componentInstance.competencia();
     expect(raiz.querySelector('form')).toBeNull();
@@ -90,6 +91,7 @@ describe('Fatura com navegação mensal', () => {
     const fixture = TestBed.createComponent(CartaoDetalhePage);
     fixture.detectChanges();
     await fixture.whenStable();
+    fixture.detectChanges();
     const raiz = fixture.nativeElement as HTMLElement;
     expect(raiz.textContent).toContain('Fatura quitada');
     expect(raiz.textContent).not.toContain('Registrar pagamento da fatura');
