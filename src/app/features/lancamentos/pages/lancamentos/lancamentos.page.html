@@ -5,7 +5,10 @@
       <h1>Lançamentos</h1>
       <p>Receitas e despesas confirmadas ou previstas, registradas no seu financeiro.</p>
     </div>
-    <a class="button-primary" routerLink="/lancamentos/novo">+ Novo lançamento</a>
+    <div class="page-links">
+      <a class="button-secondary" routerLink="/transferencias">Transferências</a>
+      <a class="button-primary" routerLink="/lancamentos/novo">+ Novo lançamento</a>
+    </div>
   </div>
   @if (paginaCriada) {
     <p class="success-message" role="status">Lançamento cadastrado com sucesso.</p>

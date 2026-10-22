@@ -398,3 +398,71 @@ html[data-theme='dark'] .personalizar-page .message.success {
   background: var(--rf-theme-accent-soft);
   color: var(--rf-theme-accent);
 }
+
+/* Transferências integradas: formulário, listagem, diálogo e saldos de caixa. */
+html[data-theme='dark'] .app-layout .transferencias-page :is(
+  .form-card, .periodo-selector, .movement, .modal-card
+) {
+  background: var(--rf-theme-surface);
+  color: var(--rf-theme-text);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .app-layout .transferencias-page :is(
+  .page-heading p, .form-note, .results-caption, .field-hint,
+  .movement-detail span, .movement-detail small, .movement-value small
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .app-layout .transferencias-page :is(
+  .movement-detail strong, .movement-value strong, .field label,
+  .periodo-selector strong
+) { color: var(--rf-theme-text); }
+html[data-theme='dark'] .app-layout .transferencias-page :is(
+  .periodo-selector button, .form-note, .movement-icon
+) { background: var(--rf-theme-raised); color: var(--rf-theme-accent); }
+html[data-theme='dark'] .app-layout .transferencias-page :is(
+  .field input, .field select, .field textarea, .modal-card input
+) {
+  background: var(--rf-theme-subtle);
+  color: var(--rf-theme-text);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .app-layout .transferencias-page .modal-card .alerta {
+  background: var(--rf-theme-warning-soft);
+  color: var(--rf-theme-warning);
+}
+html[data-theme='dark'] .app-layout .transferencias-page .movement-value span {
+  color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .app-layout .transferencias-page .movement-value span.previsto {
+  color: var(--rf-theme-warning);
+}
+html[data-theme='dark'] .app-layout .transferencias-page .button-secondary.danger {
+  color: var(--rf-theme-negative);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .dashboard :is(
+  .cash-balances-row, .cash-balances-columns, .cash-balances-total
+) { border-color: var(--rf-theme-border); }
+html[data-theme='dark'] .dashboard .cash-balances-total {
+  background: var(--rf-theme-raised);
+}
+html[data-theme='dark'] .dashboard .cash-balances-row:hover {
+  background: var(--rf-theme-raised);
+}
+html[data-theme='dark'] .dashboard :is(
+  .cash-balances-account, .cash-balances-total-name,
+  .cash-balances-amount:not(.positive):not(.negative)
+) { color: var(--rf-theme-text); }
+html[data-theme='dark'] .dashboard :is(
+  .cash-balances-columns, .cash-balances-note
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .dashboard .cash-balances-bank-icon {
+  background: var(--rf-theme-accent-soft);
+  color: var(--rf-theme-accent);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .dashboard .cash-balances-amount.positive {
+  color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .dashboard .cash-balances-amount.negative {
+  color: var(--rf-theme-negative);
+}

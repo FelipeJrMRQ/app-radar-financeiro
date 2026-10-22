@@ -58,6 +58,7 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
 
     conferir('.sidebar-link[href="/"]', 'table-cells-large');
     conferir('.sidebar-link[href="/lancamentos"]', 'list-ul');
+    conferir('.sidebar-link[href="/transferencias"]', 'arrow-right-arrow-left');
     conferir('.sidebar-group:first-of-type .sidebar-group-trigger', 'folder-open');
     conferir('.sidebar-group:nth-of-type(2) .sidebar-group-trigger', 'gear');
     conferir('.mobile-bottom-nav a[href="/"]', 'table-cells-large');
@@ -85,8 +86,8 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
       .toBe('/lancamentos/novo?tipo=RECEITA');
     expect(raiz.querySelector('a[aria-label="Nova despesa"]')?.getAttribute('href'))
       .toBe('/lancamentos/novo?tipo=DESPESA');
-    expect(raiz.querySelector<HTMLButtonElement>('button[aria-label^="Nova transferência"]')?.disabled)
-      .toBeTrue();
+    expect(raiz.querySelector('a[aria-label="Nova transferência"]')?.getAttribute('href'))
+      .toBe('/transferencias/novo');
     expect(raiz.querySelector('[aria-label="Nova receita"] .lancamento-speed-letra')?.textContent)
       .toBe('R');
     expect(raiz.querySelector('[aria-label="Nova receita"]')?.classList.contains('receita'))
@@ -95,9 +96,9 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
       .toBe('D');
     expect(raiz.querySelector('[aria-label="Nova despesa"]')?.classList.contains('despesa'))
       .toBeTrue();
-    expect(raiz.querySelector('button[aria-label^="Nova transferência"] .lancamento-speed-letra')?.textContent)
+    expect(raiz.querySelector('a[aria-label="Nova transferência"] .lancamento-speed-letra')?.textContent)
       .toBe('T');
-    expect(raiz.querySelector('.lancamento-speed-opcao.transferencia.indisponivel')).not.toBeNull();
+    expect(raiz.querySelector('.lancamento-speed-opcao.transferencia.indisponivel')).toBeNull();
     raiz.querySelector('.lancamento-speed-dial')?.dispatchEvent(
       new PointerEvent('pointerleave', { pointerType:'mouse' }),
     );

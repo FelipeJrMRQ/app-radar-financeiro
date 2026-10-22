@@ -18,6 +18,10 @@
           <fa-icon [icon]="iconeLancamentos" aria-hidden="true"></fa-icon>
           Lançamentos
         </a>
+        <a routerLink="/transferencias" routerLinkActive="active" class="sidebar-link">
+          <fa-icon [icon]="iconeTransferencias" aria-hidden="true"></fa-icon>
+          Transferências
+        </a>
       </nav>
 
       <span class="sidebar-section-title grouped-title">GERENCIAMENTO</span>
@@ -142,14 +146,13 @@
               <span class="lancamento-speed-letra" aria-hidden="true">D</span>
             </span>
           </a>
-          <div class="lancamento-speed-opcao transferencia indisponivel">
-            <span class="lancamento-speed-descricao">Transferência · em breve</span>
-            <button type="button" class="lancamento-speed-icone" disabled
-              aria-label="Nova transferência indisponível: em breve"
-              title="Transferências serão implementadas em uma próxima etapa">
+          <a class="lancamento-speed-opcao transferencia" routerLink="/transferencias/novo"
+             aria-label="Nova transferência" (click)="fecharMenuLancamento()">
+            <span class="lancamento-speed-descricao">Nova transferência</span>
+            <span class="lancamento-speed-icone">
               <span class="lancamento-speed-letra" aria-hidden="true">T</span>
-            </button>
-          </div>
+            </span>
+          </a>
         </div>
       }
     </div>

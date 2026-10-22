@@ -137,6 +137,26 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     expect(valor?.classList.contains('negative')).toBeTrue();
   });
 
+  it('filtra apenas o total do card de caixa, sem alterar os saldos globais ou o gráfico', async () => {
+    const { fixture, fluxoCaixaConsolidado } = await montar();
+    const raiz = fixture.nativeElement as HTMLElement;
+    const checkboxes = raiz.querySelectorAll<HTMLInputElement>(
+      '.cash-balances-panel .cash-balances-row input[type=checkbox]',
+    );
+    expect(checkboxes.length).toBe(2);
+    expect(checkboxes[0].checked).toBeTrue();
+    checkboxes[1].checked = false;
+    checkboxes[1].dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.contasGraficoIds()).toEqual([7, 8]);
+    expect(fluxoCaixaConsolidado).not.toHaveBeenCalledWith([7], jasmine.any(String), jasmine.any(String));
+    expect(raiz.querySelector('.cash-balances-total')?.textContent).toContain('119,76');
+    expect(raiz.querySelector('.cash-balances-total')?.textContent).toContain('630,24');
+    expect(raiz.querySelector('.stats-grid')?.textContent).toContain('1.619,76');
+  });
+
   it('mantém resumo geral quando apenas uma conta é marcada no gráfico', async () => {
     const { fixture, fluxoCaixaConsolidado } = await montar();
     fixture.componentInstance.alterarContasGrafico([7]);
@@ -165,7 +185,7 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     const raiz = fixture.nativeElement as HTMLElement;
     expect(raiz.querySelectorAll('.eyebrow').length).toBe(0);
     for (const titulo of [
-      'Saldos das contas', 'Despesas por categoria', 'Fluxo de caixa consolidado',
+      'Saldos de caixa', 'Despesas por categoria', 'Fluxo de caixa consolidado',
       'Contas a pagar', 'Contas a receber', 'O que deseja fazer?',
     ]) {
       expect(raiz.textContent).toContain(titulo);
