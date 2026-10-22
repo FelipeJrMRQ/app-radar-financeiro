@@ -2,6 +2,7 @@ import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { mensagemDeErro } from '../../../../core/http/api-error';
+import { PrivacidadeValoresService } from '../../../../core/privacidade/privacidade-valores.service';
 import { formatarMoeda } from '../../../../shared/valor-monetario';
 import { CartaoCredito } from '../../models/cartao.model';
 import { CartoesService } from '../../services/cartoes.service';
@@ -14,6 +15,7 @@ import { CartoesService } from '../../services/cartoes.service';
 })
 export class CartoesPage implements OnInit {
   private readonly api = inject(CartoesService);
+  readonly privacidade = inject(PrivacidadeValoresService);
   private readonly destruir = inject(DestroyRef);
   private revisao = 0;
 

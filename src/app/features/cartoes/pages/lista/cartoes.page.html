@@ -32,7 +32,7 @@
           </div>
           <h2>{{ cartao.nome }}</h2>
           <p class="cartoes-muted">Limite cadastrado</p>
-          <strong class="cartoes-valor">{{ moeda(cartao.limiteCredito) }}</strong>
+          <strong class="cartoes-valor">{{ privacidade.valoresVisiveis() ? moeda(cartao.limiteCredito) : '••••••' }}</strong>
           <div class="cartoes-datas">
             <span>Fechamento <strong>Dia {{ cartao.diaFechamento }}</strong></span>
             <span>Vencimento <strong>Dia {{ cartao.diaVencimento }}</strong></span>

@@ -101,7 +101,7 @@ export class CompraCartaoFormPage implements OnInit {
         !Number.isInteger(f.quantidadeParcelas) || f.quantidadeParcelas < 1 ||
         f.quantidadeParcelas > 120 || f.dataCompra > dataHojeLocal() ||
         !this.categorias().some(c => c.id === f.categoriaId) ||
-        this.salvando() || this.carregando() || !!this.erro()) return;
+        this.salvando() || this.carregando() || !this.cartao()?.ativo) return;
     this.salvando.set(true);
     this.erro.set(null);
     const payload = {
