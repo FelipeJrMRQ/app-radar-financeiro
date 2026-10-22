@@ -17,9 +17,6 @@
           </time>
           <div class="due-description">
             <strong>{{ item.descricao }}</strong>
-            @if (item.origem === 'FATURA_CARTAO') {
-              <span class="rf-fatura-origem">{{ item.previa ? 'Prévia da fatura' : 'Fatura do cartão' }}</span>
-            }
             @if (item.atrasado) { <span class="late-label">Atrasado</span> }
           </div>
           <div class="due-end">
@@ -27,10 +24,17 @@
             @if (item.origem === 'LANCAMENTO') {
               <app-lancamento-acoes [lancamentoId]="item.lancamentoId" (alterado)="alterado.emit()" />
             } @else {
-              <a class="rf-fatura-detalhes"
+              <a class="rf-fatura-opcoes more-button"
                 [routerLink]="['/cartoes', item.cartaoCreditoId]"
                 [queryParams]="{ competencia: item.competencia }"
-                [attr.aria-label]="'Detalhes da ' + item.descricao">Detalhes →</a>
+                [attr.aria-label]="'Ver detalhes da ' + item.descricao"
+                title="Ver detalhes da fatura">
+                <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true">
+                  <circle cx="12" cy="5" r="1.8"/>
+                  <circle cx="12" cy="12" r="1.8"/>
+                  <circle cx="12" cy="19" r="1.8"/>
+                </svg>
+              </a>
             }
           </div>
         </div>

@@ -68,13 +68,22 @@ describe('Card de contas a pagar', () => {
     expect(rows[1].textContent).toContain('Fatura Nubank');
     expect(rows[2].textContent).toContain('Aluguel');
     expect(rows[0].textContent).toContain('Atrasado');
-    expect(rows[1].textContent).toContain('Prévia da fatura');
+    expect(rows[1].textContent).not.toContain('Prévia da fatura');
+    expect(rows[1].textContent).not.toContain('Fatura do cartão');
+    expect(rows[1].textContent).not.toContain('Detalhes →');
     expect(rows[1].textContent).toContain('600,00');
     expect(rows[0].querySelector('app-lancamento-acoes')).toBeNull();
     expect(rows[1].querySelector('app-lancamento-acoes')).toBeNull();
     expect(rows[2].querySelector('app-lancamento-acoes')).not.toBeNull();
-    expect(rows[0].querySelector('a[href="/cartoes/8?competencia=2026-09"]')).not.toBeNull();
-    expect(rows[1].querySelector('a[href="/cartoes/7?competencia=2026-10"]')).not.toBeNull();
+    const opcaoItau = rows[0].querySelector<HTMLAnchorElement>('a.rf-fatura-opcoes[href="/cartoes/8?competencia=2026-09"]');
+    const opcaoNubank = rows[1].querySelector<HTMLAnchorElement>('a.rf-fatura-opcoes[href="/cartoes/7?competencia=2026-10"]');
+    expect(opcaoItau).not.toBeNull();
+    expect(opcaoNubank).not.toBeNull();
+    expect(opcaoItau?.getAttribute('aria-label')).toBe('Ver detalhes da Fatura Itaú');
+    expect(opcaoNubank?.getAttribute('aria-label')).toBe('Ver detalhes da Fatura Nubank');
+    expect(opcaoNubank?.querySelectorAll('svg circle').length).toBe(3);
+    expect(rows[1].querySelector('.rf-fatura-origem')).toBeNull();
+    expect(rows[1].querySelector('.rf-fatura-detalhes')).toBeNull();
   });
 
   it('mostra somente os cinco vencimentos prioritarios do conjunto', async () => {

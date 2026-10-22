@@ -540,35 +540,31 @@ h1 { margin:0 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; color
   }
 }
 
-/* Vencimentos de fatura: ação contextual sem simular lançamento comum. */
-.dashboard .rf-fatura-origem {
-  display: block;
-  margin-top: 4px;
-  font-size: 11px;
-  line-height: 1.35;
-  color: var(--rf-theme-muted, #637986);
-}
-.dashboard .rf-fatura-detalhes {
-  display: inline-flex;
-  min-height: 32px;
-  align-items: center;
-  font-size: 11px;
-  font-weight: 750;
-  white-space: nowrap;
+/* Acesso à fatura com os mesmos três pontos das ações dos lançamentos.
+   É um link direto para a competência, sem abrir um menu de outras ações. */
+.dashboard .due-panel .rf-fatura-opcoes {
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  min-width: 38px;
+  min-height: 42px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--rf-theme-accent, #537685);
+  cursor: pointer;
   text-decoration: none;
-  color: var(--rf-theme-accent, #087d73);
 }
-.dashboard .rf-fatura-detalhes:hover { text-decoration: underline; }
-.dashboard .rf-fatura-detalhes:focus-visible {
+.dashboard .due-panel .rf-fatura-opcoes:is(:hover, :focus-visible) {
+  border-color: transparent;
+  background: var(--rf-theme-accent-soft, #e6f3ef);
+  color: var(--rf-theme-accent, #076a5e);
+}
+.dashboard .due-panel .rf-fatura-opcoes:focus-visible {
   outline: 2px solid var(--rf-theme-accent, #087d73);
   outline-offset: 2px;
 }
-.dashboard .due-end:has(.rf-fatura-detalhes) {
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 5px 12px;
-}
-
 
 /*
  * Densidade uniforme para Saldos de caixa, Contas a pagar e Contas a receber.

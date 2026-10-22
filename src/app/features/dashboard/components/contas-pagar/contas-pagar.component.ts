@@ -9,7 +9,7 @@ type ItemAPagar =
       valorRestante: PendenciaPainel['valorRestante']; atrasado: boolean; lancamentoId: number }
   | { origem: 'FATURA_CARTAO'; chave: string; vencimento: string; descricao: string;
       valorRestante: FaturaPendentePainel['valorRestante']; atrasado: boolean;
-      cartaoCreditoId: number; competencia: string; previa: boolean };
+      cartaoCreditoId: number; competencia: string };
 
 @Component({ selector: 'app-contas-pagar-card', standalone: true, imports: [RouterLink, LancamentoAcoesComponent],
   templateUrl: './contas-pagar.component.html' })
@@ -38,7 +38,6 @@ export class ContasPagarCardComponent {
       valorRestante: item.valorRestante, atrasado: item.atrasado,
       cartaoCreditoId: item.cartaoCreditoId,
       competencia: item.competencia.slice(0, 7),
-      previa: item.previa,
     }));
     return [...lancamentos, ...faturas]
       .sort((a, b) => a.vencimento.localeCompare(b.vencimento) || a.chave.localeCompare(b.chave))
