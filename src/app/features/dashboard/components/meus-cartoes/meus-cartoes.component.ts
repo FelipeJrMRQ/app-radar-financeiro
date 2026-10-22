@@ -37,6 +37,15 @@ export class MeusCartoesCardComponent {
   readonly moeda = formatarMoeda;
   readonly data = formatarDataLocal;
 
+  /**
+   * A fatura mostra o total do ciclo; o saldo restante só acrescenta
+   * informação quando houve pagamento parcial. Faturas sem pagamentos
+   * repetiriam o valor, e faturas quitadas já são identificadas pelo status.
+   */
+  temPagamentoParcial(cartao: CartaoPainel): boolean {
+    return Number(cartao.totalPago) > 0 && Number(cartao.saldoRestante) > 0;
+  }
+
   situacao(cartao: CartaoPainel): string {
     switch (cartao.situacaoFatura) {
       case 'QUITADA': return 'Quitada';

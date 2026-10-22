@@ -40,6 +40,60 @@ describe('Meus cartões no dashboard', () => {
     expect(texto).toContain('R$ 8.000,00');
     expect(raiz.textContent).toContain('60%');
     expect(raiz.querySelector('a[href="/cartoes/7"]')).not.toBeNull();
+    expect(raiz.textContent).not.toContain('Restante a pagar');
+  });
+
+  it('exibe restante a pagar apenas após pagamento parcial', () => {
+    const fixture = TestBed.createComponent(MeusCartoesCardComponent);
+    fixture.componentRef.setInput('cartoes', [{
+      ...cartao, totalPago: '400.00', saldoRestante: '2050.00',
+    }]);
+    fixture.componentRef.setInput('competencia', '2026-10');
+    fixture.detectChanges();
+    const texto = ((fixture.nativeElement as HTMLElement).textContent ?? '').replaceAll('\u00A0', ' ');
+    expect(texto).toContain('Fatura do mês');
+    expect(texto).toContain('R$ 2.450,00');
+    expect(texto).toContain('Restante a pagar: R$ 2.050,00');
+  });
+
+  it('não repete zero ou total em faturas vazias e sem pagamentos', () => {
+    const fixture = TestBed.createComponent(MeusCartoesCardComponent);
+    fixture.componentRef.setInput('cartoes', [{
+      ...cartao, totalFatura: '0.00', totalPago: '0.00',
+      saldoRestante: '0.00', situacaoFatura: 'SEM_MOVIMENTACAO',
+    }]);
+    fixture.componentRef.setInput('competencia', '2026-10');
+    fixture.detectChanges();
+    const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(texto).toContain('Sem compras');
+    expect(texto).not.toContain('Restante a pagar');
+  });
+
+  it('não duplica saldo de fatura quitada; status informa a quitação', () => {
+    const fixture = TestBed.createComponent(MeusCartoesCardComponent);
+    fixture.componentRef.setInput('cartoes', [{
+      ...cartao, totalPago: '2450.00', saldoRestante: '0.00',
+      situacaoFatura: 'QUITADA',
+    }]);
+    fixture.componentRef.setInput('competencia', '2026-10');
+    fixture.detectChanges();
+    const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(texto).toContain('Quitada');
+    expect(texto).not.toContain('Restante a pagar');
+  });
+
+  it('respeita privacidade ao exibir saldo após pagamento parcial', () => {
+    const fixture = TestBed.createComponent(MeusCartoesCardComponent);
+    fixture.componentRef.setInput('cartoes', [{
+      ...cartao, totalPago: '400.00', saldoRestante: '2050.00',
+    }]);
+    fixture.componentRef.setInput('competencia', '2026-10');
+    fixture.componentRef.setInput('valoresVisiveis', false);
+    fixture.detectChanges();
+    const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(texto).toContain('Restante a pagar');
+    expect(texto).not.toContain('2.050,00');
+    expect(texto).toContain('••••••');
   });
 
   it('não revela valores nem percentual visual se privacidade estiver ativa', () => {

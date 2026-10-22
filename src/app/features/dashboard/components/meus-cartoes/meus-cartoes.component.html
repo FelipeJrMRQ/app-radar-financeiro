@@ -75,7 +75,9 @@
             <span>Fecha em {{ data(cartao.dataFechamento) }} · Vence em {{ data(cartao.dataVencimento) }}</span>
           </div>
           <div class="rf-cartao-rodape">
-            <span>Saldo a pagar: <b>{{ valoresVisiveis() ? moeda(cartao.saldoRestante) : '••••••' }}</b></span>
+            @if (temPagamentoParcial(cartao)) {
+              <span>Restante a pagar: <b>{{ valoresVisiveis() ? moeda(cartao.saldoRestante) : '••••••' }}</b></span>
+            }
             <a [routerLink]="['/cartoes', cartao.cartaoCreditoId]">Detalhes <span aria-hidden="true">↗</span></a>
           </div>
         </article>
