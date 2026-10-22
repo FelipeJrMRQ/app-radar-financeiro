@@ -4,7 +4,8 @@ import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { PrivacidadeValoresService } from '../../../../core/privacidade/privacidade-valores.service';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { AuthService } from '../../../../core/auth/auth.service';
 import { PainelFinanceiro } from '../../models/painel-financeiro.model';
@@ -120,6 +121,19 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     visibilidade.set(true);
     fixture.detectChanges();
     expect(raiz.querySelector('.stats-grid')?.textContent).toContain('1.619,76');
+  });
+
+  it('orienta atualizar o backend quando rota do card conflita com ID numerico', async () => {
+    const { fixture, consultarCartoes } = await montar();
+    consultarCartoes.and.returnValue(throwError(() => new HttpErrorResponse({
+      status: 400,
+      error: { detail: 'A requisição está ausente ou possui formato inválido.' },
+    })));
+    await fixture.componentInstance.carregarCartoes();
+    expect(fixture.componentInstance.erroCartoes()).toContain('feature/cartoes');
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).textContent)
+      .toContain('reinicie o servidor Java');
   });
 
   it('troca Em atraso por projeção do fim do mês de todas as contas', async () => {

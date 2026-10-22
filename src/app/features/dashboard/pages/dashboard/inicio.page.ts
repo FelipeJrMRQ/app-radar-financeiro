@@ -2,6 +2,7 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import { PreferenciasFluxoCaixaService } from '../../services/preferencias-fluxo-caixa.service';
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { AuthService } from '../../../../core/auth/auth.service';
 import { PrivacidadeValoresService } from '../../../../core/privacidade/privacidade-valores.service';
@@ -197,11 +198,24 @@ export class InicioPage implements OnInit {
     } catch (erro) {
       if (!this.destruido && versao === this.versaoCartoes) {
         this.cartoesPainel.set([]);
-        this.erroCartoes.set(mensagemDeErro(erro));
+        this.erroCartoes.set(this.mensagemErroCartoes(erro));
       }
     } finally {
       if (!this.destruido && versao === this.versaoCartoes) this.carregandoCartoes.set(false);
     }
+  }
+
+  private mensagemErroCartoes(erro: unknown): string {
+    // Se a versão do Java não tem GET /cartoes-credito/painel,
+    // o GET cai na rota legada /{cartaoCreditoId}, tenta converter
+    // o texto "painel" para Long e devolve 400.
+    if (erro instanceof HttpErrorResponse
+        && (erro.status === 404 || (erro.status === 400
+          && erro.error?.detail === 'A requisição está ausente ou possui formato inválido.'))) {
+      return 'A API Java em execução parece estar desatualizada para o resumo de cartões. '
+        + 'Atualize a branch feature/cartoes do backend e reinicie o servidor Java.';
+    }
+    return mensagemDeErro(erro);
   }
 
   private async carregarCategorias(versao: number, inicio: string, fim: string): Promise<void> {
