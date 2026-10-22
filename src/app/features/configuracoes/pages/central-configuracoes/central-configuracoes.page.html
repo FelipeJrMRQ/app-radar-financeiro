@@ -33,6 +33,38 @@
     }
   </section>
 
+  <section class="aparencia-bloco" aria-labelledby="titulo-privacidade">
+    <div class="aparencia-cabecalho">
+      <h2 id="titulo-privacidade">Privacidade dos dados financeiros</h2>
+      <p>Defina como os valores de saldos e contas a receber aparecem no seu painel.
+         A escolha é individual e fica salva para os próximos acessos.</p>
+    </div>
+    <div class="tema-opcoes privacidade-opcoes" role="group" aria-label="Exibição dos valores financeiros">
+      <button type="button" class="tema-opcao"
+        [class.selecionado]="privacidade.valoresVisiveis()"
+        [attr.aria-pressed]="privacidade.valoresVisiveis()"
+        [disabled]="tema.carregando() || tema.salvando()"
+        (click)="definirExibicao(true)">
+        <strong>Exibir valores</strong>
+        <small>Opção padrão. Mostra seus saldos e valores a receber.</small>
+      </button>
+      <button type="button" class="tema-opcao"
+        [class.selecionado]="!privacidade.valoresVisiveis()"
+        [attr.aria-pressed]="!privacidade.valoresVisiveis()"
+        [disabled]="tema.carregando() || tema.salvando()"
+        (click)="definirExibicao(false)">
+        <strong>Ocultar valores</strong>
+        <small>Esconde os valores sensíveis. Você pode revelá-los quando quiser pelo ícone de olho.</small>
+      </button>
+    </div>
+    @if (tema.salvando()) {
+      <p class="tema-status" role="status">Salvando sua preferência…</p>
+    }
+    @if (tema.erro()) {
+      <p class="tema-erro" role="alert">{{ tema.erro() }}</p>
+    }
+  </section>
+
   <div class="menu-grid">
     <a class="menu-card" routerLink="/configuracoes/painel">
       <span class="card-icon" aria-hidden="true">▦</span>

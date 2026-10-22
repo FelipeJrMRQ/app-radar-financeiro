@@ -15,7 +15,12 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
     await TestBed.configureTestingModule({
       imports: [AppShell],
       providers: [
-        { provide: TemaService, useValue: { efetivo: signal('CLARO') } },
+        { provide: TemaService, useValue: {
+          efetivo: signal('CLARO'),
+          carregando: signal(false),
+          salvando: signal(false),
+          alternarVisibilidade: () => TestBed.inject(PrivacidadeValoresService).alternar(),
+        } },
         provideRouter([
           { path: 'lancamentos/novo', component: PaginaVazia },
           { path: 'entrar', component: PaginaVazia },
@@ -28,22 +33,26 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
     }).compileComponents();
   });
 
-  it('inicia valores ocultos e alterna pelo olho em desktop e celular', () => {
+  it('inicia valores exibidos e permite ocultar e exibir pelo olho em desktop e celular', () => {
     const fixture = TestBed.createComponent(AppShell);
     fixture.detectChanges();
     const privacidade = TestBed.inject(PrivacidadeValoresService);
-    expect(privacidade.valoresVisiveis()).toBeFalse();
+    expect(privacidade.valoresVisiveis()).toBeTrue();
     const botoes = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
       '.toggle-privacidade',
     );
     expect(botoes.length).toBe(2);
-    expect(botoes[0].getAttribute('aria-label')).toBe('Mostrar valores financeiros');
+    expect(botoes[0].getAttribute('aria-label')).toBe('Ocultar valores financeiros');
     botoes[0].click();
     fixture.detectChanges();
-    expect(privacidade.valoresVisiveis()).toBeTrue();
-    expect(botoes[1].getAttribute('aria-label')).toBe('Ocultar valores financeiros');
-    fixture.componentInstance.sair();
     expect(privacidade.valoresVisiveis()).toBeFalse();
+    expect(botoes[1].getAttribute('aria-label')).toBe('Mostrar valores financeiros');
+    botoes[1].click();
+    fixture.detectChanges();
+    expect(privacidade.valoresVisiveis()).toBeTrue();
+    privacidade.ocultar();
+    fixture.componentInstance.sair();
+    expect(privacidade.valoresVisiveis()).toBeTrue();
   });
 
   it('renderiza ícones Font Awesome nos menus desktop e mobile', () => {

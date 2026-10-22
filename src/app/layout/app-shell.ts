@@ -122,7 +122,6 @@ export class AppShell {
   sair(): void {
     this.fecharMenuLancamento();
     this.feedbackOperacoes.limpar();
-    this.privacidade.ocultar();
     this.sessao.sair();
     void this.router.navigateByUrl('/entrar');
   }
