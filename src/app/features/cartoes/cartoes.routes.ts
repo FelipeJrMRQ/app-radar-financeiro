@@ -23,6 +23,11 @@ export const CARTOES_ROUTES: Routes = [
     loadComponent: () => import('./pages/detalhe/cartao-detalhe.page').then(m => m.CartaoDetalhePage),
   },
   {
+    path: 'cartoes/:cartaoId/faturas/:competencia/pagar',
+    title: 'Registrar pagamento de fatura | Radar Financeiro',
+    loadComponent: () => import('./pages/pagamento/pagamento-fatura.page').then(m => m.PagamentoFaturaPage),
+  },
+  {
     path: 'cartoes/:cartaoId/compras/nova',
     title: 'Nova compra no cartão | Radar Financeiro',
     loadComponent: () => import('./pages/compra/compra-form.page').then(m => m.CompraCartaoFormPage),

@@ -65,14 +65,14 @@
       @if (fatura(); as atual) {
         <div class="cartoes-situacao-ciclo">
           <span class="cartoes-pill">{{ cicloEmAberto() ? 'Ciclo em andamento ou previsto' : 'Ciclo encerrado' }}</span>
-          <span class="cartoes-small">{{ atual.itens.length }} item(ns) neste período</span>
+          <span class="cartoes-small">{{ atual.itens.length }} {{ atual.itens.length === 1 ? 'compra' : 'compras' }}</span>
         </div>
-        <div class="cartoes-summary">
-          <div><span>Total da fatura</span>
-            <strong>{{ privacidade.valoresVisiveis() ? moeda(atual.total) : '••••••' }}</strong></div>
-          <div><span>Fechamento</span><strong>{{ data(atual.dataFechamento) }}</strong></div>
-          <div><span>Vencimento</span><strong>{{ data(atual.dataVencimento) }}</strong></div>
+        <div class="cartoes-fatura-principal">
+          <span>Total da fatura</span>
+          <strong>{{ privacidade.valoresVisiveis() ? moeda(atual.total) : '••••••' }}</strong>
+          <span>Vence em <b>{{ data(atual.dataVencimento) }}</b></span>
         </div>
+        <p class="cartoes-small cartoes-fechamento">Fechamento: {{ data(atual.dataFechamento) }}</p>
         <h3>Itens da fatura</h3>
         @if (atual.itens.length === 0) {
           <p class="cartoes-small">Nenhuma compra ou parcela prevista para este mês.
@@ -90,50 +90,22 @@
           }
         }
         @if (pagamentos(); as resumo) {
-          <div class="cartoes-summary" style="margin-top:18px">
-            <div><span>Pago</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.totalPago) : '••••••' }}</strong></div>
-            <div><span>Saldo restante</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.saldoRestante) : '••••••' }}</strong></div>
-            <div><span>Situação</span><strong>{{ resumo.quitada ? 'Quitada' : saldoPendente() ? 'Em aberto' : 'Sem movimentações' }}</strong></div>
-          </div>
-          @if (!resumo.quitada && saldoPendente() && contas().length > 0) {
-            <h3>Pagamento da fatura</h3>
-            <p class="cartoes-small">Você pode pagar o saldo integral calculado pelo servidor
-              ou registrar apenas uma parte. Para pagamentos parciais, informe um valor.</p>
-            <form [formGroup]="formPagamento" (ngSubmit)="pagar()" novalidate>
-              <div class="cartoes-field-grid">
-                <div class="cartoes-field">
-                  <label for="cartao-conta-pagamento">Conta financeira</label>
-                  <select id="cartao-conta-pagamento" formControlName="contaFinanceiraId">
-                    <option [ngValue]="null">Selecione uma conta</option>
-                    @for (conta of contas(); track conta.id) {
-                      <option [ngValue]="conta.id">{{ conta.nome }}</option>
-                    }
-                  </select>
-                </div>
-                <div class="cartoes-field">
-                  <label for="cartao-valor-pagamento">Valor do pagamento</label>
-                  <input id="cartao-valor-pagamento" type="text" inputmode="numeric"
-                    formControlName="valorPago" rfMoedaBr placeholder="R$ 0,00" />
-                  <small>Informe o valor total ou parcial; o servidor valida o saldo restante.</small>
-                </div>
-                <div class="cartoes-field">
-                  <label for="cartao-data-pagamento">Data do pagamento</label>
-                  <input id="cartao-data-pagamento" type="date"
-                    formControlName="dataPagamento" [max]="hoje" />
-                </div>
-              </div>
-              <div class="cartoes-acoes">
-                <button class="cartoes-primary" type="button" [disabled]="operando()"
-                  (click)="quitarSaldo()">
-                  {{ operando() ? 'Registrando…' : 'Quitar saldo da fatura' }}
-                </button>
-                <button class="cartoes-secondary" type="submit" [disabled]="operando()">
-                  Registrar pagamento parcial
-                </button>
-              </div>
-            </form>
-          } @else if (!resumo.quitada && saldoPendente()) {
-            <p class="cartoes-note">Cadastre uma conta financeira ativa para pagar a fatura.</p>
+          @if (pagamentoParcial()) {
+            <div class="cartoes-pagamento-resumo" aria-label="Pagamento parcial">
+              <span>Já pago: <strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.totalPago) : '••••••' }}</strong></span>
+              <span>Falta pagar: <strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.saldoRestante) : '••••••' }}</strong></span>
+            </div>
+          } @else if (resumo.quitada && Number(resumo.totalFatura) > 0) {
+            <p class="cartoes-pill cartoes-status-quitada">Fatura quitada</p>
+          }
+          @if (!resumo.quitada && saldoPendente()) {
+            <div class="cartoes-pagar-acao">
+              <a class="cartoes-primary"
+                [routerLink]="['/cartoes', cartaoId, 'faturas', competencia(), 'pagar']">
+                Registrar pagamento da fatura
+              </a>
+              <p class="cartoes-small">O Radar registra pagamentos já realizados fora do aplicativo.</p>
+            </div>
           }
           @if (resumo.pagamentos.length > 0) {
             <h3>Pagamentos realizados</h3>

@@ -1,34 +1,24 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom, forkJoin } from 'rxjs';
 import { mensagemDeErro } from '../../../../core/http/api-error';
 import { PrivacidadeValoresService } from '../../../../core/privacidade/privacidade-valores.service';
-import { MoedaBrInputDirective } from '../../../../shared/directives/moeda-br-input.directive';
-import { dataHojeLocal, decimalPositivo, formatarDataLocal, formatarMoeda } from '../../../../shared/valor-monetario';
-import { ContaFinanceira } from '../../../contas-financeiras/models/contas-financeiras.model';
-import { ContasFinanceirasService } from '../../../contas-financeiras/services/contas-financeiras.service';
+import { dataHojeLocal, formatarDataLocal, formatarMoeda } from '../../../../shared/valor-monetario';
 import { CartaoCredito, CompraCartao, FaturaCartao, PagamentoFatura, ResumoPagamentos } from '../../models/cartao.model';
 import { CartoesService } from '../../services/cartoes.service';
-
-function valorValido(c: AbstractControl): ValidationErrors | null {
-  return typeof c.value === 'string' && decimalPositivo(c.value) ? null : { valorInvalido: true };
-}
 
 @Component({
   selector: 'app-cartao-detalhe',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, MoedaBrInputDirective],
+  imports: [RouterLink],
   templateUrl: './cartao-detalhe.page.html',
 })
 export class CartaoDetalhePage implements OnInit {
   private readonly api = inject(CartoesService);
-  private readonly contasApi = inject(ContasFinanceirasService);
   private readonly rota = inject(ActivatedRoute);
   private readonly destruir = inject(DestroyRef);
   private readonly cartaoTexto = this.rota.snapshot.paramMap.get('cartaoId');
   readonly cartaoId = Number(this.cartaoTexto);
-  private readonly fb = inject(FormBuilder).nonNullable;
   private revisaoFatura = 0;
   readonly privacidade = inject(PrivacidadeValoresService);
   readonly moeda = formatarMoeda;
@@ -43,7 +33,6 @@ export class CartaoDetalhePage implements OnInit {
   readonly sucesso = signal<string | null>(null);
   readonly cartao = signal<CartaoCredito | null>(null);
   readonly compras = signal<CompraCartao[]>([]);
-  readonly contas = signal<ContaFinanceira[]>([]);
   readonly competencia = signal(dataHojeLocal().slice(0, 7));
   readonly competenciaDescricao = computed(() => {
     const [ano, mes] = this.competencia().split('-').map(Number);
@@ -56,6 +45,8 @@ export class CartaoDetalhePage implements OnInit {
     const restante = this.pagamentos()?.saldoRestante;
     return restante == null ? null : String(restante);
   });
+  readonly pagamentoParcial = computed(() =>
+    Number(this.pagamentos()?.totalPago ?? 0) > 0 && this.saldoPendente());
   readonly saldoPendente = computed(() => {
     const exato = this.saldoRestanteExato();
     // A API usa decimal em formato JSON, não o formato monetário pt-BR.
@@ -68,11 +59,6 @@ export class CartaoDetalhePage implements OnInit {
   readonly comprasVisiveis = computed(() => this.compras().slice(0, this.limiteCompras()));
   readonly cancelarCompra = signal<CompraCartao | null>(null);
   readonly estornar = signal<PagamentoFatura | null>(null);
-  readonly formPagamento = this.fb.group({
-    contaFinanceiraId: this.fb.control<number | null>(null, Validators.required),
-    valorPago: ['', valorValido],
-    dataPagamento: [dataHojeLocal(), Validators.required],
-  });
 
   ngOnInit(): void {
     const competenciaSolicitada = this.rota.snapshot.queryParamMap.get('competencia');
@@ -82,6 +68,8 @@ export class CartaoDetalhePage implements OnInit {
     const resultado = this.rota.snapshot.queryParamMap.get('resultado');
     if (resultado === 'compra-criada') this.sucesso.set('Compra registrada com sucesso.');
     if (resultado === 'compra-editada') this.sucesso.set('Compra atualizada com sucesso.');
+    if (resultado === 'pagamento-registrado')
+      this.sucesso.set('Pagamento registrado. O saldo da fatura e da conta financeira foi atualizado.');
     void this.carregar();
   }
 
@@ -97,13 +85,11 @@ export class CartaoDetalhePage implements OnInit {
       const dados = await firstValueFrom(forkJoin({
         cartao: this.api.buscar(this.cartaoId),
         compras: this.api.listarCompras(this.cartaoId),
-        contas: this.contasApi.listar(),
       }));
       if (this.destruir.destroyed) return;
       this.cartao.set(dados.cartao);
       this.compras.set(dados.compras.filter(c => c.ativo)
         .sort((a, b) => b.dataCompra.localeCompare(a.dataCompra) || b.id - a.id));
-      this.contas.set(dados.contas.filter(c => c.ativo));
       const hoje = this.hoje;
       const [ano, mes] = hoje.slice(0, 7).split('-').map(Number);
       const diaFechamento = Math.min(dados.cartao.diaFechamento, new Date(ano, mes, 0).getDate());
@@ -157,59 +143,6 @@ export class CartaoDetalhePage implements OnInit {
     } finally {
       if (!this.destruir.destroyed && revisao === this.revisaoFatura)
         this.carregandoFatura.set(false);
-    }
-  }
-
-  async pagar(): Promise<void> {
-    this.formPagamento.markAllAsTouched();
-    const f = this.formPagamento.getRawValue();
-    const valor = decimalPositivo(f.valorPago);
-    if (this.operando() || !this.fatura() || this.formPagamento.invalid || !valor ||
-      !f.contaFinanceiraId || f.dataPagamento > this.hoje ||
-      !this.contas().some(c => c.id === f.contaFinanceiraId)) return;
-    this.operando.set(true);
-    this.erroFatura.set(null);
-    const comp = this.competencia();
-    try {
-      const resultado = await firstValueFrom(this.api.pagarParcialmente(this.cartaoId, comp, {
-        contaFinanceiraId: f.contaFinanceiraId, valorPago: valor, dataPagamento: f.dataPagamento,
-      }));
-      if (this.destruir.destroyed || comp !== this.competencia()) return;
-      this.pagamentos.set(resultado);
-      this.formPagamento.patchValue({ valorPago: '' });
-      this.sucesso.set('Pagamento registrado pela API e refletido no saldo da conta financeira.');
-    } catch (e) {
-      if (!this.destruir.destroyed) this.erroFatura.set(mensagemDeErro(e));
-    } finally {
-      if (!this.destruir.destroyed) this.operando.set(false);
-    }
-  }
-
-  async quitarSaldo(): Promise<void> {
-    this.formPagamento.controls.contaFinanceiraId.markAsTouched();
-    const dados = this.formPagamento.getRawValue();
-    const restante = this.saldoRestanteExato();
-    if (this.operando() || !this.saldoPendente() || !restante ||
-      !dados.contaFinanceiraId || dados.dataPagamento > this.hoje ||
-      !this.contas().some(c => c.id === dados.contaFinanceiraId)) return;
-
-    this.operando.set(true);
-    this.erroFatura.set(null);
-    try {
-      // Usa o saldo integral EXATO da API, nunca o valor arredondado na tela.
-      const resumo = await firstValueFrom(this.api.pagarParcialmente(
-        this.cartaoId, this.competencia(), {
-          contaFinanceiraId: dados.contaFinanceiraId, valorPago: restante,
-          dataPagamento: dados.dataPagamento,
-        }));
-      if (this.destruir.destroyed) return;
-      this.pagamentos.set(resumo);
-      this.formPagamento.patchValue({ valorPago: '' });
-      this.sucesso.set('Pagamento integral registrado com valor exato.');
-    } catch (e) {
-      if (!this.destruir.destroyed) this.erroFatura.set(mensagemDeErro(e));
-    } finally {
-      if (!this.destruir.destroyed) this.operando.set(false);
     }
   }
 

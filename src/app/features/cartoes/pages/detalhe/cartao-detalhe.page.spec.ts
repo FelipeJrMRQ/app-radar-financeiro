@@ -2,22 +2,18 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
-import { dataHojeLocal } from '../../../../shared/valor-monetario';
-import { ContasFinanceirasService } from '../../../contas-financeiras/services/contas-financeiras.service';
 import { CartoesService } from '../../services/cartoes.service';
 import { CartaoDetalhePage } from './cartao-detalhe.page';
 
 describe('Fatura com navegação mensal', () => {
   const buscarFatura = jasmine.createSpy('buscarFatura');
   const listarPagamentos = jasmine.createSpy('listarPagamentos');
-  const pagarParcialmente = jasmine.createSpy('pagarParcialmente');
   const buscar = jasmine.createSpy('buscar');
   const listarCompras = jasmine.createSpy('listarCompras');
 
   beforeEach(async () => {
     buscarFatura.calls.reset();
     listarPagamentos.calls.reset();
-    pagarParcialmente.calls.reset();
     buscar.and.returnValue(of({
       id: 5, nome: 'Cartão pessoal', ativo: true,
       limiteCredito: '5000.00', diaFechamento: 17, diaVencimento: 25,
@@ -38,11 +34,6 @@ describe('Fatura com navegação mensal', () => {
       totalFatura: '66.6666', totalPago: '0',
       saldoRestante: '66.6666', quitada: false, pagamentos: [],
     }));
-    pagarParcialmente.and.returnValue(of({
-      faturaCartaoId: 8, competencia: '2026-11-01',
-      totalFatura: '66.6666', totalPago: '66.6666',
-      saldoRestante: '0', quitada: true, pagamentos: [],
-    }));
     await TestBed.configureTestingModule({
       imports: [CartaoDetalhePage],
       providers: [
@@ -56,13 +47,7 @@ describe('Fatura com navegação mensal', () => {
         },
         {
           provide: CartoesService,
-          useValue: { buscar, listarCompras, buscarFatura, listarPagamentos, pagarParcialmente },
-        },
-        {
-          provide: ContasFinanceirasService,
-          useValue: { listar: () => of([{
-            id: 7, nome: 'Conta principal', ativo: true,
-          }]) },
+          useValue: { buscar, listarCompras, buscarFatura, listarPagamentos },
         },
       ],
     }).compileComponents();
@@ -84,21 +69,29 @@ describe('Fatura com navegação mensal', () => {
     expect(fixture.componentInstance.fatura()?.itens.length).toBe(1);
   });
 
-  it('quita pelo valor exato da API e nao pelo texto de duas casas exibido', async () => {
+  it('mostra acesso à página de pagamento sem formulário na fatura', async () => {
     const fixture = TestBed.createComponent(CartaoDetalhePage);
     fixture.detectChanges();
     await fixture.whenStable();
-    fixture.componentInstance.formPagamento.patchValue({
-      contaFinanceiraId: 7,
-      dataPagamento: dataHojeLocal(),
-    });
-    await fixture.componentInstance.quitarSaldo();
-    expect(pagarParcialmente).toHaveBeenCalledWith(
-      5, fixture.componentInstance.competencia(), jasmine.objectContaining({
-        contaFinanceiraId: 7,
-        valorPago: '66.6666',
-      }),
-    );
-    expect(fixture.componentInstance.pagamentos()?.quitada).toBeTrue();
+    const raiz = fixture.nativeElement as HTMLElement;
+    const comp = fixture.componentInstance.competencia();
+    expect(raiz.querySelector('form')).toBeNull();
+    expect(raiz.textContent).toContain('Registrar pagamento da fatura');
+    expect(raiz.querySelector('a[href="/cartoes/5/faturas/' + comp + '/pagar"]'))
+      .not.toBeNull();
+  });
+
+  it('não oferece pagamento de fatura já quitada', async () => {
+    listarPagamentos.and.returnValue(of({
+      faturaCartaoId: 8, competencia: '2026-11-01',
+      totalFatura: '66.6666', totalPago: '66.6666',
+      saldoRestante: '0', quitada: true, pagamentos: [],
+    }));
+    const fixture = TestBed.createComponent(CartaoDetalhePage);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const raiz = fixture.nativeElement as HTMLElement;
+    expect(raiz.textContent).toContain('Fatura quitada');
+    expect(raiz.textContent).not.toContain('Registrar pagamento da fatura');
   });
 });
