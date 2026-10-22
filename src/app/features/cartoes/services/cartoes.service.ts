@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { HttpParams } from '@angular/common/http';
+import { CartaoPainel } from '../../dashboard/models/painel-cartoes.model';
 import { AuthService } from '../../../core/auth/auth.service';
 import { API_BASE_URL } from '../../../core/config/api.config';
 import {
@@ -22,6 +24,10 @@ export class CartoesService {
   private compras(id: number): string { return `${this.cartao(id)}/compras`; }
   private faturas(id: number): string { return `${this.cartao(id)}/faturas`; }
 
+  consultarPainel(competencia: string): Observable<CartaoPainel[]> {
+    const params = new HttpParams().set('competencia', competencia);
+    return this.http.get<CartaoPainel[]>(this.endpoint() + '/painel', { params });
+  }
   listar(): Observable<CartaoCredito[]> { return this.http.get<CartaoCredito[]>(this.endpoint()); }
   buscar(id: number): Observable<CartaoCredito> { return this.http.get<CartaoCredito>(this.cartao(id)); }
   criar(dados: DadosCartaoCredito): Observable<CartaoCredito> {

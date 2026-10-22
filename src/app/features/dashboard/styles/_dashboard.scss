@@ -430,3 +430,59 @@ h1 { margin:0 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; color
   width:38px; height:38px; min-width:38px; display:inline-flex; align-items:center;
   justify-content:center; padding:0; font-size:15px;
 }
+
+/* Card de credito: utiliza tokens compartilhados para temas claro e escuro. */
+.dashboard .dashboard-grid > app-meus-cartoes-card {display:block;}
+.dashboard .rf-meus-cartoes {color:var(--rf-theme-text,#173149);}
+.dashboard .rf-cartoes-subtitulo {margin:6px 0 0;color:var(--rf-theme-muted,#748997);font-size:12px;}
+.dashboard .rf-cartoes-estado {padding:12px 20px 22px;color:var(--rf-theme-muted,#647887);font-size:13px;line-height:1.6;}
+.dashboard .rf-cartoes-estado a {font-weight:750;color:var(--rf-theme-accent,#087d73);}
+.dashboard .rf-cartoes-lista {display:grid;gap:14px;padding:0 18px 12px;}
+.dashboard .rf-cartao-item {border:1px solid var(--rf-theme-border,#dce7eb);
+  border-radius:13px;padding:17px 16px;background:var(--rf-theme-surface,#fff);
+  min-width:0;display:flex;flex-direction:column;gap:13px;}
+.dashboard .rf-cartao-cabecalho {display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.dashboard .rf-cartao-nome {display:flex;align-items:center;gap:11px;min-width:0;}
+.dashboard .rf-cartao-nome > div {display:flex;flex-direction:column;gap:4px;min-width:0;}
+.dashboard .rf-cartao-nome strong {font-size:14px;overflow-wrap:anywhere;color:var(--rf-theme-text,#173149);}
+.dashboard .rf-cartao-nome small {font-size:11px;color:var(--rf-theme-muted,#697f8c);}
+.dashboard .rf-cartao-icone {width:39px;height:39px;display:grid;place-items:center;
+  flex:0 0 39px;border-radius:11px;font-size:24px;
+  background:var(--rf-theme-accent-soft,#e4f5ef);color:var(--rf-theme-accent,#087d73);}
+.dashboard .rf-cartao-situacao {font-size:10px;font-weight:750;border-radius:999px;
+  padding:6px 9px;white-space:nowrap;color:var(--rf-theme-accent,#087d73);
+  background:var(--rf-theme-accent-soft,#e4f5ef);}
+.dashboard .rf-cartao-quitada {background:var(--rf-theme-accent-soft,#e4f5ef);}
+.dashboard .rf-cartao-valores {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;}
+.dashboard .rf-cartao-valores > div {min-width:0;display:flex;flex-direction:column;gap:9px;
+  background:var(--rf-theme-raised,#f3f8f8);border:1px solid var(--rf-theme-border,#dce7eb);
+  border-radius:11px;padding:14px 12px;}
+.dashboard .rf-cartao-valores span,.dashboard .rf-cartao-progresso-linha span {
+  font-size:11px;color:var(--rf-theme-muted,#697f8c);}
+.dashboard .rf-cartao-valores strong {font-size:clamp(16px,2.5vw,23px);letter-spacing:-.4px;
+  overflow-wrap:anywhere;color:var(--rf-theme-text,#173149);}
+.dashboard .rf-cartao-progresso-linha {display:flex;justify-content:space-between;
+  flex-wrap:wrap;gap:10px;align-items:center;}
+.dashboard .rf-cartao-progresso-linha strong {font-size:12px;color:var(--rf-theme-text,#173149);}
+.dashboard .rf-cartao-progresso {height:8px;border-radius:99px;overflow:hidden;
+  background:var(--rf-theme-raised,#eef3f4);border:1px solid var(--rf-theme-border,#dce7eb);}
+.dashboard .rf-cartao-progresso > div {height:100%;background:#087d73;border-radius:99px;}
+.dashboard .rf-cartao-informacoes {display:flex;flex-wrap:wrap;align-items:center;
+  justify-content:space-between;gap:8px;font-size:11px;line-height:1.5;
+  color:var(--rf-theme-muted,#697f8c);}
+.dashboard .rf-cartao-informacoes b {color:var(--rf-theme-text,#173149);}
+.dashboard .rf-cartao-rodape {display:flex;flex-wrap:wrap;justify-content:space-between;
+  align-items:center;gap:10px;padding-top:12px;
+  border-top:1px solid var(--rf-theme-border,#dce7eb);
+  font-size:12px;color:var(--rf-theme-muted,#697f8c);}
+.dashboard .rf-cartao-rodape b {color:var(--rf-theme-text,#173149);}
+.dashboard .rf-cartao-rodape a {color:var(--rf-theme-accent,#087d73);font-size:12px;
+  text-decoration:none;font-weight:800;min-height:38px;display:inline-flex;align-items:center;}
+.dashboard .rf-cartao-rodape a:hover {text-decoration:underline;}
+.dashboard .rf-cartoes-aviso {padding:0 20px 18px;margin:0;color:var(--rf-theme-muted,#697f8c);
+  line-height:1.6;font-size:11px;}
+@media(max-width:420px) {
+  .dashboard .rf-cartoes-lista {padding-inline:12px;}
+  .dashboard .rf-cartao-item {padding:13px;}
+  .dashboard .rf-cartao-valores {grid-template-columns:minmax(0,1fr);}
+}

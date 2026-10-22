@@ -1,0 +1,77 @@
+<section class="panel rf-meus-cartoes" aria-labelledby="titulo-meus-cartoes">
+  <header class="panel-head">
+    <div>
+      <h2 id="titulo-meus-cartoes">Meus cartões</h2>
+      <p class="rf-cartoes-subtitulo">Faturas e crédito dos cartões cadastrados</p>
+    </div>
+    <a routerLink="/cartoes" class="panel-link">Ver cartões →</a>
+  </header>
+
+  @if (carregando()) {
+    <p class="rf-cartoes-estado" role="status">Consultando seus cartões…</p>
+  } @else if (erro()) {
+    <div class="rf-cartoes-estado" role="alert">
+      <p>Não foi possível consultar os cartões: {{ erro() }}</p>
+      <a routerLink="/cartoes">Abrir cartões →</a>
+    </div>
+  } @else if (cartoes().length === 0) {
+    <div class="rf-cartoes-estado">
+      <p>Você ainda não possui cartões ativos.</p>
+      <a routerLink="/cartoes/novo">Cadastrar cartão →</a>
+    </div>
+  } @else {
+    <div class="rf-cartoes-lista">
+      @for (cartao of cartoes(); track cartao.cartaoCreditoId) {
+        <article class="rf-cartao-item">
+          <div class="rf-cartao-cabecalho">
+            <div class="rf-cartao-nome">
+              <span class="rf-cartao-icone" aria-hidden="true">▤</span>
+              <div>
+                <strong>{{ cartao.nome }}</strong>
+                <small>Fatura {{ cartao.competencia.slice(0, 7) }}</small>
+              </div>
+            </div>
+            <span class="rf-cartao-situacao"
+              [class.rf-cartao-quitada]="cartao.situacaoFatura === 'QUITADA'">
+              {{ situacao(cartao) }}
+            </span>
+          </div>
+
+          <div class="rf-cartao-valores">
+            <div>
+              <span>Fatura do mês</span>
+              <strong>{{ valoresVisiveis() ? moeda(cartao.totalFatura) : '••••••' }}</strong>
+            </div>
+            <div>
+              <span>Limite disponível*</span>
+              <strong>{{ valoresVisiveis() ? moeda(cartao.limiteDisponivelEstimado) : '••••••' }}</strong>
+            </div>
+          </div>
+
+          <div class="rf-cartao-progresso-linha">
+            <span>Utilização do crédito</span>
+            <strong>{{ valoresVisiveis() ? cartao.percentualUtilizacao + '%' : 'Oculto' }}</strong>
+          </div>
+          <div class="rf-cartao-progresso" role="meter"
+            [attr.aria-label]="'Utilização estimada do limite de ' + cartao.nome"
+            [attr.aria-valuenow]="valoresVisiveis() ? cartao.percentualUtilizacao : null"
+            aria-valuemin="0" aria-valuemax="100">
+            <div [style.width.%]="cartao.percentualUtilizacao"></div>
+          </div>
+          <div class="rf-cartao-informacoes">
+            <span>Limite total: <b>{{ valoresVisiveis() ? moeda(cartao.limiteTotal) : '••••••' }}</b></span>
+            <span>Fecha em {{ data(cartao.dataFechamento) }} · Vence em {{ data(cartao.dataVencimento) }}</span>
+          </div>
+          <div class="rf-cartao-rodape">
+            <span>Saldo a pagar: <b>{{ valoresVisiveis() ? moeda(cartao.saldoRestante) : '••••••' }}</b></span>
+            <a [routerLink]="['/cartoes', cartao.cartaoCreditoId]">Detalhes <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+      }
+    </div>
+    <p class="rf-cartoes-aviso">
+      *Limite estimado com base nas compras e nos pagamentos registrados no Radar.
+      Pode diferir do disponível informado pela instituição financeira.
+    </p>
+  }
+</section>

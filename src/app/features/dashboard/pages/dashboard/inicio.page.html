@@ -88,6 +88,12 @@
       @case ('FLUXO_CAIXA') {
         <app-fluxo-caixa-card rfMosaicoPainelItem [contas]="contasVisiveis()" [contasSelecionadas]="contasGraficoIds() ?? []" [fluxo]="fluxo()" [carregandoFluxo]="carregandoFluxo()" [erroFluxo]="erroFluxo()" [ocultarContasZeradas]="ocultarContasZeradas()" [quantidadeOcultas]="ocultarContasZeradas() ? contasZeradas().length : 0" [erroPreferencias]="preferenciasFluxo.erro()" (selecaoAlterada)="alterarContasGrafico($event)" (alternarZeradas)="alternarContasZeradas()" [valoresVisiveis]="privacidade.valoresVisiveis()" />
       }
+      @case ('MEUS_CARTOES') {
+        <app-meus-cartoes-card rfMosaicoPainelItem
+          [cartoes]="cartoesPainel()" [carregando]="carregandoCartoes()"
+          [erro]="erroCartoes()" [competencia]="mesReferencia()"
+          [valoresVisiveis]="privacidade.valoresVisiveis()" />
+      }
       @case ('DESPESAS_CATEGORIA') {
         <app-despesas-categoria-card rfMosaicoPainelItem [categorias]="categorias()" [erroCategorias]="erroCategorias()" />
       }
@@ -106,7 +112,7 @@
           <a routerLink="/contas"><span aria-hidden="true">▣</span> Consultar contas</a>
           <a routerLink="/categorias"><span aria-hidden="true">≡</span> Organizar categorias</a>
         </div>
-        <p class="scope-note">O painel apresenta lançamentos de contas financeiras. Faturas de cartão serão integradas em etapa própria, sem duplicar despesas.</p>
+        <p class="scope-note">As informações de cartões são consultadas separadamente das movimentações de caixa, sem duplicar despesas.</p>
       </section>
     </div>
   }

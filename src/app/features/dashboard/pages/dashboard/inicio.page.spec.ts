@@ -1,3 +1,4 @@
+import { CartoesService } from '../../../cartoes/services/cartoes.service';
 import { TemaService } from '../../../../core/tema/tema.service';
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
@@ -37,6 +38,7 @@ describe('Resumo sem redundâncias do painel inicial', () => {
       item => !codigos || codigos.includes(item.codigoComponente),
     );
     const consultar = jasmine.createSpy('consultar').and.returnValue(of(dados));
+    const consultarCartoes = jasmine.createSpy('consultarPainel').and.returnValue(of([]));
     const fluxoCaixaConsolidado = jasmine.createSpy('fluxoCaixaConsolidado').and.returnValue(of({
       dataInicio: dados.dataInicio,
       dataFim: dados.dataFim,
@@ -55,6 +57,7 @@ describe('Resumo sem redundâncias do painel inicial', () => {
         provideRouter([]),
         { provide: PrivacidadeValoresService, useValue: { valoresVisiveis: visibilidade.asReadonly() } },
         { provide: AuthService, useValue: { usuario: () => ({ nome: 'Teste' }) } },
+        { provide: CartoesService, useValue: { consultarPainel: consultarCartoes } },
         { provide: PainelFinanceiroService, useValue: {
           consultar,
           fluxoCaixaConsolidado,
@@ -79,7 +82,7 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
-    return { fixture, consultar, fluxoCaixaConsolidado, visibilidade };
+    return { fixture, consultar, fluxoCaixaConsolidado, consultarCartoes, visibilidade };
   }
 
   it('oculta apenas contas realmente zeradas, preservando preferências manuais', async () => {
@@ -186,11 +189,21 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     expect(raiz.querySelectorAll('.eyebrow').length).toBe(0);
     for (const titulo of [
       'Saldos de caixa', 'Despesas por categoria', 'Fluxo de caixa consolidado',
-      'Contas a pagar', 'Contas a receber', 'O que deseja fazer?',
+      'Contas a pagar', 'Contas a receber', 'Meus cartões', 'O que deseja fazer?',
     ]) {
       expect(raiz.textContent).toContain(titulo);
     }
     expect(raiz.querySelectorAll('.cash-flow-footer')).toHaveSize(0);
+  });
+
+  it('consulta cartões da competência selecionada sem interferir no painel', async () => {
+    const { fixture, consultarCartoes } = await montar();
+    expect(consultarCartoes).toHaveBeenCalledWith(fixture.componentInstance.mesReferencia());
+    const anterior = fixture.componentInstance.mesReferencia();
+    fixture.componentInstance.mudarMes(1);
+    await fixture.whenStable();
+    expect(fixture.componentInstance.mesReferencia()).not.toBe(anterior);
+    expect(consultarCartoes).toHaveBeenCalledWith(fixture.componentInstance.mesReferencia());
   });
 
   it('distingue projeção positiva de negativa somente pela cor do valor', async () => {
