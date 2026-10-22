@@ -1,0 +1,64 @@
+<section class="cartoes-page">
+  <header class="cartoes-heading">
+    <div>
+      <span class="cartoes-eyebrow">CONTROLE DE CRÉDITO</span>
+      <h1>Cartões de crédito</h1>
+      <p>Gerencie cartões, compras e faturas. Os valores são calculados pela API.</p>
+    </div>
+    <a class="cartoes-primary" routerLink="/cartoes/novo">+ Novo cartão</a>
+  </header>
+  @if (sucesso()) { <p class="cartoes-success" role="status">{{ sucesso() }}</p> }
+  @if (erro()) {
+    <div class="cartoes-error" role="alert">
+      {{ erro() }}
+      <button type="button" class="cartoes-secondary" (click)="carregar()">Tentar novamente</button>
+    </div>
+  }
+  @if (carregando()) {
+    <div class="cartoes-empty" role="status">Carregando cartões…</div>
+  } @else if (!erro() && cartoes().length === 0) {
+    <div class="cartoes-empty">
+      <h2>Nenhum cartão cadastrado</h2>
+      <p>Cadastre um cartão para registrar compras e acompanhar suas faturas.</p>
+      <a routerLink="/cartoes/novo" class="cartoes-primary">Cadastrar primeiro cartão</a>
+    </div>
+  } @else {
+    <div class="cartoes-grid">
+      @for (cartao of cartoes(); track cartao.id) {
+        <article class="cartoes-card">
+          <div class="cartoes-card-top">
+            <span class="cartoes-chip" aria-hidden="true">▤</span>
+            <span class="cartoes-chip-text">Crédito</span>
+          </div>
+          <h2>{{ cartao.nome }}</h2>
+          <p class="cartoes-muted">Limite cadastrado</p>
+          <strong class="cartoes-valor">{{ moeda(cartao.limiteCredito) }}</strong>
+          <div class="cartoes-datas">
+            <span>Fechamento <strong>Dia {{ cartao.diaFechamento }}</strong></span>
+            <span>Vencimento <strong>Dia {{ cartao.diaVencimento }}</strong></span>
+          </div>
+          <div class="cartoes-acoes">
+            <a class="cartoes-primary" [routerLink]="['/cartoes', cartao.id]">Ver compras e faturas</a>
+            <a class="cartoes-secondary" [routerLink]="['/cartoes', cartao.id, 'editar']">Editar</a>
+            <button class="cartoes-text-danger" type="button"
+              (click)="prepararInativacao(cartao)">Inativar</button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+  @if (confirmar(); as cartao) {
+    <div class="cartoes-modal-backdrop" aria-hidden="true"></div>
+    <div class="cartoes-modal" role="dialog" aria-modal="true" aria-labelledby="inativar-titulo">
+      <h2 id="inativar-titulo">Inativar {{ cartao.nome }}?</h2>
+      <p>O cartão deixará de aparecer entre os ativos. Compras e faturas históricas serão preservadas pela API.</p>
+      @if (erro()) { <p class="cartoes-error" role="alert">{{ erro() }}</p> }
+      <div class="cartoes-acoes">
+        <button class="cartoes-secondary" type="button" [disabled]="operando()" (click)="confirmar.set(null)">Cancelar</button>
+        <button class="cartoes-danger" type="button" [disabled]="operando()" (click)="inativar()">
+          {{ operando() ? 'Processando…' : 'Confirmar inativação' }}
+        </button>
+      </div>
+    </div>
+  }
+</section>
