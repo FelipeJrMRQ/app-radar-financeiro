@@ -62,6 +62,11 @@ describe('Fluxo de caixa consolidado', () => {
     const canvas = (fixture.nativeElement as HTMLElement)
       .querySelector<HTMLCanvasElement>('.cash-flow-chart canvas');
     expect(canvas).not.toBeNull();
+    // Chart.js é importado dinamicamente; whenStable não garante que o import
+    // e o efeito de desenho tenham terminado na mesma microtarefa.
+    for (let tentativa = 0; tentativa < 8 && !ChartJs.getChart(canvas!); tentativa++) {
+      await new Promise<void>(resolver => requestAnimationFrame(() => resolver()));
+    }
     const graficoPrivado = ChartJs.getChart(canvas!);
     expect(graficoPrivado).toBeDefined();
     expect(graficoPrivado?.options.events).toEqual(['click']);
