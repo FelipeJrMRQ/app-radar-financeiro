@@ -485,26 +485,3 @@ html[data-theme='dark'] .app-layout .lancamentos-page :is(
 html[data-theme='dark'] .app-layout .lancamentos-page .account-filter select {
   max-width: 100%;
 }
-
-/*
- * Proteção contra deslocamento horizontal de todo o layout, especialmente
- * após redimensionamento da janela ou mudança de tema.
- * A barra lateral deve permanecer no fluxo original do grid.
- */
-html[data-theme='dark'] .app-layout {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  overflow-x: clip;
-}
-html[data-theme='dark'] .app-layout .workspace {
-  min-width: 0;
-  max-width: 100%;
-}
-html[data-theme='dark'] .app-layout .desktop-header .privacidade-controles {
-  min-width: 0;
-}
-html[data-theme='dark'] .app-layout .desktop-header .header-user {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
