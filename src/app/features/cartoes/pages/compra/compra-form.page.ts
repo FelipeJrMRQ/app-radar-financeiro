@@ -20,7 +20,6 @@ function valorValido(controle: AbstractControl): ValidationErrors | null {
   standalone: true,
   imports: [RouterLink, ReactiveFormsModule, MoedaBrInputDirective],
   templateUrl: './compra-form.page.html',
-  styleUrl: '../../styles/_cartoes.page.scss',
 })
 export class CompraCartaoFormPage implements OnInit {
   private readonly fb = inject(FormBuilder).nonNullable;

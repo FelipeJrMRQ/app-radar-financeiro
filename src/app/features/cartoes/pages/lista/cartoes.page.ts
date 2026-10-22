@@ -11,7 +11,6 @@ import { CartoesService } from '../../services/cartoes.service';
   standalone: true,
   imports: [RouterLink],
   templateUrl: './cartoes.page.html',
-  styleUrl: '../../styles/_cartoes.page.scss',
 })
 export class CartoesPage implements OnInit {
   private readonly api = inject(CartoesService);

@@ -20,7 +20,6 @@ function valorValido(c: AbstractControl): ValidationErrors | null {
   standalone: true,
   imports: [RouterLink, ReactiveFormsModule, MoedaBrInputDirective],
   templateUrl: './cartao-detalhe.page.html',
-  styleUrl: '../../styles/_cartoes.page.scss',
 })
 export class CartaoDetalhePage implements OnInit {
   private readonly api = inject(CartoesService);
