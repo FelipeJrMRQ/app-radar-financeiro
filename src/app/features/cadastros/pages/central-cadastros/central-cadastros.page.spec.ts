@@ -16,7 +16,7 @@ describe('CentralCadastrosPage', () => {
       .map(link => link.getAttribute('href'));
     expect(links).toContain('/contas');
     expect(links).toContain('/categorias');
-    expect(links).not.toContain('/cartoes');
-    expect(fixture.nativeElement.textContent).toContain('Em breve');
+    expect(links).toContain('/cartoes');
+    expect(fixture.nativeElement.textContent).toContain('Cadastre cartões');
   });
 });
