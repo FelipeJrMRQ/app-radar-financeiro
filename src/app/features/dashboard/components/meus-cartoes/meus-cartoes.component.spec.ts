@@ -34,9 +34,10 @@ describe('Meus cartões no dashboard', () => {
     fixture.componentRef.setInput('valoresVisiveis', true);
     fixture.detectChanges();
     const raiz = fixture.nativeElement as HTMLElement;
-    expect(raiz.textContent).toContain('R$ 2.450,00');
-    expect(raiz.textContent).toContain('R$ 3.200,00');
-    expect(raiz.textContent).toContain('R$ 8.000,00');
+    const texto = (raiz.textContent ?? '').replaceAll('\u00A0', ' ');
+    expect(texto).toContain('R$ 2.450,00');
+    expect(texto).toContain('R$ 3.200,00');
+    expect(texto).toContain('R$ 8.000,00');
     expect(raiz.textContent).toContain('60%');
     expect(raiz.querySelector('a[href="/cartoes/7"]')).not.toBeNull();
   });
