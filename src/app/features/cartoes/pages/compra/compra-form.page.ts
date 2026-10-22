@@ -44,7 +44,7 @@ export class CompraCartaoFormPage implements OnInit {
     descricao: ['', [Validators.required, Validators.maxLength(200)]],
     valorTotal: ['', valorValido],
     dataCompra: [dataHojeLocal(), Validators.required],
-    quantidadeParcelas: [1, [Validators.required, Validators.min(1), Validators.max(120)]],
+    quantidadeParcelas: [1, [Validators.required, Validators.min(1), Validators.max(500)]],
     observacao: ['', Validators.maxLength(500)],
   });
 
@@ -99,7 +99,7 @@ export class CompraCartaoFormPage implements OnInit {
     const valor = decimalPositivo(f.valorTotal);
     if (this.form.invalid || !f.categoriaId || !f.descricao.trim() || !valor ||
         !Number.isInteger(f.quantidadeParcelas) || f.quantidadeParcelas < 1 ||
-        f.quantidadeParcelas > 120 || f.dataCompra > dataHojeLocal() ||
+        f.quantidadeParcelas > 500 || f.dataCompra > dataHojeLocal() ||
         !this.categorias().some(c => c.id === f.categoriaId) ||
         this.salvando() || this.carregando() || !this.cartao()?.ativo) return;
     this.salvando.set(true);

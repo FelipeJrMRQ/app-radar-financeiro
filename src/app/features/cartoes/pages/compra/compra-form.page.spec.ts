@@ -49,6 +49,27 @@ describe('Compra de cartão', () => {
     expect(comprarParcelado).not.toHaveBeenCalled();
   });
 
+  it('aceita financiamentos de 360 e 500 meses e rejeita 501', async () => {
+    const fixture = TestBed.createComponent(CompraCartaoFormPage);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    for (const quantidade of [360, 500]) {
+      fixture.componentInstance.form.patchValue({
+        categoriaId: 3, descricao: 'Financiamento',
+        valorTotal: '500.000,00', dataCompra: '2026-10-10',
+        quantidadeParcelas: quantidade,
+      });
+      await fixture.componentInstance.salvar();
+      expect(comprarParcelado).toHaveBeenCalledWith(5, jasmine.objectContaining({
+        quantidadeParcelas: quantidade, valorTotal: '500000.00',
+      }));
+    }
+    comprarParcelado.calls.reset();
+    fixture.componentInstance.form.patchValue({ quantidadeParcelas: 501 });
+    await fixture.componentInstance.salvar();
+    expect(comprarParcelado).not.toHaveBeenCalled();
+  });
+
   it('delegada a divisao em parcelas ao backend', async () => {
     const fixture = TestBed.createComponent(CompraCartaoFormPage);
     fixture.detectChanges();
