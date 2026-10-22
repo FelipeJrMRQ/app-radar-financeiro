@@ -6,6 +6,33 @@
        as configurações de outros usuários.</p>
   </header>
 
+  <section class="aparencia-bloco" aria-labelledby="titulo-aparencia">
+    <div class="aparencia-cabecalho">
+      <h2 id="titulo-aparencia">Aparência</h2>
+      <p>Escolha seu tema. A preferência é sincronizada entre dispositivos.</p>
+    </div>
+    <div class="tema-opcoes" role="group" aria-label="Tema da interface">
+      @for (opcao of escolhas; track opcao.valor) {
+        <button type="button" class="tema-opcao"
+          [class.selecionado]="tema.preferencia() === opcao.valor"
+          [attr.aria-pressed]="tema.preferencia() === opcao.valor"
+          [disabled]="tema.carregando() || tema.salvando()"
+          (click)="escolher(opcao.valor)">
+          <strong>{{ opcao.titulo }}</strong>
+          <small>{{ opcao.descricao }}</small>
+        </button>
+      }
+    </div>
+    @if (tema.carregando()) { <p class="tema-status" role="status">Carregando preferência…</p> }
+    @if (tema.salvando()) { <p class="tema-status" role="status">Salvando preferência…</p> }
+    @if (tema.erro()) {
+      <div class="tema-erro" role="alert">
+        <span>{{ tema.erro() }}</span>
+        <button type="button" (click)="tema.recarregar()">Recarregar</button>
+      </div>
+    }
+  </section>
+
   <div class="menu-grid">
     <a class="menu-card" routerLink="/configuracoes/painel">
       <span class="card-icon" aria-hidden="true">▦</span>

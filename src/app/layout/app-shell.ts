@@ -4,6 +4,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { filter } from 'rxjs';
 
 import { AuthService } from '../core/auth/auth.service';
+import { TemaService } from '../core/tema/tema.service';
 import { FeedbackOperacoesService } from '../core/feedback/feedback-operacoes.service';
 import { PrivacidadeValoresService } from '../core/privacidade/privacidade-valores.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -23,6 +24,7 @@ import { grupoNavegacao } from './navegacao-grupos';
 export class AppShell {
   readonly sessao = inject(AuthService);
   readonly privacidade = inject(PrivacidadeValoresService);
+  readonly tema = inject(TemaService);
   readonly iconeOlho = faEye;
   readonly iconeOlhoFechado = faEyeSlash;
   readonly iconeInicio = faTableCellsLarge;
