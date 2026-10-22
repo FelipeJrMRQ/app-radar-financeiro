@@ -39,37 +39,34 @@
     </section>
 
     <section class="cartoes-panel" aria-labelledby="cartoes-faturas-titulo">
-      <div class="cartoes-split">
+      <div class="cartoes-fatura-cabecalho">
         <div>
           <span class="cartoes-eyebrow">PAGAMENTOS E CICLOS</span>
-          <h2 id="cartoes-faturas-titulo">Faturas</h2>
-          <p>Selecione uma competência existente ou gere uma nova fatura na API.</p>
+          <h2 id="cartoes-faturas-titulo">Fatura do cartão</h2>
+          <p class="cartoes-small">Compras e parcelas são incluídas automaticamente no mês correspondente.</p>
         </div>
-        <div class="cartoes-field">
-          <label for="cartao-competencia">Competência</label>
-          <input id="cartao-competencia" type="month"
-            [value]="competencia()" (change)="atualizarCompetencia($event)" />
+        <div class="cartoes-periodo" aria-label="Navegação mensal da fatura">
+          <button type="button" (click)="mudarMes(-1)" [disabled]="operando()"
+            aria-label="Fatura do mês anterior">‹</button>
+          <strong aria-live="polite">{{ competenciaDescricao() }}</strong>
+          <button type="button" (click)="mudarMes(1)" [disabled]="operando()"
+            aria-label="Fatura do próximo mês">›</button>
         </div>
       </div>
-      <div class="cartoes-acoes">
-        @for (resumo of faturas(); track resumo.id) {
-          <button type="button" class="cartoes-secondary"
-            [attr.aria-pressed]="competencia() === resumo.competencia.slice(0, 7)"
-            (click)="selecionarCompetencia(resumo.competencia)">
-            {{ resumo.competencia.slice(0, 7) }} · {{ privacidade.valoresVisiveis() ? moeda(resumo.total) : '••••••' }}
-          </button>
-        }
-      </div>
-      @if (carregandoFatura()) { <p role="status" class="cartoes-small">Consultando fatura…</p> }
-      @if (erroFatura()) { <p class="cartoes-error" role="alert">{{ erroFatura() }}</p> }
-      @if (!fatura() && !carregandoFatura()) {
-        <div class="cartoes-empty">
-          <p>Nenhuma fatura carregada para {{ competencia() }}.</p>
-          <button class="cartoes-primary" type="button" [disabled]="operando()"
-            (click)="gerarFatura()">{{ operando() ? 'Processando…' : 'Gerar/abrir fatura' }}</button>
+      @if (carregandoFatura()) {
+        <p role="status" class="cartoes-small">Consultando o mês selecionado…</p>
+      }
+      @if (erroFatura()) {
+        <div class="cartoes-error" role="alert">
+          {{ erroFatura() }}
+          <button type="button" class="cartoes-secondary" (click)="consultarFatura()">Tentar novamente</button>
         </div>
       }
       @if (fatura(); as atual) {
+        <div class="cartoes-situacao-ciclo">
+          <span class="cartoes-pill">{{ cicloEmAberto() ? 'Ciclo em andamento ou previsto' : 'Ciclo encerrado' }}</span>
+          <span class="cartoes-small">{{ atual.itens.length }} item(ns) neste período</span>
+        </div>
         <div class="cartoes-summary">
           <div><span>Total da fatura</span>
             <strong>{{ privacidade.valoresVisiveis() ? moeda(atual.total) : '••••••' }}</strong></div>
@@ -78,7 +75,8 @@
         </div>
         <h3>Itens da fatura</h3>
         @if (atual.itens.length === 0) {
-          <p class="cartoes-small">Sem compras neste ciclo.</p>
+          <p class="cartoes-small">Nenhuma compra ou parcela prevista para este mês.
+            Navegue para o mês seguinte para consultar futuras parcelas.</p>
         } @else {
           @for (item of atual.itens; track $index) {
             <div class="cartoes-row">
@@ -98,7 +96,9 @@
             <div><span>Situação</span><strong>{{ resumo.quitada ? 'Quitada' : 'Em aberto' }}</strong></div>
           </div>
           @if (!resumo.quitada && contas().length > 0) {
-            <h3>Registrar pagamento da fatura</h3>
+            <h3>Pagamento da fatura</h3>
+            <p class="cartoes-small">Você pode pagar o saldo integral calculado pelo servidor
+              ou registrar apenas uma parte. Para pagamentos parciais, informe um valor.</p>
             <form [formGroup]="formPagamento" (ngSubmit)="pagar()" novalidate>
               <div class="cartoes-field-grid">
                 <div class="cartoes-field">
@@ -122,9 +122,15 @@
                     formControlName="dataPagamento" [max]="hoje" />
                 </div>
               </div>
-              <button class="cartoes-primary" type="submit" [disabled]="operando()">
-                {{ operando() ? 'Registrando…' : 'Registrar pagamento' }}
-              </button>
+              <div class="cartoes-acoes">
+                <button class="cartoes-primary" type="button" [disabled]="operando()"
+                  (click)="quitarSaldo()">
+                  {{ operando() ? 'Registrando…' : 'Quitar saldo da fatura' }}
+                </button>
+                <button class="cartoes-secondary" type="submit" [disabled]="operando()">
+                  Registrar pagamento parcial
+                </button>
+              </div>
             </form>
           } @else if (!resumo.quitada) {
             <p class="cartoes-note">Cadastre uma conta financeira ativa para pagar a fatura.</p>

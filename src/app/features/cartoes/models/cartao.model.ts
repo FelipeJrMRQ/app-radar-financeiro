@@ -66,7 +66,7 @@ export interface ItemFatura {
   dataReferencia: string;
 }
 export interface FaturaResumo {
-  id: number;
+  id: number | null;
   competencia: string;
   dataFechamento: string;
   dataVencimento: string;
@@ -91,7 +91,7 @@ export interface PagamentoFatura {
   criadoEm: string;
 }
 export interface ResumoPagamentos {
-  faturaCartaoId: number;
+  faturaCartaoId: number | null;
   competencia: string;
   totalFatura: ValorFinanceiroApi;
   totalPago: ValorFinanceiroApi;
