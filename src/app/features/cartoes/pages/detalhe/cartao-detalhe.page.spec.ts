@@ -131,9 +131,9 @@ describe('Fatura com navegação mensal', () => {
     const itens = root.querySelectorAll<HTMLElement>('.cartoes-fatura-item-row');
     expect(itens.length).toBe(1);
     expect(itens[0].querySelector('time')?.getAttribute('datetime'))
-      .toMatch(/^\\d{4}-\\d{2}-01$/);
+      .toMatch(/^\d{4}-\d{2}-01$/);
     expect(itens[0].querySelector('time')?.textContent)
-      .toMatch(/^01\\/\\d{2}\\/\\d{2}$/);
+      .toMatch(/^01\/\d{2}\/\d{2}$/);
     expect(itens[0].querySelector('.cartoes-row-meta-fixo')?.textContent).toContain('3');
   });
 
