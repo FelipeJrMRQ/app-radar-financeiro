@@ -36,4 +36,60 @@ describe('Card de contas a pagar', () => {
     expect(card.textContent).not.toContain('Moradia');
     expect(card.querySelector('.due-description small')).toBeNull();
   });
+
+  it('combina faturas previstas e contas normais ordenadas por vencimento', async () => {
+    await TestBed.configureTestingModule({
+      imports: [ContasPagarCardComponent],
+      providers: [provideRouter([])],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(ContasPagarCardComponent);
+    fixture.componentRef.setInput('itens', [{
+      lancamentoId: 10, contaFinanceiraId: 5, contaFinanceiraNome: 'Conta',
+      descricao: 'Aluguel', categoriaNome: 'Moradia', tipo: 'DESPESA',
+      vencimento: '2026-10-30', valorOriginal: '750.00',
+      valorRestante: '750.00', atrasado: false,
+    }]);
+    fixture.componentRef.setInput('faturas', [
+      { cartaoCreditoId: 7, cartaoCreditoNome: 'Nubank',
+        competencia: '2026-10-01', vencimento: '2026-10-25',
+        valorOriginal: '1000', valorRestante: '600',
+        atrasado: false, previa: true },
+      { cartaoCreditoId: 8, cartaoCreditoNome: 'Itaú',
+        competencia: '2026-09-01', vencimento: '2026-10-05',
+        valorOriginal: '850', valorRestante: '850',
+        atrasado: true, previa: false },
+    ]);
+    fixture.componentRef.setInput('mesReferencia', '2026-10');
+    fixture.detectChanges();
+
+    const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.due-row'));
+    expect(rows.length).toBe(3);
+    expect(rows[0].textContent).toContain('Fatura Itaú');
+    expect(rows[1].textContent).toContain('Fatura Nubank');
+    expect(rows[2].textContent).toContain('Aluguel');
+    expect(rows[0].textContent).toContain('Atrasado');
+    expect(rows[1].textContent).toContain('Prévia da fatura');
+    expect(rows[1].textContent).toContain('600,00');
+    expect(rows[0].querySelector('app-lancamento-acoes')).toBeNull();
+    expect(rows[1].querySelector('app-lancamento-acoes')).toBeNull();
+    expect(rows[2].querySelector('app-lancamento-acoes')).not.toBeNull();
+    expect(rows[0].querySelector('a[href="/cartoes/8?competencia=2026-09"]')).not.toBeNull();
+    expect(rows[1].querySelector('a[href="/cartoes/7?competencia=2026-10"]')).not.toBeNull();
+  });
+
+  it('mostra somente os cinco vencimentos prioritarios do conjunto', async () => {
+    await TestBed.configureTestingModule({
+      imports: [ContasPagarCardComponent],
+      providers: [provideRouter([])],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(ContasPagarCardComponent);
+    fixture.componentRef.setInput('itens', []);
+    fixture.componentRef.setInput('faturas', Array.from({ length: 7 }, (_, i) => ({
+      cartaoCreditoId: i + 1, cartaoCreditoNome: 'Cartão ' + (i + 1),
+      competencia: '2026-10-01', vencimento: '2026-10-' + String(10 + i).padStart(2, '0'),
+      valorOriginal: '100', valorRestante: '100', atrasado: false, previa: true,
+    })));
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).querySelectorAll('.due-row').length).toBe(5);
+  });
 });
