@@ -568,3 +568,16 @@ h1 { margin:0 0 8px; font-size:clamp(26px,5vw,34px); letter-spacing:-.9px; color
   justify-content: flex-end;
   gap: 5px 12px;
 }
+
+/* Ações de lançamentos no Contas a pagar: ícone limpo em repouso.
+   Mantém a área de toque e o foco do teclado, sem afetar o menu aberto
+   nem o componente de ações usado nas outras telas. */
+.app-layout .dashboard app-contas-pagar-card app-lancamento-acoes button.more-button {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.app-layout .dashboard app-contas-pagar-card app-lancamento-acoes button.more-button:is(:hover, :focus-visible, .active) {
+  background: var(--rf-theme-accent-soft, #e6f3ef);
+  border-color: transparent;
+}
