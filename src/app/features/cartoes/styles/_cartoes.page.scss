@@ -126,3 +126,71 @@
 .cartoes-periodo button:disabled {opacity:.45;cursor:default;}
 .cartoes-situacao-ciclo {display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;}
 @media(max-width:620px){.cartoes-periodo{width:100%;}}
+
+/* Consulta e registro financeiro em telas independentes, mobile-first. */
+.cartoes-fatura-principal {
+  display:flex;flex-direction:column;gap:7px;
+  border:1px solid var(--card-border);background:var(--card-raised);
+  border-radius:13px;padding:19px;margin-bottom:10px;
+}
+.cartoes-fatura-principal>span:first-child {font-size:12px;color:var(--card-muted);}
+.cartoes-fatura-principal>strong {font-size:clamp(26px,4vw,32px);
+  letter-spacing:-.5px;overflow-wrap:anywhere;}
+.cartoes-fatura-principal>span:last-child {font-size:13px;color:var(--card-text);}
+.cartoes-fechamento {margin:0 0 20px;}
+.cartoes-pagamento-resumo {
+  display:flex;flex-wrap:wrap;gap:12px 24px;
+  padding:16px 0;border-top:1px solid var(--card-border);margin-top:12px;
+  font-size:13px;color:var(--card-muted);
+}
+.cartoes-pagamento-resumo strong {color:var(--card-text);}
+.cartoes-status-quitada {display:inline-block;margin:16px 0 0;}
+.cartoes-pagar-acao {padding-top:20px;}
+.cartoes-pagar-acao .cartoes-small {margin:9px 0 0;line-height:1.5;}
+.cartoes-pagamento-page {max-width:730px;padding-bottom:calc(96px + env(safe-area-inset-bottom));}
+.cartoes-pagamento-bloco {
+  background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:16px;padding:clamp(18px,3vw,28px);
+}
+.cartoes-pagamento-cabecalho {display:flex;justify-content:space-between;
+  gap:8px;flex-wrap:wrap;align-items:center;font-size:14px;}
+.cartoes-pagamento-cabecalho span {color:var(--card-muted);text-transform:capitalize;}
+.cartoes-pagamento-total {display:flex;flex-direction:column;
+  gap:6px;padding:17px;margin:18px 0;border:1px solid var(--card-border);
+  background:var(--card-raised);border-radius:12px;}
+.cartoes-pagamento-total span {font-size:12px;color:var(--card-muted);}
+.cartoes-pagamento-total strong {font-size:clamp(25px,4vw,32px);overflow-wrap:anywhere;}
+.cartoes-pagamento-total small {font-size:13px;color:var(--card-text);}
+.cartoes-modo-pagamento {padding:0;margin:4px 0 20px;border:0;
+  display:flex;flex-wrap:wrap;gap:8px;}
+.cartoes-modo-pagamento legend {font-size:13px;font-weight:750;
+  padding:0 0 10px;color:var(--card-text);}
+.cartoes-modo-pagamento button {
+  flex:1 1 130px;min-height:44px;padding:10px 12px;
+  border:1px solid var(--card-border);border-radius:10px;
+  color:var(--card-text);background:var(--card-raised);
+  font:inherit;font-weight:700;font-size:13px;cursor:pointer;
+}
+.cartoes-modo-pagamento button.selecionado {border-color:var(--card-accent);
+  background:var(--card-accent-soft);color:var(--card-accent);}
+.cartoes-modo-pagamento button:focus-visible,.cartoes-pagamento-bloco button:focus-visible,
+.cartoes-pagamento-bloco a:focus-visible {outline:2px solid var(--card-accent);outline-offset:3px;}
+.cartoes-pagamento-exato {color:var(--card-muted);font-size:13px;line-height:1.6;
+  margin:0 0 20px;}
+.cartoes-pagamento-exato strong {color:var(--card-text);}
+.cartoes-pagamento-confirmacao h2 {font-size:19px;margin:22px 0 8px;}
+.cartoes-pagamento-aviso {font-size:13px;line-height:1.6;
+  padding:13px;border-radius:10px;background:var(--card-accent-soft);color:var(--card-text);}
+.cartoes-pagamento-confirmacao dl {margin:18px 0;}
+.cartoes-pagamento-confirmacao dl>div {display:flex;justify-content:space-between;
+  flex-wrap:wrap;gap:4px 12px;border-bottom:1px solid var(--card-border);padding:12px 0;}
+.cartoes-pagamento-confirmacao dt {font-size:12px;color:var(--card-muted);}
+.cartoes-pagamento-confirmacao dd {font-size:13px;font-weight:750;margin:0;color:var(--card-text);
+  text-align:right;overflow-wrap:anywhere;}
+@media(max-width:420px) {
+  .cartoes-pagamento-bloco {padding:16px;}
+  .cartoes-pagamento-confirmacao dl>div {flex-direction:column;}
+  .cartoes-pagamento-confirmacao dd {text-align:left;}
+  .cartoes-pagar-acao .cartoes-primary {width:100%;}
+  .cartoes-pagamento-page .cartoes-acoes > * {flex:1 1 100%;}
+}
