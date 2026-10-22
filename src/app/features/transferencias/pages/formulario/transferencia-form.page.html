@@ -1,0 +1,102 @@
+<section class="transferencias-page">
+  <a class="back-link" routerLink="/transferencias">← Voltar para transferências</a>
+  <header class="page-heading">
+    <div>
+      <span class="eyebrow">MOVIMENTAÇÃO ENTRE CONTAS</span>
+      <h1>{{ editando ? 'Editar transferência' : 'Nova transferência' }}</h1>
+      <p>Transfira valores entre suas contas financeiras sem criar receita ou despesa.</p>
+    </div>
+  </header>
+
+  @if (carregando()) {
+    <div class="state-card" role="status">Carregando contas financeiras…</div>
+  } @else if (erroInicial()) {
+    <div class="state-card" role="alert">
+      <p>{{ erroInicial() }}</p>
+      <button type="button" class="button-secondary" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else if (contas().length < 2) {
+    <div class="state-card empty">
+      <h2>São necessárias duas contas ativas</h2>
+      <p>Cadastre pelo menos duas contas financeiras para realizar transferências.</p>
+      <a class="button-primary" routerLink="/contas/nova">Cadastrar conta</a>
+    </div>
+  } @else {
+    <div class="form-card">
+      @if (erro()) { <div class="error-message" role="alert">{{ erro() }}</div> }
+      @if (erroValidacao()) { <div class="error-message" role="alert">{{ erroValidacao() }}</div> }
+      <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+        <div class="field-grid">
+          <div class="field">
+            <label for="conta-origem">Conta de origem</label>
+            <select id="conta-origem" formControlName="contaOrigemId">
+              <option [ngValue]="null">Selecione a conta de origem</option>
+              @for (conta of contas(); track conta.id) {
+                <option [ngValue]="conta.id">{{ conta.nome }}</option>
+              }
+            </select>
+            @if (form.controls.contaOrigemId.touched && form.controls.contaOrigemId.invalid) {
+              <small class="field-error">Selecione a conta que enviará o dinheiro.</small>
+            }
+          </div>
+          <div class="field">
+            <label for="conta-destino">Conta de destino</label>
+            <select id="conta-destino" formControlName="contaDestinoId">
+              <option [ngValue]="null">Selecione a conta de destino</option>
+              @for (conta of contas(); track conta.id) {
+                <option [ngValue]="conta.id" [disabled]="conta.id === form.controls.contaOrigemId.value">
+                  {{ conta.nome }}
+                </option>
+              }
+            </select>
+            @if (form.controls.contaDestinoId.touched && form.controls.contaDestinoId.invalid) {
+              <small class="field-error">Selecione a conta que receberá o dinheiro.</small>
+            }
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <label for="valor-transferencia">Valor (R$)</label>
+            <input id="valor-transferencia" type="text" inputmode="numeric" rfMoedaBr
+              formControlName="valor" placeholder="R$ 0,00" />
+            <small class="field-hint">Digite 105035 para R$ 1.050,35.</small>
+            @if (form.controls.valor.touched && form.controls.valor.invalid) {
+              <small class="field-error">Informe um valor positivo, com até 4 casas decimais.</small>
+            }
+          </div>
+          <div class="field">
+            <label for="data-transferencia">Data da transferência</label>
+            <input id="data-transferencia" type="date" formControlName="dataTransferencia" />
+            @if (form.controls.dataTransferencia.touched && form.controls.dataTransferencia.invalid) {
+              <small class="field-error">Informe a data da transferência.</small>
+            }
+          </div>
+        </div>
+        <div class="field">
+          <label for="descricao-transferencia">Descrição</label>
+          <input id="descricao-transferencia" type="text" maxlength="200" formControlName="descricao"
+            placeholder="Ex.: Reserva mensal" />
+          @if (form.controls.descricao.touched &&
+               (form.controls.descricao.invalid || !form.controls.descricao.value.trim())) {
+            <small class="field-error">Informe uma descrição de até 200 caracteres.</small>
+          }
+        </div>
+        <div class="field">
+          <label for="observacao-transferencia">Observação <span>(opcional)</span></label>
+          <textarea id="observacao-transferencia" formControlName="observacao" maxlength="500"
+            rows="3" placeholder="Detalhes adicionais…"></textarea>
+        </div>
+        <p class="form-note">
+          Transferências com data de hoje ou anterior são confirmadas automaticamente pela API.
+          Transferências futuras ficam previstas até a confirmação. Não são receitas nem despesas.
+        </p>
+        <div class="form-actions">
+          <a class="button-secondary" routerLink="/transferencias">Cancelar</a>
+          <button class="button-primary" type="submit" [disabled]="salvando()">
+            {{ salvando() ? 'Salvando…' : editando ? 'Salvar alterações' : 'Registrar transferência' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</section>

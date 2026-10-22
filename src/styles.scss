@@ -1,4 +1,6 @@
 @use './app/features/dashboard/styles/dashboard';
+@use './tema-escuro';
+@use './tema-escuro-acabamento';
 :root {
   /* Tokens centrais para ajustes futuros da identidade sem alterar cada feature. */
   --rf-navy-950: #03111f;

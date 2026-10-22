@@ -81,7 +81,9 @@
         <app-contas-pagar-card rfMosaicoPainelItem [itens]="aPagar()" [mesReferencia]="mesReferencia()" (alterado)="carregar()" />
       }
       @case ('SALDOS_CONTAS') {
-        <app-saldos-contas-card rfMosaicoPainelItem [contas]="dados.contas.slice(0, 5)" [saldoConfirmado]="dados.saldoConfirmado" [saldoProjetado]="dados.saldoProjetado" [valoresVisiveis]="privacidade.valoresVisiveis()" />
+        <app-saldos-contas-card rfMosaicoPainelItem
+          [contas]="dados.contas"
+          [valoresVisiveis]="privacidade.valoresVisiveis()" />
       }
       @case ('FLUXO_CAIXA') {
         <app-fluxo-caixa-card rfMosaicoPainelItem [contas]="contasVisiveis()" [contasSelecionadas]="contasGraficoIds() ?? []" [fluxo]="fluxo()" [carregandoFluxo]="carregandoFluxo()" [erroFluxo]="erroFluxo()" [ocultarContasZeradas]="ocultarContasZeradas()" [quantidadeOcultas]="ocultarContasZeradas() ? contasZeradas().length : 0" [erroPreferencias]="preferenciasFluxo.erro()" (selecaoAlterada)="alterarContasGrafico($event)" (alternarZeradas)="alternarContasZeradas()" [valoresVisiveis]="privacidade.valoresVisiveis()" />
@@ -100,6 +102,7 @@
         <div class="panel-head"><div><h2 id="titulo-acoes">O que deseja fazer?</h2></div></div>
         <div class="shortcuts">
           <a routerLink="/lancamentos/novo"><span aria-hidden="true">+</span> Novo lançamento</a>
+          <a routerLink="/transferencias"><span aria-hidden="true">T</span> Transferências</a>
           <a routerLink="/contas"><span aria-hidden="true">▣</span> Consultar contas</a>
           <a routerLink="/categorias"><span aria-hidden="true">≡</span> Organizar categorias</a>
         </div>

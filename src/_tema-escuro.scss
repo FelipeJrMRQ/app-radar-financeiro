@@ -1,0 +1,487 @@
+/*
+ * Tema escuro do Radar Financeiro.
+ * Apenas valores visuais mudam; regras, estados financeiros e privacidade
+ * permanecem nos componentes e na API. Os seletores são deliberadamente
+ * limitados à aplicação para não alterar bibliotecas ou páginas externas.
+ */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --rf-background: #101c26;
+  --rf-surface: #1a2d39;
+  --rf-text-primary: #e6f3f5;
+  --rf-text-muted: #aec2ca;
+  --rf-theme-surface: #1a2d39;
+  --rf-theme-raised: #223947;
+  --rf-theme-subtle: #172732;
+  --rf-theme-border: #344b57;
+  --rf-theme-text: #e6f3f5;
+  --rf-theme-muted: #aec2ca;
+  --rf-theme-accent: #6fe3cd;
+  --rf-theme-accent-soft: #21483f;
+  --rf-theme-negative: #f08791;
+  --rf-theme-negative-soft: #432e39;
+  --rf-theme-warning: #f0c47d;
+  --rf-theme-warning-soft: #433b30;
+  --rf-theme-shadow: rgba(0, 0, 0, .22);
+}
+:root[data-theme='light'] { color-scheme: light; }
+
+html[data-theme='dark'],
+html[data-theme='dark'] body {
+  color: var(--rf-theme-text);
+  background: var(--rf-background);
+}
+html[data-theme='dark'] .app-layout {
+  background: var(--rf-background);
+  color: var(--rf-theme-text);
+}
+html[data-theme='dark'] .workspace,
+html[data-theme='dark'] .page-content { background: var(--rf-background); }
+html[data-theme='dark'] .app-layout :is(h1, h2, h3),
+html[data-theme='dark'] .auth-main :is(h1, h2, h3) {
+  color: var(--rf-theme-text);
+}
+html[data-theme='dark'] .app-layout :is(.page-description, .page-heading p, .heading p, .subtitle, .footer-note, .hint, .field-hint, .form-note, .manage-help, .read-only-note, .scope-note) {
+  color: var(--rf-theme-muted);
+}
+html[data-theme='dark'] .app-layout :is(
+  .mobile-header, .desktop-header, .mobile-bottom-nav
+) {
+  background: var(--rf-theme-surface);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .app-layout :is(.header-title, .mobile-logo) {
+  color: var(--rf-theme-text);
+}
+html[data-theme='dark'] .app-layout :is(.header-user, .mobile-bottom-nav a:not(.active), .sidebar-section-title) {
+  color: var(--rf-theme-muted);
+}
+html[data-theme='dark'] .app-layout .mobile-bottom-nav a.active {
+  color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .app-layout :is(.mobile-logout, .toggle-privacidade) {
+  background: var(--rf-theme-raised);
+  border-color: var(--rf-theme-border);
+  color: var(--rf-theme-text);
+}
+html[data-theme='dark'] .app-layout .toggle-privacidade[aria-pressed='true'] {
+  color: var(--rf-theme-accent);
+  border-color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .app-layout .sidebar {
+  background: linear-gradient(180deg, #071621 0%, #102b36 100%);
+}
+html[data-theme='dark'] .app-layout .feedback-lancamento {
+  background: #183b37;
+  color: #b5f1db;
+  border-color: #357d6c;
+}
+html[data-theme='dark'] .app-layout .feedback-lancamento button:hover {
+  background: #27564b;
+}
+html[data-theme='dark'] .app-layout .lancamento-speed-descricao {
+  background: #284452;
+  color: #f0faff;
+}
+
+/* Formulários e estados de foco */
+html[data-theme='dark'] :is(.app-layout, .auth-main) :is(
+  input:not([type='checkbox']):not([type='radio']),
+  textarea, select
+) {
+  background: var(--rf-theme-subtle);
+  color: var(--rf-theme-text);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] :is(.app-layout, .auth-main) :is(
+  input, textarea, select
+)::placeholder { color: #9cb3bf; }
+html[data-theme='dark'] :is(.app-layout, .auth-main) :is(input, textarea, select):focus-visible {
+  border-color: var(--rf-theme-accent);
+  outline-color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .app-layout :is(.field label, .form-field label, .account-filter label, .action-field label, .form-card label, .modality-group > span) {
+  color: var(--rf-theme-text);
+}
+html[data-theme='dark'] .app-layout :is(
+  .secondary-action, .button-secondary, .secondary, .back-link,
+  .text-button, .show-password, .more-button, .arrow-actions button,
+  .action-link, .account-link
+) {
+  color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .app-layout :is(
+  .secondary-action, .button-secondary, .secondary,
+  .more-button, .arrow-actions button
+) {
+  background: var(--rf-theme-raised);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] :is(.app-layout, .auth-main) :is(
+  button, input, select, textarea, a
+):focus-visible {
+  outline-color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .app-layout :is(
+  .button-primary, .primary-action, .primary, .primary-button
+) { background: #087d73; color: #fff; }
+html[data-theme='dark'] .app-layout :is(
+  .field-error, .inline-error, .balance-error, .action-error, .cash-flow-preferences-error
+) { color: var(--rf-theme-negative); }
+html[data-theme='dark'] .app-layout :is(.state-hint, .field-hint, .field-note) {
+  color: var(--rf-theme-muted);
+}
+html[data-theme='dark'] .app-layout :is(.saldo-warning, .action-warning, .account-confirmation) {
+  background: var(--rf-theme-warning-soft);
+  color: var(--rf-theme-warning);
+  border-color: #6d593d;
+}
+html[data-theme='dark'] .app-layout :is(.error-message, .inline-manage-error, .message.error, .feedback-card.error) {
+  background: var(--rf-theme-negative-soft);
+  color: var(--rf-theme-negative);
+  border-color: #764653;
+}
+html[data-theme='dark'] .app-layout :is(.success-message, .accounts-success, .message.success, .feedback-card.success) {
+  background: var(--rf-theme-accent-soft);
+  color: #b0efda;
+  border-color: #38745e;
+}
+
+/* Superfícies da navegação por feature, contas, lançamentos e configurações */
+html[data-theme='dark'] .app-layout :is(
+  .form-card, .form-panel, .form-section, .form-content,
+  .category-card, .state-card, .menu-card, .profile-card, .config-card,
+  .account-card, .summary-card, .statement-section, .manage-account,
+  .movement-list, .total-periodo, .month-switcher,
+  .periodo-selector, .account-confirmation,
+  .feedback-card, .category-grid > article,
+  .actions-panel, .preference-row
+) {
+  background: var(--rf-theme-surface);
+  color: var(--rf-theme-text);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .app-layout :is(
+  .unavailable, .account-card.inactive, .preference-row.hidden-card
+) {
+  background: var(--rf-theme-subtle);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .app-layout :is(
+  .menu-card:hover, .account-link:hover, .shortcuts a:hover, .secondary-action:hover
+) { border-color: var(--rf-theme-accent); }
+html[data-theme='dark'] .app-layout :is(
+  .card-icon, .account-icon, .category-icon, .profile-avatar,
+  .movement-icon, .sequence, .toggle-track, .inactive-label, .tag
+) {
+  background: var(--rf-theme-raised);
+  color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .app-layout :is(
+  .card-copy strong, .menu-card strong, .account-card h2, .category-description h2,
+  .profile-heading h2, .config-intro h2, .profile-fields dd,
+  .summary-card strong, .movement-description h3, .manage-heading h2,
+  .statement-heading h2, .total-periodo-label strong, .name,
+  .statement-balances strong, .account-balance, .quantity
+) { color: var(--rf-theme-text); }
+html[data-theme='dark'] .app-layout :is(
+  .card-copy > span, .account-type, .balance-caption,
+  .category-description > span, .profile-fields dt, .profile-heading span,
+  .movement-date, .movement-category, .summary-card span, .summary-card small,
+  .statement-balances span, .read-only-note, .category-description .scope
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .app-layout :is(
+  .movement, .preference-row, .profile-fields div, .due-row,
+  .statement-balances, .account-header, .realizacao-item
+) { border-color: var(--rf-theme-border); }
+html[data-theme='dark'] .app-layout :is(
+  .periodo-selector button, .month-switcher button,
+  .account-filters button, .filter-bar button, .filters button,
+  .type-switch button, .modality-options button, .arrow-actions button,
+  .actions-panel > button, .actions-panel .action-link
+) {
+  background: var(--rf-theme-raised);
+  border-color: var(--rf-theme-border);
+  color: var(--rf-theme-text);
+}
+html[data-theme='dark'] .app-layout :is(
+  .filters button.selected, .account-filters button.selected,
+  .filter-bar button.selected, .type-switch button.selected,
+  .modality-options button.active
+) {
+  background: #087d73;
+  color: #fff;
+  border-color: #087d73;
+}
+html[data-theme='dark'] .app-layout :is(
+  .periodo-selector strong, .month-switcher span, .account-filter select,
+  .movement-detail strong, .movement-detail span, .movement-detail small,
+  .total-periodo-label small, .results-caption
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .app-layout :is(
+  .movement-detail strong, .periodo-selector strong, .month-switcher span
+) { color: var(--rf-theme-text); }
+html[data-theme='dark'] .app-layout .movement-value > span {
+  background: var(--rf-theme-accent-soft);
+  color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .app-layout :is(.movement-value > span.previsto, .movement-value span.pending) {
+  background: var(--rf-theme-warning-soft);
+  color: var(--rf-theme-warning);
+}
+html[data-theme='dark'] .app-layout :is(
+  .movement-value strong, .account-balance:not(.negative),
+  .balance-grid strong, .income-text, .projection-text,
+  .total-periodo-valor:not(.despesa)
+) { color: #6fe3cd; }
+html[data-theme='dark'] .app-layout :is(
+  .account-balance.negative, .negative, .expense-text, .total-periodo-valor.despesa,
+  .movement-value strong.despesa, .danger-action
+) { color: var(--rf-theme-negative); }
+
+/* Popovers e painéis de ações têm maior prioridade visual. */
+html[data-theme='dark'] .app-layout :is(
+  .actions-panel, .action-scope, .action-scope input,
+  .realizacao-item, .account-confirmation, .scope-note
+) { border-color: var(--rf-theme-border); }
+html[data-theme='dark'] .app-layout :is(
+  .actions-heading, .action-scope legend, .action-help,
+  .action-scope label, .action-field, .action-warning p
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .app-layout .actions-panel :is(button:hover, .action-link:hover) {
+  background: var(--rf-theme-raised);
+}
+html[data-theme='dark'] .app-layout .actions-panel .commit-action {
+  color: #b4f7e6; background: #20564a;
+}
+html[data-theme='dark'] .app-layout :is(.action-warning, .saldo-warning) {
+  background: var(--rf-theme-warning-soft);
+  color: var(--rf-theme-warning);
+}
+
+/* Login e cadastro mantêm o painel institucional, apenas formulário adapta */
+html[data-theme='dark'] .auth-main {
+  background: var(--rf-background);
+  color: var(--rf-theme-text);
+}
+html[data-theme='dark'] .auth-main :is(
+  .auth-form, .auth-container, .field, .password-field
+) { color: var(--rf-theme-text); }
+html[data-theme='dark'] .auth-main :is(
+  .subtitle, .form-footer, .auth-legal
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .auth-main :is(
+  .field label, .form-footer a, .show-password
+) { color: var(--rf-theme-accent); }
+html[data-theme='dark'] .auth-main :is(.form-error, .form-success) {
+  background: var(--rf-theme-raised);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .auth-main .form-error { color: var(--rf-theme-negative); }
+html[data-theme='dark'] .auth-main .form-success { color: var(--rf-theme-accent); }
+
+/* Dashboard e Chart.js: superfícies e legendas acompanham o tema. */
+html[data-theme='dark'] .dashboard :is(
+  .month-controls, .dashboard-state, .stat-card, .panel,
+  .cash-flow-panel, .shortcuts a, .secondary-action,
+  .chart-select-label select, .cash-flow-account,
+  .cash-flow-zero-toggle, .cash-flow-accounts-heading button,
+  .account-head-row
+) {
+  background: var(--rf-theme-surface);
+  color: var(--rf-theme-text);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .dashboard :is(
+  .month-controls button, .shortcuts a span, .cash-flow-count,
+  .cash-flow-account.checked, .cash-flow-zero-toggle,
+  .cash-flow-accounts-heading button
+) {
+  background: var(--rf-theme-raised);
+  color: var(--rf-theme-accent);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .dashboard :is(
+  .month-controls span, .panel-head h2, .cash-flow-heading h2,
+  .cash-flow-accounts-heading strong, .due-description strong,
+  .account-row, .account-name, .account-row strong,
+  .account-footer strong, .stat-card > strong,
+  .category-doughnut-center strong, .category-doughnut-legend-value,
+  .category-doughnut-legend-text > span
+) { color: var(--rf-theme-text); }
+html[data-theme='dark'] .dashboard :is(
+  .dashboard-heading p, .stat-label, .stat-card > small, .empty-data,
+  .date-block, .due-description small, .account-head-row, .account-value-label,
+  .chart-legend, .chart-select-label, .chart-footer, .scope-note,
+  .cash-flow-hidden-note, .cash-flow-chart-notes, .cash-flow-projection-note,
+  .cash-flow-empty, .category-doughnut-center span,
+  .category-doughnut-legend-text small
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .dashboard :is(
+  .due-row, .account-row, .chart-footer, .scope-note,
+  .cash-flow-accounts, .category-doughnut-legend-item
+) { border-color: var(--rf-theme-border); }
+html[data-theme='dark'] .dashboard .panel :is(.income-text, .projection-text) {
+  color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .dashboard :is(.income-text, .projection-text) {
+  color: var(--rf-theme-accent) !important;
+}
+html[data-theme='dark'] .dashboard :is(.expense-text, .projection-text.negative) {
+  color: var(--rf-theme-negative) !important;
+}
+html[data-theme='dark'] .dashboard :is(.empty-data a, .panel-link, .secondary-action) {
+  color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .dashboard .late-label {
+  color: var(--rf-theme-warning);
+  background: var(--rf-theme-warning-soft);
+}
+html[data-theme='dark'] .dashboard .cash-flow-preferences-error {
+  color: var(--rf-theme-negative);
+}
+html[data-theme='dark'] .dashboard .cash-flow-account:hover,
+html[data-theme='dark'] .dashboard .shortcuts a:hover {
+  background: var(--rf-theme-raised);
+  border-color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .dashboard :is(
+  .axis-label, .cash-flow-chart-notes, .category-doughnut-legend-text small
+) { fill: var(--rf-theme-muted); }
+html[data-theme='dark'] .dashboard .gridline { stroke: var(--rf-theme-border); }
+
+/* Configurações: escolhas de tema, cartões e preferências do painel. */
+html[data-theme='dark'] .configuracoes-page :is(
+  .aparencia-bloco, .menu-card
+) {
+  background: var(--rf-theme-surface);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .configuracoes-page :is(
+  .menu-card.unavailable, .unavailable .card-icon, .tag
+) { background: var(--rf-theme-subtle); }
+html[data-theme='dark'] .configuracoes-page :is(
+  .card-copy strong, .card-arrow, .card-icon
+) { color: var(--rf-theme-accent); }
+html[data-theme='dark'] .configuracoes-page :is(
+  .card-copy > span, .page-heading p
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .configuracoes-page .tema-opcao {
+  background: var(--rf-theme-raised);
+  border-color: var(--rf-theme-border);
+  color: var(--rf-theme-text);
+}
+html[data-theme='dark'] .configuracoes-page .tema-opcao.selecionado {
+  background: var(--rf-theme-accent-soft);
+  border-color: var(--rf-theme-accent);
+}
+
+/* Personalizar painel: ordenação, visibilidade e feedback. */
+html[data-theme='dark'] .personalizar-page :is(
+  .config-card, .preference-row
+) { background: var(--rf-theme-surface); border-color: var(--rf-theme-border); }
+html[data-theme='dark'] .personalizar-page :is(
+  .config-intro h2, .name, .quantity, .visible-text, .sequence
+) { color: var(--rf-theme-text); }
+html[data-theme='dark'] .personalizar-page :is(
+  .hint, .heading p, .config-intro p
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .personalizar-page .drag-target {
+  background: var(--rf-theme-accent-soft);
+}
+html[data-theme='dark'] .personalizar-page .message.error {
+  background: var(--rf-theme-negative-soft);
+  color: var(--rf-theme-negative);
+}
+html[data-theme='dark'] .personalizar-page .message.success {
+  background: var(--rf-theme-accent-soft);
+  color: var(--rf-theme-accent);
+}
+
+/* Transferências integradas: formulário, listagem, diálogo e saldos de caixa. */
+html[data-theme='dark'] .app-layout .transferencias-page :is(
+  .form-card, .periodo-selector, .movement, .modal-card
+) {
+  background: var(--rf-theme-surface);
+  color: var(--rf-theme-text);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .app-layout .transferencias-page :is(
+  .page-heading p, .form-note, .results-caption, .field-hint,
+  .movement-detail span, .movement-detail small, .movement-value small
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .app-layout .transferencias-page :is(
+  .movement-detail strong, .movement-value strong, .field label,
+  .periodo-selector strong
+) { color: var(--rf-theme-text); }
+html[data-theme='dark'] .app-layout .transferencias-page :is(
+  .periodo-selector button, .form-note, .movement-icon
+) { background: var(--rf-theme-raised); color: var(--rf-theme-accent); }
+html[data-theme='dark'] .app-layout .transferencias-page :is(
+  .field input, .field select, .field textarea, .modal-card input
+) {
+  background: var(--rf-theme-subtle);
+  color: var(--rf-theme-text);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .app-layout .transferencias-page .modal-card .alerta {
+  background: var(--rf-theme-warning-soft);
+  color: var(--rf-theme-warning);
+}
+html[data-theme='dark'] .app-layout .transferencias-page .movement-value span {
+  color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .app-layout .transferencias-page .movement-value span.previsto {
+  color: var(--rf-theme-warning);
+}
+html[data-theme='dark'] .app-layout .transferencias-page .button-secondary.danger {
+  color: var(--rf-theme-negative);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .dashboard :is(
+  .cash-balances-row, .cash-balances-columns, .cash-balances-total
+) { border-color: var(--rf-theme-border); }
+html[data-theme='dark'] .dashboard .cash-balances-total {
+  background: var(--rf-theme-raised);
+}
+html[data-theme='dark'] .dashboard .cash-balances-row:hover {
+  background: var(--rf-theme-raised);
+}
+html[data-theme='dark'] .dashboard :is(
+  .cash-balances-account, .cash-balances-total-name,
+  .cash-balances-amount:not(.positive):not(.negative)
+) { color: var(--rf-theme-text); }
+html[data-theme='dark'] .dashboard :is(
+  .cash-balances-columns, .cash-balances-note
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .dashboard .cash-balances-bank-icon {
+  background: var(--rf-theme-accent-soft);
+  color: var(--rf-theme-accent);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .dashboard .cash-balances-amount.positive {
+  color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .dashboard .cash-balances-amount.negative {
+  color: var(--rf-theme-negative);
+}
+
+/*
+ * Os filtros de lançamentos não são um card.
+ * Evita que a paleta global pinte a linha inteira e preserve o espaçamento,
+ * agrupamento e geometria originais dos controles.
+ */
+html[data-theme='dark'] .app-layout .lancamentos-page .filter-panel {
+  background: transparent;
+  border: 0;
+  color: inherit;
+}
+html[data-theme='dark'] .app-layout .lancamentos-page :is(
+  .filter-panel, .filters, .account-filter, .movement-list, .movement
+) {
+  min-width: 0;
+  max-width: 100%;
+}
+html[data-theme='dark'] .app-layout .lancamentos-page .account-filter select {
+  max-width: 100%;
+}

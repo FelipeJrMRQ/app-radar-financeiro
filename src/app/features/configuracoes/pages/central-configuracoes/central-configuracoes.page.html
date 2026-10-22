@@ -6,6 +6,65 @@
        as configurações de outros usuários.</p>
   </header>
 
+  <section class="aparencia-bloco" aria-labelledby="titulo-aparencia">
+    <div class="aparencia-cabecalho">
+      <h2 id="titulo-aparencia">Aparência</h2>
+      <p>Escolha seu tema. A preferência é sincronizada entre dispositivos.</p>
+    </div>
+    <div class="tema-opcoes" role="group" aria-label="Tema da interface">
+      @for (opcao of escolhas; track opcao.valor) {
+        <button type="button" class="tema-opcao"
+          [class.selecionado]="tema.preferencia() === opcao.valor"
+          [attr.aria-pressed]="tema.preferencia() === opcao.valor"
+          [disabled]="tema.carregando() || tema.salvando()"
+          (click)="escolher(opcao.valor)">
+          <strong>{{ opcao.titulo }}</strong>
+          <small>{{ opcao.descricao }}</small>
+        </button>
+      }
+    </div>
+    @if (tema.carregando()) { <p class="tema-status" role="status">Carregando preferência…</p> }
+    @if (tema.salvando()) { <p class="tema-status" role="status">Salvando preferência…</p> }
+    @if (tema.erro()) {
+      <div class="tema-erro" role="alert">
+        <span>{{ tema.erro() }}</span>
+        <button type="button" (click)="tema.recarregar()">Recarregar</button>
+      </div>
+    }
+  </section>
+
+  <section class="aparencia-bloco" aria-labelledby="titulo-privacidade">
+    <div class="aparencia-cabecalho">
+      <h2 id="titulo-privacidade">Privacidade dos dados financeiros</h2>
+      <p>Defina como os valores de saldos e contas a receber aparecem no seu painel.
+         A escolha é individual e fica salva para os próximos acessos.</p>
+    </div>
+    <div class="tema-opcoes privacidade-opcoes" role="group" aria-label="Exibição dos valores financeiros">
+      <button type="button" class="tema-opcao"
+        [class.selecionado]="privacidade.valoresVisiveis()"
+        [attr.aria-pressed]="privacidade.valoresVisiveis()"
+        [disabled]="tema.carregando() || tema.salvando()"
+        (click)="definirExibicao(true)">
+        <strong>Exibir valores</strong>
+        <small>Opção padrão. Mostra seus saldos e valores a receber.</small>
+      </button>
+      <button type="button" class="tema-opcao"
+        [class.selecionado]="!privacidade.valoresVisiveis()"
+        [attr.aria-pressed]="!privacidade.valoresVisiveis()"
+        [disabled]="tema.carregando() || tema.salvando()"
+        (click)="definirExibicao(false)">
+        <strong>Ocultar valores</strong>
+        <small>Esconde os valores sensíveis. Você pode revelá-los quando quiser pelo ícone de olho.</small>
+      </button>
+    </div>
+    @if (tema.salvando()) {
+      <p class="tema-status" role="status">Salvando sua preferência…</p>
+    }
+    @if (tema.erro()) {
+      <p class="tema-erro" role="alert">{{ tema.erro() }}</p>
+    }
+  </section>
+
   <div class="menu-grid">
     <a class="menu-card" routerLink="/configuracoes/painel">
       <span class="card-icon" aria-hidden="true">▦</span>

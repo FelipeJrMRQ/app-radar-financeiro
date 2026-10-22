@@ -1,3 +1,4 @@
+import { TemaService } from '../core/tema/tema.service';
 import { Component, signal } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
@@ -14,34 +15,44 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
     await TestBed.configureTestingModule({
       imports: [AppShell],
       providers: [
+        { provide: TemaService, useValue: {
+          efetivo: signal('CLARO'),
+          carregando: signal(false),
+          salvando: signal(false),
+          alternarVisibilidade: () => TestBed.inject(PrivacidadeValoresService).alternar(),
+        } },
         provideRouter([
           { path: 'lancamentos/novo', component: PaginaVazia },
           { path: 'entrar', component: PaginaVazia },
         ]),
         { provide: AuthService, useValue: {
           usuario: signal({ nome: 'Pessoa Teste', email: 'pessoa@exemplo.com' }),
-          sair: () => {},
+          sair: () => TestBed.inject(PrivacidadeValoresService).restaurarPadrao(),
         }},
       ],
     }).compileComponents();
   });
 
-  it('inicia valores ocultos e alterna pelo olho em desktop e celular', () => {
+  it('inicia valores exibidos e permite ocultar e exibir pelo olho em desktop e celular', () => {
     const fixture = TestBed.createComponent(AppShell);
     fixture.detectChanges();
     const privacidade = TestBed.inject(PrivacidadeValoresService);
-    expect(privacidade.valoresVisiveis()).toBeFalse();
+    expect(privacidade.valoresVisiveis()).toBeTrue();
     const botoes = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
       '.toggle-privacidade',
     );
     expect(botoes.length).toBe(2);
-    expect(botoes[0].getAttribute('aria-label')).toBe('Mostrar valores financeiros');
+    expect(botoes[0].getAttribute('aria-label')).toBe('Ocultar valores financeiros');
     botoes[0].click();
     fixture.detectChanges();
-    expect(privacidade.valoresVisiveis()).toBeTrue();
-    expect(botoes[1].getAttribute('aria-label')).toBe('Ocultar valores financeiros');
-    fixture.componentInstance.sair();
     expect(privacidade.valoresVisiveis()).toBeFalse();
+    expect(botoes[1].getAttribute('aria-label')).toBe('Mostrar valores financeiros');
+    botoes[1].click();
+    fixture.detectChanges();
+    expect(privacidade.valoresVisiveis()).toBeTrue();
+    privacidade.ocultar();
+    fixture.componentInstance.sair();
+    expect(privacidade.valoresVisiveis()).toBeTrue();
   });
 
   it('renderiza ícones Font Awesome nos menus desktop e mobile', () => {
@@ -56,6 +67,7 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
 
     conferir('.sidebar-link[href="/"]', 'table-cells-large');
     conferir('.sidebar-link[href="/lancamentos"]', 'list-ul');
+    conferir('.sidebar-link[href="/transferencias"]', 'arrow-right-arrow-left');
     conferir('.sidebar-group:first-of-type .sidebar-group-trigger', 'folder-open');
     conferir('.sidebar-group:nth-of-type(2) .sidebar-group-trigger', 'gear');
     conferir('.mobile-bottom-nav a[href="/"]', 'table-cells-large');
@@ -83,8 +95,8 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
       .toBe('/lancamentos/novo?tipo=RECEITA');
     expect(raiz.querySelector('a[aria-label="Nova despesa"]')?.getAttribute('href'))
       .toBe('/lancamentos/novo?tipo=DESPESA');
-    expect(raiz.querySelector<HTMLButtonElement>('button[aria-label^="Nova transferência"]')?.disabled)
-      .toBeTrue();
+    expect(raiz.querySelector('a[aria-label="Nova transferência"]')?.getAttribute('href'))
+      .toBe('/transferencias/novo');
     expect(raiz.querySelector('[aria-label="Nova receita"] .lancamento-speed-letra')?.textContent)
       .toBe('R');
     expect(raiz.querySelector('[aria-label="Nova receita"]')?.classList.contains('receita'))
@@ -93,9 +105,9 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
       .toBe('D');
     expect(raiz.querySelector('[aria-label="Nova despesa"]')?.classList.contains('despesa'))
       .toBeTrue();
-    expect(raiz.querySelector('button[aria-label^="Nova transferência"] .lancamento-speed-letra')?.textContent)
+    expect(raiz.querySelector('a[aria-label="Nova transferência"] .lancamento-speed-letra')?.textContent)
       .toBe('T');
-    expect(raiz.querySelector('.lancamento-speed-opcao.transferencia.indisponivel')).not.toBeNull();
+    expect(raiz.querySelector('.lancamento-speed-opcao.transferencia.indisponivel')).toBeNull();
     raiz.querySelector('.lancamento-speed-dial')?.dispatchEvent(
       new PointerEvent('pointerleave', { pointerType:'mouse' }),
     );

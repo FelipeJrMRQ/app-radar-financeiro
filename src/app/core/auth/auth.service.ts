@@ -127,7 +127,7 @@ export class AuthService {
   }
 
   sair(): void {
-    this.privacidade.ocultar();
+    this.privacidade.restaurarPadrao();
     this.revisaoSessao++;
     this.tokenState.set(null);
     this.expiracaoState.set(0);

@@ -1,3 +1,5 @@
+import { signal } from '@angular/core';
+import { TemaService } from '../../../../core/tema/tema.service';
 import { TestBed } from '@angular/core/testing';
 
 import { DespesasCategoriaCardComponent } from './despesas-categoria.component';
@@ -5,6 +7,7 @@ import { DespesasCategoriaCardComponent } from './despesas-categoria.component';
 describe('Despesas por categoria com Chart.js Doughnut', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      providers: [{ provide: TemaService, useValue: { efetivo: signal('CLARO') } }],
       imports: [DespesasCategoriaCardComponent],
     }).compileComponents();
   });
