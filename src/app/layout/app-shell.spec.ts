@@ -27,7 +27,7 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
         ]),
         { provide: AuthService, useValue: {
           usuario: signal({ nome: 'Pessoa Teste', email: 'pessoa@exemplo.com' }),
-          sair: () => {},
+          sair: () => TestBed.inject(PrivacidadeValoresService).restaurarPadrao(),
         }},
       ],
     }).compileComponents();
