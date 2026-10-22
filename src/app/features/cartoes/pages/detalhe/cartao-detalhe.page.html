@@ -1,0 +1,209 @@
+<section class="cartoes-page">
+  <a routerLink="/cartoes" class="cartoes-back">← Todos os cartões</a>
+  @if (erro()) {
+    <p class="cartoes-error" role="alert">{{ erro() }}
+      <button type="button" class="cartoes-secondary" (click)="carregar()">Tentar novamente</button>
+    </p>
+  }
+  @if (sucesso()) { <p class="cartoes-success" role="status">{{ sucesso() }}</p> }
+  @if (carregando()) {
+    <div class="cartoes-empty" role="status">Carregando compras e faturas…</div>
+  } @else if (cartao(); as cartaoAtual) {
+    <header class="cartoes-heading">
+      <div>
+        <span class="cartoes-eyebrow">CARTÃO DE CRÉDITO</span>
+        <h1>{{ cartaoAtual.nome }}</h1>
+        <p>Fechamento no dia {{ cartaoAtual.diaFechamento }} · vencimento no dia {{ cartaoAtual.diaVencimento }}.</p>
+      </div>
+      <div class="cartoes-acoes">
+        @if (cartaoAtual.ativo) {
+          <a class="cartoes-primary" [routerLink]="['/cartoes', cartaoId, 'compras', 'nova']">+ Nova compra</a>
+          <a class="cartoes-secondary" [routerLink]="['/cartoes', cartaoId, 'editar']">Editar cartão</a>
+        }
+      </div>
+    </header>
+
+    <section class="cartoes-panel" aria-label="Limite cadastrado">
+      <div class="cartoes-summary">
+        <div>
+          <span>Limite total cadastrado</span>
+          <strong>{{ privacidade.valoresVisiveis() ? moeda(cartaoAtual.limiteCredito) : '••••••' }}</strong>
+        </div>
+        <div>
+          <span>Ciclo de fatura</span>
+          <strong>Dia {{ cartaoAtual.diaFechamento }} / {{ cartaoAtual.diaVencimento }}</strong>
+        </div>
+      </div>
+      <p class="cartoes-small">O limite informado não representa o crédito disponível.
+        Não subtraímos compras no navegador para estimá-lo.</p>
+    </section>
+
+    <section class="cartoes-panel" aria-labelledby="cartoes-faturas-titulo">
+      <div class="cartoes-split">
+        <div>
+          <span class="cartoes-eyebrow">PAGAMENTOS E CICLOS</span>
+          <h2 id="cartoes-faturas-titulo">Faturas</h2>
+          <p>Selecione uma competência existente ou gere uma nova fatura na API.</p>
+        </div>
+        <div class="cartoes-field">
+          <label for="cartao-competencia">Competência</label>
+          <input id="cartao-competencia" type="month"
+            [value]="competencia()" (change)="atualizarCompetencia($event)" />
+        </div>
+      </div>
+      <div class="cartoes-acoes">
+        @for (resumo of faturas(); track resumo.id) {
+          <button type="button" class="cartoes-secondary"
+            [attr.aria-pressed]="competencia() === resumo.competencia.slice(0, 7)"
+            (click)="selecionarCompetencia(resumo.competencia)">
+            {{ resumo.competencia.slice(0, 7) }} · {{ privacidade.valoresVisiveis() ? moeda(resumo.total) : '••••••' }}
+          </button>
+        }
+      </div>
+      @if (carregandoFatura()) { <p role="status" class="cartoes-small">Consultando fatura…</p> }
+      @if (erroFatura()) { <p class="cartoes-error" role="alert">{{ erroFatura() }}</p> }
+      @if (!fatura() && !carregandoFatura()) {
+        <div class="cartoes-empty">
+          <p>Nenhuma fatura carregada para {{ competencia() }}.</p>
+          <button class="cartoes-primary" type="button" [disabled]="operando()"
+            (click)="gerarFatura()">{{ operando() ? 'Processando…' : 'Gerar/abrir fatura' }}</button>
+        </div>
+      }
+      @if (fatura(); as atual) {
+        <div class="cartoes-summary">
+          <div><span>Total da fatura</span>
+            <strong>{{ privacidade.valoresVisiveis() ? moeda(atual.total) : '••••••' }}</strong></div>
+          <div><span>Fechamento</span><strong>{{ data(atual.dataFechamento) }}</strong></div>
+          <div><span>Vencimento</span><strong>{{ data(atual.dataVencimento) }}</strong></div>
+        </div>
+        <h3>Itens da fatura</h3>
+        @if (atual.itens.length === 0) {
+          <p class="cartoes-small">Sem compras neste ciclo.</p>
+        } @else {
+          @for (item of atual.itens; track $index) {
+            <div class="cartoes-row">
+              <div class="cartoes-row-details">
+                <strong>{{ item.descricao }}</strong>
+                <small>{{ item.categoriaNome }} · {{ data(item.dataReferencia) }}
+                  @if (item.numeroParcela) { · {{ item.numeroParcela }}/{{ item.quantidadeParcelas }} }</small>
+              </div>
+              <span class="cartoes-row-value">{{ privacidade.valoresVisiveis() ? moeda(item.valor) : '••••••' }}</span>
+            </div>
+          }
+        }
+        @if (pagamentos(); as resumo) {
+          <div class="cartoes-summary" style="margin-top:18px">
+            <div><span>Pago</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.totalPago) : '••••••' }}</strong></div>
+            <div><span>Saldo restante</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.saldoRestante) : '••••••' }}</strong></div>
+            <div><span>Situação</span><strong>{{ resumo.quitada ? 'Quitada' : 'Em aberto' }}</strong></div>
+          </div>
+          @if (!resumo.quitada && contas().length > 0) {
+            <h3>Registrar pagamento da fatura</h3>
+            <form [formGroup]="formPagamento" (ngSubmit)="pagar()" novalidate>
+              <div class="cartoes-field-grid">
+                <div class="cartoes-field">
+                  <label for="cartao-conta-pagamento">Conta financeira</label>
+                  <select id="cartao-conta-pagamento" formControlName="contaFinanceiraId">
+                    <option [ngValue]="null">Selecione uma conta</option>
+                    @for (conta of contas(); track conta.id) {
+                      <option [ngValue]="conta.id">{{ conta.nome }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="cartoes-field">
+                  <label for="cartao-valor-pagamento">Valor do pagamento</label>
+                  <input id="cartao-valor-pagamento" type="text" inputmode="numeric"
+                    formControlName="valorPago" rfMoedaBr placeholder="R$ 0,00" />
+                  <small>Informe o valor total ou parcial; o servidor valida o saldo restante.</small>
+                </div>
+                <div class="cartoes-field">
+                  <label for="cartao-data-pagamento">Data do pagamento</label>
+                  <input id="cartao-data-pagamento" type="date"
+                    formControlName="dataPagamento" [max]="hoje" />
+                </div>
+              </div>
+              <button class="cartoes-primary" type="submit" [disabled]="operando()">
+                {{ operando() ? 'Registrando…' : 'Registrar pagamento' }}
+              </button>
+            </form>
+          } @else if (!resumo.quitada) {
+            <p class="cartoes-note">Cadastre uma conta financeira ativa para pagar a fatura.</p>
+          }
+          @if (resumo.pagamentos.length > 0) {
+            <h3>Pagamentos realizados</h3>
+            @for (pagamento of resumo.pagamentos; track pagamento.id) {
+              <div class="cartoes-row">
+                <div class="cartoes-row-details">
+                  <strong>{{ pagamento.contaFinanceiraNome }}</strong>
+                  <small>{{ data(pagamento.dataPagamento) }} · Pagamento confirmado</small>
+                </div>
+                <strong class="cartoes-row-value">{{ privacidade.valoresVisiveis() ? moeda(pagamento.valorPago) : '••••••' }}</strong>
+                <button class="cartoes-text-danger" type="button" (click)="estornar.set(pagamento)">Estornar</button>
+              </div>
+            }
+          }
+        }
+      }
+    </section>
+
+    <section class="cartoes-panel" aria-labelledby="cartoes-compras-titulo">
+      <div class="cartoes-split">
+        <div><span class="cartoes-eyebrow">REGISTROS DO CARTÃO</span>
+          <h2 id="cartoes-compras-titulo">Compras</h2></div>
+        @if (cartaoAtual.ativo) {
+          <a class="cartoes-secondary" [routerLink]="['/cartoes', cartaoId, 'compras', 'nova']">+ Registrar compra</a>
+        }
+      </div>
+      @if (compras().length === 0) {
+        <div class="cartoes-empty">Nenhuma compra ativa registrada.</div>
+      } @else {
+        @for (compra of comprasVisiveis(); track compra.id) {
+          <div class="cartoes-row">
+            <div class="cartoes-row-details">
+              <strong>{{ compra.descricao }}</strong>
+              <small>{{ compra.categoriaNome }} · {{ data(compra.dataCompra) }}
+                · {{ compra.quantidadeParcelas > 1 ? compra.quantidadeParcelas + ' parcelas' : 'À vista no cartão' }}</small>
+            </div>
+            <strong class="cartoes-row-value">{{ privacidade.valoresVisiveis() ? moeda(compra.valorTotal) : '••••••' }}</strong>
+            @if (cartaoAtual.ativo) {
+              <div class="cartoes-acoes">
+                @if (compra.quantidadeParcelas === 1) {
+                  <a class="cartoes-secondary" [routerLink]="['/cartoes', cartaoId, 'compras', compra.id, 'editar']">Editar</a>
+                }
+                <button class="cartoes-text-danger" type="button" (click)="cancelarCompra.set(compra)">Cancelar</button>
+              </div>
+            }
+          </div>
+        }
+        @if (compras().length > comprasVisiveis().length) {
+          <button type="button" class="cartoes-secondary" (click)="limiteCompras.update(v => v + 20)">Mostrar mais compras</button>
+        }
+      }
+    </section>
+  }
+  @if (cancelarCompra(); as item) {
+    <div class="cartoes-modal-backdrop" aria-hidden="true"></div>
+    <div class="cartoes-modal" role="dialog" aria-modal="true" aria-labelledby="cancelar-compra-titulo">
+      <h2 id="cancelar-compra-titulo">Cancelar compra?</h2>
+      <p>{{ item.descricao }}. A API não permite alterar compras vinculadas a fatura paga.</p>
+      @if (erro()) { <p class="cartoes-error" role="alert">{{ erro() }}</p> }
+      <div class="cartoes-acoes">
+        <button type="button" class="cartoes-secondary" [disabled]="operando()" (click)="cancelarCompra.set(null)">Voltar</button>
+        <button type="button" class="cartoes-danger" [disabled]="operando()" (click)="confirmarCancelamentoCompra()">Confirmar cancelamento</button>
+      </div>
+    </div>
+  }
+  @if (estornar(); as pagamento) {
+    <div class="cartoes-modal-backdrop" aria-hidden="true"></div>
+    <div class="cartoes-modal" role="dialog" aria-modal="true" aria-labelledby="estorno-pagamento-titulo">
+      <h2 id="estorno-pagamento-titulo">Estornar pagamento?</h2>
+      <p>O estorno de {{ data(pagamento.dataPagamento) }} pode alterar o saldo da conta financeira.
+        Utilize somente para corrigir pagamentos registrados incorretamente.</p>
+      @if (erroFatura()) { <p class="cartoes-error" role="alert">{{ erroFatura() }}</p> }
+      <div class="cartoes-acoes">
+        <button class="cartoes-secondary" type="button" [disabled]="operando()" (click)="estornar.set(null)">Cancelar</button>
+        <button class="cartoes-danger" type="button" [disabled]="operando()" (click)="confirmarEstorno()">Confirmar estorno</button>
+      </div>
+    </div>
+  }
+</section>
