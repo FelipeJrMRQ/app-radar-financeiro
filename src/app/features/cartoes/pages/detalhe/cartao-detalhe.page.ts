@@ -56,6 +56,12 @@ export class CartaoDetalhePage implements OnInit {
     const restante = this.pagamentos()?.saldoRestante;
     return restante == null ? null : String(restante);
   });
+  readonly saldoPendente = computed(() => {
+    const exato = this.saldoRestanteExato();
+    // A API usa decimal em formato JSON, não o formato monetário pt-BR.
+    return exato != null && /^\d+(?:\.\d{1,4})?$/.test(exato)
+      && /[1-9]/.test(exato);
+  });
   readonly fatura = signal<FaturaCartao | null>(null);
   readonly pagamentos = signal<ResumoPagamentos | null>(null);
   readonly limiteCompras = signal(20);
@@ -178,7 +184,7 @@ export class CartaoDetalhePage implements OnInit {
     this.formPagamento.controls.contaFinanceiraId.markAsTouched();
     const dados = this.formPagamento.getRawValue();
     const restante = this.saldoRestanteExato();
-    if (this.operando() || !restante || !decimalPositivo(restante) ||
+    if (this.operando() || !this.saldoPendente() || !restante ||
       !dados.contaFinanceiraId || dados.dataPagamento > this.hoje ||
       !this.contas().some(c => c.id === dados.contaFinanceiraId)) return;
 

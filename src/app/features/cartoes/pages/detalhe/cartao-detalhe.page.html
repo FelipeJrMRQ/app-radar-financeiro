@@ -93,9 +93,9 @@
           <div class="cartoes-summary" style="margin-top:18px">
             <div><span>Pago</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.totalPago) : '••••••' }}</strong></div>
             <div><span>Saldo restante</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.saldoRestante) : '••••••' }}</strong></div>
-            <div><span>Situação</span><strong>{{ resumo.quitada ? 'Quitada' : 'Em aberto' }}</strong></div>
+            <div><span>Situação</span><strong>{{ resumo.quitada ? 'Quitada' : saldoPendente() ? 'Em aberto' : 'Sem movimentações' }}</strong></div>
           </div>
-          @if (!resumo.quitada && contas().length > 0) {
+          @if (!resumo.quitada && saldoPendente() && contas().length > 0) {
             <h3>Pagamento da fatura</h3>
             <p class="cartoes-small">Você pode pagar o saldo integral calculado pelo servidor
               ou registrar apenas uma parte. Para pagamentos parciais, informe um valor.</p>
@@ -132,7 +132,7 @@
                 </button>
               </div>
             </form>
-          } @else if (!resumo.quitada) {
+          } @else if (!resumo.quitada && saldoPendente()) {
             <p class="cartoes-note">Cadastre uma conta financeira ativa para pagar a fatura.</p>
           }
           @if (resumo.pagamentos.length > 0) {
