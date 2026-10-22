@@ -170,6 +170,9 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     expect(fixture.componentInstance.contasGraficoIds()).toEqual([7, 8]);
     expect(fluxoCaixaConsolidado).not.toHaveBeenCalledWith([7], jasmine.any(String), jasmine.any(String));
     expect(raiz.querySelector('.cash-balances-total')?.textContent).toContain('119,76');
+    expect(raiz.querySelector('.cash-balances-total')?.textContent).not.toContain('630,24');
+    (raiz.querySelector('.cash-balances-switch') as HTMLButtonElement).click();
+    fixture.detectChanges();
     expect(raiz.querySelector('.cash-balances-total')?.textContent).toContain('630,24');
     expect(raiz.querySelector('.stats-grid')?.textContent).toContain('1.619,76');
   });
