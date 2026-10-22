@@ -1,3 +1,4 @@
+import { TemaService } from '../core/tema/tema.service';
 import { Component, signal } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
@@ -14,6 +15,7 @@ describe('Ação flutuante de lançamento no layout responsivo', () => {
     await TestBed.configureTestingModule({
       imports: [AppShell],
       providers: [
+        { provide: TemaService, useValue: { efetivo: signal('CLARO') } },
         provideRouter([
           { path: 'lancamentos/novo', component: PaginaVazia },
           { path: 'entrar', component: PaginaVazia },

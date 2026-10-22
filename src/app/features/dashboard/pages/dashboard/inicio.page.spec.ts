@@ -1,3 +1,4 @@
+import { TemaService } from '../../../../core/tema/tema.service';
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { PrivacidadeValoresService } from '../../../../core/privacidade/privacidade-valores.service';
@@ -50,6 +51,7 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     await TestBed.configureTestingModule({
       imports: [InicioPage],
       providers: [
+        { provide: TemaService, useValue: { efetivo: signal('CLARO') } },
         provideRouter([]),
         { provide: PrivacidadeValoresService, useValue: { valoresVisiveis: visibilidade.asReadonly() } },
         { provide: AuthService, useValue: { usuario: () => ({ nome: 'Teste' }) } },
