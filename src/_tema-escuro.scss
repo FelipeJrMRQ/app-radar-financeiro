@@ -280,3 +280,121 @@ html[data-theme='dark'] .auth-main :is(.form-error, .form-success) {
 }
 html[data-theme='dark'] .auth-main .form-error { color: var(--rf-theme-negative); }
 html[data-theme='dark'] .auth-main .form-success { color: var(--rf-theme-accent); }
+
+/* Dashboard e Chart.js: superfícies e legendas acompanham o tema. */
+html[data-theme='dark'] .dashboard :is(
+  .month-controls, .dashboard-state, .stat-card, .panel,
+  .cash-flow-panel, .shortcuts a, .secondary-action,
+  .chart-select-label select, .cash-flow-account,
+  .cash-flow-zero-toggle, .cash-flow-accounts-heading button,
+  .account-head-row
+) {
+  background: var(--rf-theme-surface);
+  color: var(--rf-theme-text);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .dashboard :is(
+  .month-controls button, .shortcuts a span, .cash-flow-count,
+  .cash-flow-account.checked, .cash-flow-zero-toggle,
+  .cash-flow-accounts-heading button
+) {
+  background: var(--rf-theme-raised);
+  color: var(--rf-theme-accent);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .dashboard :is(
+  .month-controls span, .panel-head h2, .cash-flow-heading h2,
+  .cash-flow-accounts-heading strong, .due-description strong,
+  .account-row, .account-name, .account-row strong,
+  .account-footer strong, .stat-card > strong,
+  .category-doughnut-center strong, .category-doughnut-legend-value,
+  .category-doughnut-legend-text > span
+) { color: var(--rf-theme-text); }
+html[data-theme='dark'] .dashboard :is(
+  .dashboard-heading p, .stat-label, .stat-card > small, .empty-data,
+  .date-block, .due-description small, .account-head-row, .account-value-label,
+  .chart-legend, .chart-select-label, .chart-footer, .scope-note,
+  .cash-flow-hidden-note, .cash-flow-chart-notes, .cash-flow-projection-note,
+  .cash-flow-empty, .category-doughnut-center span,
+  .category-doughnut-legend-text small
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .dashboard :is(
+  .due-row, .account-row, .chart-footer, .scope-note,
+  .cash-flow-accounts, .category-doughnut-legend-item
+) { border-color: var(--rf-theme-border); }
+html[data-theme='dark'] .dashboard .panel :is(.income-text, .projection-text) {
+  color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .dashboard :is(.income-text, .projection-text) {
+  color: var(--rf-theme-accent) !important;
+}
+html[data-theme='dark'] .dashboard :is(.expense-text, .projection-text.negative) {
+  color: var(--rf-theme-negative) !important;
+}
+html[data-theme='dark'] .dashboard :is(.empty-data a, .panel-link, .secondary-action) {
+  color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .dashboard .late-label {
+  color: var(--rf-theme-warning);
+  background: var(--rf-theme-warning-soft);
+}
+html[data-theme='dark'] .dashboard .cash-flow-preferences-error {
+  color: var(--rf-theme-negative);
+}
+html[data-theme='dark'] .dashboard .cash-flow-account:hover,
+html[data-theme='dark'] .dashboard .shortcuts a:hover {
+  background: var(--rf-theme-raised);
+  border-color: var(--rf-theme-accent);
+}
+html[data-theme='dark'] .dashboard :is(
+  .axis-label, .cash-flow-chart-notes, .category-doughnut-legend-text small
+) { fill: var(--rf-theme-muted); }
+html[data-theme='dark'] .dashboard .gridline { stroke: var(--rf-theme-border); }
+
+/* Configurações: escolhas de tema, cartões e preferências do painel. */
+html[data-theme='dark'] .configuracoes-page :is(
+  .aparencia-bloco, .menu-card
+) {
+  background: var(--rf-theme-surface);
+  border-color: var(--rf-theme-border);
+}
+html[data-theme='dark'] .configuracoes-page :is(
+  .menu-card.unavailable, .unavailable .card-icon, .tag
+) { background: var(--rf-theme-subtle); }
+html[data-theme='dark'] .configuracoes-page :is(
+  .card-copy strong, .card-arrow, .card-icon
+) { color: var(--rf-theme-accent); }
+html[data-theme='dark'] .configuracoes-page :is(
+  .card-copy > span, .page-heading p
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .configuracoes-page .tema-opcao {
+  background: var(--rf-theme-raised);
+  border-color: var(--rf-theme-border);
+  color: var(--rf-theme-text);
+}
+html[data-theme='dark'] .configuracoes-page .tema-opcao.selecionado {
+  background: var(--rf-theme-accent-soft);
+  border-color: var(--rf-theme-accent);
+}
+
+/* Personalizar painel: ordenação, visibilidade e feedback. */
+html[data-theme='dark'] .personalizar-page :is(
+  .config-card, .preference-row
+) { background: var(--rf-theme-surface); border-color: var(--rf-theme-border); }
+html[data-theme='dark'] .personalizar-page :is(
+  .config-intro h2, .name, .quantity, .visible-text, .sequence
+) { color: var(--rf-theme-text); }
+html[data-theme='dark'] .personalizar-page :is(
+  .hint, .heading p, .config-intro p
+) { color: var(--rf-theme-muted); }
+html[data-theme='dark'] .personalizar-page .drag-target {
+  background: var(--rf-theme-accent-soft);
+}
+html[data-theme='dark'] .personalizar-page .message.error {
+  background: var(--rf-theme-negative-soft);
+  color: var(--rf-theme-negative);
+}
+html[data-theme='dark'] .personalizar-page .message.success {
+  background: var(--rf-theme-accent-soft);
+  color: var(--rf-theme-accent);
+}

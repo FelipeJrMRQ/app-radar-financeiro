@@ -1,3 +1,5 @@
+import { signal } from '@angular/core';
+import { TemaService } from '../../../../core/tema/tema.service';
 import { TestBed } from '@angular/core/testing';
 
 import { FluxoCaixaCardComponent } from './fluxo-caixa.component';
@@ -18,6 +20,7 @@ describe('Fluxo de caixa consolidado', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      providers: [{ provide: TemaService, useValue: { efetivo: signal('CLARO') } }],
       imports: [FluxoCaixaCardComponent],
     }).compileComponents();
   });

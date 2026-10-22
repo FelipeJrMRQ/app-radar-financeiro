@@ -6,6 +6,7 @@ import type { Chart, ScriptableContext } from 'chart.js';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
+import { TemaService } from '../../../../core/tema/tema.service';
 import { formatarDataLocal, formatarMoeda } from '../../../../shared/valor-monetario';
 import { FluxoCaixaConsolidado, SaldoContaPainel } from '../../models/painel-financeiro.model';
 import { criarSerieConsolidadaParaGrafico } from '../../utils/painel-visuais';
@@ -33,6 +34,7 @@ export class FluxoCaixaCardComponent {
 
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('graficoFluxo');
   private readonly destroyRef = inject(DestroyRef);
+  private readonly tema = inject(TemaService);
   private grafico: Chart | null = null;
   private versao = 0;
 
@@ -50,11 +52,12 @@ export class FluxoCaixaCardComponent {
       const dados = this.fluxo();
       // Refaz o gráfico ao alternar a privacidade, atualizando eixo e interações.
       const valoresVisiveis = this.valoresVisiveis();
+      const modoEscuro = this.tema.efetivo() === 'ESCURO';
       const versao = ++this.versao;
       this.grafico?.destroy();
       this.grafico = null;
       if (canvas && dados?.pontos?.length) {
-        void this.desenhar(canvas, dados, versao, valoresVisiveis);
+        void this.desenhar(canvas, dados, versao, valoresVisiveis, modoEscuro);
       }
     });
     this.destroyRef.onDestroy(() => {
@@ -82,13 +85,19 @@ export class FluxoCaixaCardComponent {
 
   async desenhar(
     canvas: HTMLCanvasElement, dados: FluxoCaixaConsolidado, versao: number,
-    valoresVisiveis: boolean,
+    valoresVisiveis: boolean, modoEscuro: boolean,
   ): Promise<void> {
     // Lazy load: Chart.js não faz parte do bundle inicial do painel.
     const { default: ChartJs } = await import('chart.js/auto');
     if (this.destroyRef.destroyed || versao !== this.versao ||
         this.canvas()?.nativeElement !== canvas) return;
 
+    const corTexto = modoEscuro ? '#b4c9d4' : '#637e8d';
+    const corRealizado = modoEscuro ? '#6fe3cd' : '#278f7d';
+    const corNegativo = modoEscuro ? '#f08791' : '#d04a58';
+    const fundoTooltip = modoEscuro ? '#223947' : '#faffff';
+    const textoTooltip = modoEscuro ? '#e6f3f5' : '#173447';
+    const bordaTooltip = modoEscuro ? '#446370' : '#cee1e3';
     const hoje = dados.pontos.findIndex(ponto => ponto.data === dados.dataHoje);
     const escalaReais = new Intl.NumberFormat('pt-BR', {
       notation: 'compact', maximumFractionDigits: 1,
@@ -102,7 +111,7 @@ export class FluxoCaixaCardComponent {
         if (!Number.isFinite(x)) return;
         const ctx = grafico.ctx;
         ctx.save();
-        ctx.strokeStyle = 'rgba(8, 125, 115, 0.56)';
+        ctx.strokeStyle = modoEscuro ? '#6fe3cd99' : 'rgba(8, 125, 115, 0.56)';
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 5]);
         ctx.beginPath();
@@ -110,7 +119,7 @@ export class FluxoCaixaCardComponent {
         ctx.lineTo(x, bottom);
         ctx.stroke();
         ctx.setLineDash([]);
-        ctx.fillStyle = '#087d73';
+        ctx.fillStyle = corRealizado;
         ctx.font = '600 11px sans-serif';
         ctx.fillText('Hoje', Math.min(x + 6, right - 30), top + 13);
         ctx.restore();
@@ -125,8 +134,8 @@ export class FluxoCaixaCardComponent {
           label: 'Saldo consolidado',
           data: valores,
           parsing: false,
-          borderColor: '#278f7d',
-          backgroundColor: '#b7ded4',
+          borderColor: corRealizado,
+          backgroundColor: modoEscuro ? '#21483f' : '#b7ded4',
           borderWidth: 2.7,
           tension: 0,
           fill: false,
@@ -134,12 +143,12 @@ export class FluxoCaixaCardComponent {
             valores[ctx.dataIndex]?.x === hoje ? 4 : 0,
           pointHoverRadius: 6,
           pointHitRadius: 14,
-          pointBackgroundColor: '#e5f7f1',
-          pointBorderColor: '#12836f',
+          pointBackgroundColor: modoEscuro ? '#223947' : '#e5f7f1',
+          pointBorderColor: corRealizado,
           pointBorderWidth: 1.5,
           segment: {
             borderColor: (ctx) =>
-              (ctx.p0.parsed.y ?? 0) < 0 || (ctx.p1.parsed.y ?? 0) < 0 ? '#d04a58' : '#278f7d',
+              (ctx.p0.parsed.y ?? 0) < 0 || (ctx.p1.parsed.y ?? 0) < 0 ? corNegativo : corRealizado,
             borderDash: (ctx) =>
               (ctx.p0.parsed.x ?? -1) >= hoje && hoje >= 0 ? [5, 4] : [],
           },
@@ -161,10 +170,10 @@ export class FluxoCaixaCardComponent {
             // Cruzamentos interpolados não são datas financeiras nem valores realizados.
             filter: (item) => Number.isInteger(item.parsed.x ?? NaN),
             displayColors: false,
-            backgroundColor: '#faffff',
-            titleColor: '#173447',
-            bodyColor: '#173447',
-            borderColor: '#cee1e3',
+            backgroundColor: fundoTooltip,
+            titleColor: textoTooltip,
+            bodyColor: textoTooltip,
+            borderColor: bordaTooltip,
             borderWidth: 1,
             padding: 12,
             callbacks: {
@@ -190,7 +199,7 @@ export class FluxoCaixaCardComponent {
             border: { display: false },
             grid: { display: false },
             ticks: {
-              color: '#637e8d',
+              color: corTexto,
               maxTicksLimit: 7,
               autoSkip: true,
               maxRotation: 0,
@@ -207,7 +216,7 @@ export class FluxoCaixaCardComponent {
             grace: '12%',
             border: { display: false },
             ticks: {
-              color: '#637e8d',
+              color: corTexto,
               maxTicksLimit: 5,
               callback: (valor) => valoresVisiveis ? escalaReais.format(Number(valor)) : '',
             },

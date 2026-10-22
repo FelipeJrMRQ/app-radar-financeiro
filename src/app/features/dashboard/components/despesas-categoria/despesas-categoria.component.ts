@@ -3,6 +3,7 @@ import {
 } from '@angular/core';
 import type { Chart } from 'chart.js';
 
+import { TemaService } from '../../../../core/tema/tema.service';
 import { TotalCategoria } from '../../models/painel-financeiro.model';
 import { DadosDespesasRosca, prepararDespesasRosca } from '../../utils/despesas-rosca';
 
@@ -18,6 +19,7 @@ export class DespesasCategoriaCardComponent {
   readonly dadosRosca = computed(() => prepararDespesasRosca(this.categorias()));
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('graficoDespesas');
   private readonly destroyRef = inject(DestroyRef);
+  private readonly tema = inject(TemaService);
   private grafico: Chart | null = null;
   private versao = 0;
 
@@ -26,11 +28,12 @@ export class DespesasCategoriaCardComponent {
       const canvas = this.canvas()?.nativeElement;
       const dados = this.dadosRosca();
       const erro = this.erroCategorias();
+      const modoEscuro = this.tema.efetivo() === 'ESCURO';
       const versaoAtual = ++this.versao;
       this.grafico?.destroy();
       this.grafico = null;
       if (canvas && !erro && dados.fatias.length) {
-        void this.desenhar(canvas, dados, versaoAtual);
+        void this.desenhar(canvas, dados, versaoAtual, modoEscuro);
       }
     });
 
@@ -42,7 +45,7 @@ export class DespesasCategoriaCardComponent {
   }
 
   private async desenhar(
-    canvas: HTMLCanvasElement, dados: DadosDespesasRosca, versao: number,
+    canvas: HTMLCanvasElement, dados: DadosDespesasRosca, versao: number, modoEscuro: boolean,
   ): Promise<void> {
     // Reaproveita o carregamento sob demanda do Chart.js utilizado no fluxo de caixa.
     const { default: ChartJs } = await import('chart.js/auto');
@@ -57,7 +60,7 @@ export class DespesasCategoriaCardComponent {
           label: 'Despesas realizadas',
           data: dados.fatias.map(fatia => Number(fatia.valor)),
           backgroundColor: dados.fatias.map(fatia => fatia.cor),
-          borderColor: '#fff',
+          borderColor: modoEscuro ? '#1a2d39' : '#fff',
           borderWidth: 2,
           borderRadius: 3,
           hoverOffset: 7,
@@ -71,10 +74,10 @@ export class DespesasCategoriaCardComponent {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#fff',
-            titleColor: '#173447',
-            bodyColor: '#173447',
-            borderColor: '#d7e5e8',
+            backgroundColor: modoEscuro ? '#223947' : '#fff',
+            titleColor: modoEscuro ? '#e6f3f5' : '#173447',
+            bodyColor: modoEscuro ? '#e6f3f5' : '#173447',
+            borderColor: modoEscuro ? '#446370' : '#d7e5e8',
             borderWidth: 1,
             padding: 12,
             callbacks: {
