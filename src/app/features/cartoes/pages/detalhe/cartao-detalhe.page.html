@@ -79,11 +79,18 @@
             Navegue para o mês seguinte para consultar futuras parcelas.</p>
         } @else {
           @for (item of atual.itens; track $index) {
-            <div class="cartoes-row">
+            <div class="cartoes-row cartoes-fatura-item-row">
               <div class="cartoes-row-details">
-                <strong>{{ item.descricao }}</strong>
-                <small>{{ item.categoriaNome }} · {{ data(item.dataReferencia) }}
-                  @if (item.numeroParcela) { · {{ item.numeroParcela }}/{{ item.quantidadeParcelas }} }</small>
+                <strong class="cartoes-row-nome" [title]="item.descricao">{{ item.descricao }}</strong>
+                <small class="cartoes-row-meta"
+                  [title]="item.categoriaNome + ' · ' + data(item.dataReferencia)
+                    + (item.numeroParcela ? ' · Parcela ' + item.numeroParcela + ' de ' + item.quantidadeParcelas : '')">
+                  <span class="cartoes-row-categoria">{{ item.categoriaNome }}</span>
+                  <span class="cartoes-row-meta-fixo">
+                    · <time [attr.datetime]="item.dataReferencia">{{ dataCurta(item.dataReferencia) }}</time>
+                    @if (item.numeroParcela) { · {{ item.numeroParcela }}/{{ item.quantidadeParcelas }} }
+                  </span>
+                </small>
               </div>
               <span class="cartoes-row-value">{{ privacidade.valoresVisiveis() ? moeda(item.valor) : '••••••' }}</span>
             </div>
@@ -110,10 +117,12 @@
           @if (resumo.pagamentos.length > 0) {
             <h3>Pagamentos realizados</h3>
             @for (pagamento of resumo.pagamentos; track pagamento.id) {
-              <div class="cartoes-row">
+              <div class="cartoes-row cartoes-pagamento-item-row">
                 <div class="cartoes-row-details">
-                  <strong>{{ pagamento.contaFinanceiraNome }}</strong>
-                  <small>{{ data(pagamento.dataPagamento) }} · Pagamento confirmado</small>
+                  <strong class="cartoes-row-nome" [title]="pagamento.contaFinanceiraNome">{{ pagamento.contaFinanceiraNome }}</strong>
+                  <small [title]="data(pagamento.dataPagamento) + ' · Pagamento confirmado'">
+                    {{ dataCurta(pagamento.dataPagamento) }} · Pagamento confirmado
+                  </small>
                 </div>
                 <strong class="cartoes-row-value">{{ privacidade.valoresVisiveis() ? moeda(pagamento.valorPago) : '••••••' }}</strong>
                 <button class="cartoes-text-danger" type="button" (click)="estornar.set(pagamento)">Estornar</button>
@@ -136,15 +145,22 @@
         <div class="cartoes-empty">Nenhuma compra ativa registrada.</div>
       } @else {
         @for (compra of comprasVisiveis(); track compra.id) {
-          <div class="cartoes-row">
+          <div class="cartoes-row cartoes-compra-row">
             <div class="cartoes-row-details">
-              <strong>{{ compra.descricao }}</strong>
-              <small>{{ compra.categoriaNome }} · {{ data(compra.dataCompra) }}
-                · {{ compra.quantidadeParcelas > 1 ? compra.quantidadeParcelas + ' parcelas' : 'À vista no cartão' }}</small>
+              <strong class="cartoes-row-nome" [title]="compra.descricao">{{ compra.descricao }}</strong>
+              <small class="cartoes-row-meta"
+                [title]="compra.categoriaNome + ' · ' + data(compra.dataCompra)
+                  + ' · ' + (compra.quantidadeParcelas > 1 ? compra.quantidadeParcelas + ' parcelas' : 'À vista no cartão')">
+                <span class="cartoes-row-categoria">{{ compra.categoriaNome }}</span>
+                <span class="cartoes-row-meta-fixo">
+                  · <time [attr.datetime]="compra.dataCompra">{{ dataCurta(compra.dataCompra) }}</time>
+                  · {{ compra.quantidadeParcelas > 1 ? compra.quantidadeParcelas + 'x' : 'À vista' }}
+                </span>
+              </small>
             </div>
             <strong class="cartoes-row-value">{{ privacidade.valoresVisiveis() ? moeda(compra.valorTotal) : '••••••' }}</strong>
             @if (cartaoAtual.ativo) {
-              <div class="cartoes-acoes">
+              <div class="cartoes-acoes cartoes-compra-acoes">
                 @if (compra.quantidadeParcelas === 1) {
                   <a class="cartoes-secondary" [routerLink]="['/cartoes', cartaoId, 'compras', compra.id, 'editar']">Editar</a>
                 }

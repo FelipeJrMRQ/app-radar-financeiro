@@ -23,6 +23,12 @@ export class CartaoDetalhePage implements OnInit {
   readonly privacidade = inject(PrivacidadeValoresService);
   readonly moeda = formatarMoeda;
   readonly data = formatarDataLocal;
+
+  /** Datas compactas nas listas; data ISO e ano completo permanecem disponíveis. */
+  dataCurta(data: string): string {
+    const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(data);
+    return partes ? `${partes[3]}/${partes[2]}/${partes[1].slice(-2)}` : this.data(data);
+  }
   readonly hoje = dataHojeLocal();
 
   readonly carregando = signal(true);
