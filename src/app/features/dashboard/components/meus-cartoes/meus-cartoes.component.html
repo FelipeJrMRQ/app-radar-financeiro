@@ -56,7 +56,7 @@
             [attr.aria-label]="'Utilização estimada do limite de ' + cartao.nome"
             [attr.aria-valuenow]="valoresVisiveis() ? cartao.percentualUtilizacao : null"
             aria-valuemin="0" aria-valuemax="100">
-            <div [style.width.%]="cartao.percentualUtilizacao"></div>
+            <div [style.width.%]="valoresVisiveis() ? cartao.percentualUtilizacao : 0"></div>
           </div>
           <div class="rf-cartao-informacoes">
             <span>Limite total: <b>{{ valoresVisiveis() ? moeda(cartao.limiteTotal) : '••••••' }}</b></span>
