@@ -95,7 +95,7 @@
               <span>Já pago: <strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.totalPago) : '••••••' }}</strong></span>
               <span>Falta pagar: <strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.saldoRestante) : '••••••' }}</strong></span>
             </div>
-          } @else if (resumo.quitada && Number(resumo.totalFatura) > 0) {
+          } @else if (resumo.quitada && temValorNaFatura()) {
             <p class="cartoes-pill cartoes-status-quitada">Fatura quitada</p>
           }
           @if (!resumo.quitada && saldoPendente()) {

@@ -45,6 +45,7 @@ export class CartaoDetalhePage implements OnInit {
     const restante = this.pagamentos()?.saldoRestante;
     return restante == null ? null : String(restante);
   });
+  readonly temValorNaFatura = computed(() => Number(this.pagamentos()?.totalFatura ?? 0) > 0);
   readonly pagamentoParcial = computed(() =>
     Number(this.pagamentos()?.totalPago ?? 0) > 0 && this.saldoPendente());
   readonly saldoPendente = computed(() => {
