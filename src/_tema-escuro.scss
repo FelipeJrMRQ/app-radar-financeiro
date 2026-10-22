@@ -154,9 +154,8 @@ html[data-theme='dark'] .app-layout :is(
   .account-card, .summary-card, .statement-section, .manage-account,
   .movement-list, .total-periodo, .month-switcher,
   .periodo-selector, .account-confirmation,
-  .filter-panel, .feedback-card, .category-grid > article,
-  .actions-panel, .account-filters, .config-intro,
-  .preference-row, .scope-options
+  .feedback-card, .category-grid > article,
+  .actions-panel, .preference-row
 ) {
   background: var(--rf-theme-surface);
   color: var(--rf-theme-text);
@@ -465,4 +464,47 @@ html[data-theme='dark'] .dashboard .cash-balances-amount.positive {
 }
 html[data-theme='dark'] .dashboard .cash-balances-amount.negative {
   color: var(--rf-theme-negative);
+}
+
+/*
+ * Os filtros de lançamentos não são um card.
+ * Evita que a paleta global pinte a linha inteira e preserve o espaçamento,
+ * agrupamento e geometria originais dos controles.
+ */
+html[data-theme='dark'] .app-layout .lancamentos-page .filter-panel {
+  background: transparent;
+  border: 0;
+  color: inherit;
+}
+html[data-theme='dark'] .app-layout .lancamentos-page :is(
+  .filter-panel, .filters, .account-filter, .movement-list, .movement
+) {
+  min-width: 0;
+  max-width: 100%;
+}
+html[data-theme='dark'] .app-layout .lancamentos-page .account-filter select {
+  max-width: 100%;
+}
+
+/*
+ * Proteção contra deslocamento horizontal de todo o layout, especialmente
+ * após redimensionamento da janela ou mudança de tema.
+ * A barra lateral deve permanecer no fluxo original do grid.
+ */
+html[data-theme='dark'] .app-layout {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+}
+html[data-theme='dark'] .app-layout .workspace {
+  min-width: 0;
+  max-width: 100%;
+}
+html[data-theme='dark'] .app-layout .desktop-header .privacidade-controles {
+  min-width: 0;
+}
+html[data-theme='dark'] .app-layout .desktop-header .header-user {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
