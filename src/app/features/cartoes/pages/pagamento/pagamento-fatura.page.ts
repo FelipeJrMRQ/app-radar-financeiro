@@ -148,8 +148,9 @@ export class PagamentoFaturaPage implements OnInit {
     this.erroFormulario.set(null);
   }
 
-  readonly contaSelecionada = computed(() =>
-    this.contas().find(conta => conta.id === this.form.controls.contaFinanceiraId.value)?.nome ?? '');
+  contaSelecionada(): string {
+    return this.contas().find(conta => conta.id === this.form.controls.contaFinanceiraId.value)?.nome ?? '';
+  }
 
   valorConfirmacao(): string {
     return this.valorPagamento() ?? '0';
