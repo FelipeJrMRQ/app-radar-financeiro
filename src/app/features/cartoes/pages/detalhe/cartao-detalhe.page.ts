@@ -99,6 +99,8 @@ export class CartaoDetalhePage implements OnInit {
     }
   }
 
+  mostrarMaisCompras(): void { this.limiteCompras.update(v => v + 20); }
+
   atualizarCompetencia(e: Event): void {
     const valor = (e.target as HTMLInputElement).value;
     if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(valor)) return;

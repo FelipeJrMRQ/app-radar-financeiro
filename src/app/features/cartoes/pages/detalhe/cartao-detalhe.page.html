@@ -176,7 +176,7 @@
           </div>
         }
         @if (compras().length > comprasVisiveis().length) {
-          <button type="button" class="cartoes-secondary" (click)="limiteCompras.update(v => v + 20)">Mostrar mais compras</button>
+          <button type="button" class="cartoes-secondary" (click)="mostrarMaisCompras()">Mostrar mais compras</button>
         }
       }
     </section>
