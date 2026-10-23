@@ -29,7 +29,7 @@
         <label for="senha">Crie uma senha</label>
         <div class="password-field">
           <input id="senha" [type]="mostrarSenha() ? 'text' : 'password'"
-                 formControlName="senha" autocomplete="new-password" placeholder="Use 15 caracteres ou mais"
+                 formControlName="senha" autocomplete="new-password" placeholder="Use 8 caracteres ou mais"
                  [attr.aria-invalid]="formulario.controls.senha.touched && formulario.controls.senha.invalid" />
           <button type="button" class="show-password" (click)="mostrarSenha.set(!mostrarSenha())"
                   [attr.aria-label]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'">
@@ -37,7 +37,7 @@
           </button>
         </div>
         @if (formulario.controls.senha.touched && formulario.controls.senha.invalid) {
-          <small class="field-error">Use uma senha entre 15 e 128 caracteres.</small>
+          <small class="field-error">Use uma senha entre 8 e 128 caracteres.</small>
         }
       </div>
       <div class="field">
