@@ -11,24 +11,28 @@
   } @else {
     <div class="cash-balances-grid" role="group" aria-label="Saldos de caixa por conta">
       <div class="cash-balances-columns">
-        <label class="cash-balances-all" title="Selecionar contas incluídas nos totais de caixa">
+        <label class="cash-balances-all" title="Selecionar contas incluídas no total de caixa">
           <input type="checkbox"
-            aria-label="Selecionar todas as contas para os totais de caixa"
+            aria-label="Selecionar todas as contas para o total de caixa"
             [checked]="todasSelecionadas()"
             [indeterminate]="parcialmenteSelecionadas()"
             (change)="alternarTodas($event)" />
         </label>
-        <span class="cash-balances-column-title">Confirmado</span>
-        <span class="cash-balances-column-title">Projetado</span>
+        <button type="button" class="cash-balances-switch"
+          [attr.aria-label]="'Exibindo saldo ' + nomeTipoSaldo().toLowerCase() + '. Mostrar saldo ' + proximoTipoSaldo()"
+          [attr.title]="'Mostrar saldo ' + proximoTipoSaldo()"
+          (click)="alternarTipoSaldo()">
+          <span>{{ nomeTipoSaldo() }}</span>
+          <span aria-hidden="true" class="cash-balances-switch-icon">⇄</span>
+        </button>
       </div>
 
       <div class="account-list cash-balances-list">
         @for (conta of contas(); track conta.contaFinanceiraId; let i = $index) {
           <div class="cash-balances-row">
-            <label class="cash-balances-account"
-              title="Incluir ou retirar dos totais de caixa">
+            <label class="cash-balances-account" title="Incluir ou retirar do total de caixa">
               <input type="checkbox"
-                [attr.aria-label]="'Incluir ' + conta.nome + ' nos totais de caixa'"
+                [attr.aria-label]="'Incluir ' + conta.nome + ' no total de caixa'"
                 [checked]="estaSelecionada(conta.contaFinanceiraId)"
                 (change)="alterarConta(conta.contaFinanceiraId, $event)" />
               <span class="cash-balances-bank-icon" [class.alternate]="i % 2 === 1"
@@ -36,18 +40,11 @@
               <span class="cash-balances-account-name">{{ conta.nome }}</span>
             </label>
             <strong class="cash-balances-amount"
-              [class.positive]="valoresVisiveis() && valorPositivo(conta.saldoConfirmado)"
-              [class.negative]="valoresVisiveis() && valorNegativo(conta.saldoConfirmado)"
-              [attr.aria-label]="'Saldo confirmado de ' + conta.nome + ': '
-                + (valoresVisiveis() ? moeda(conta.saldoConfirmado) : 'valor oculto')">
-              {{ valoresVisiveis() ? moeda(conta.saldoConfirmado) : '••••••' }}
-            </strong>
-            <strong class="cash-balances-amount"
-              [class.positive]="valoresVisiveis() && valorPositivo(conta.saldoProjetado)"
-              [class.negative]="valoresVisiveis() && valorNegativo(conta.saldoProjetado)"
-              [attr.aria-label]="'Saldo projetado de ' + conta.nome + ': '
-                + (valoresVisiveis() ? moeda(conta.saldoProjetado) : 'valor oculto')">
-              {{ valoresVisiveis() ? moeda(conta.saldoProjetado) : '••••••' }}
+              [class.positive]="valoresVisiveis() && valorPositivo(valorExibido(conta))"
+              [class.negative]="valoresVisiveis() && valorNegativo(valorExibido(conta))"
+              [attr.aria-label]="'Saldo ' + nomeTipoSaldo().toLowerCase() + ' de ' + conta.nome + ': '
+                + (valoresVisiveis() ? moeda(valorExibido(conta)) : 'valor oculto')">
+              {{ valoresVisiveis() ? moeda(valorExibido(conta)) : '••••••' }}
             </strong>
           </div>
         }
@@ -56,19 +53,15 @@
       <footer class="cash-balances-total">
         <span class="cash-balances-total-name">Total</span>
         <strong class="cash-balances-amount"
-          [class.positive]="valoresVisiveis() && confirmadoPositivo()"
-          [class.negative]="valoresVisiveis() && confirmadoNegativo()">
-          {{ valoresVisiveis() ? moedaTotal(totalConfirmado()) : '••••••' }}
-        </strong>
-        <strong class="cash-balances-amount"
-          [class.positive]="valoresVisiveis() && projetadoPositivo()"
-          [class.negative]="valoresVisiveis() && projetadoNegativo()">
-          {{ valoresVisiveis() ? moedaTotal(totalProjetado()) : '••••••' }}
+          aria-live="polite"
+          [class.positive]="valoresVisiveis() && totalExibidoPositivo()"
+          [class.negative]="valoresVisiveis() && totalExibidoNegativo()"
+          [attr.aria-label]="'Total ' + nomeTipoSaldo().toLowerCase() + ': '
+            + (valoresVisiveis() ? moedaTotal(totalExibido()) : 'valor oculto')">
+          {{ valoresVisiveis() ? moedaTotal(totalExibido()) : '••••••' }}
         </strong>
       </footer>
     </div>
-    <p class="cash-balances-note">
-      Os totais somam somente as contas marcadas.
-    </p>
+    <p class="cash-balances-note">O total considera somente as contas marcadas.</p>
   }
 </section>

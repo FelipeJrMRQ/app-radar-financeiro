@@ -58,7 +58,7 @@ export class LancamentoNovoPage implements OnInit {
     valor: ['', [valorLancamentoValido]],
     dataLancamento: [dataHojeLocal(), Validators.required],
     situacaoInicial: this.fb.control<SituacaoLancamento>('PREVISTO', Validators.required),
-    quantidadeParcelas: this.fb.control(2, [Validators.min(2), Validators.max(120)]),
+    quantidadeParcelas: this.fb.control(2, [Validators.min(2), Validators.max(500)]),
     dataFim: [''],
     observacao: ['', Validators.maxLength(500)],
   });
@@ -123,8 +123,8 @@ export class LancamentoNovoPage implements OnInit {
       return;
     }
     if (this.modalidade() === 'PARCELADO' &&
-        (!Number.isInteger(form.quantidadeParcelas) || form.quantidadeParcelas < 2 || form.quantidadeParcelas > 120)) {
-      this.erroValidacao.set('Informe uma quantidade entre 2 e 120 parcelas.');
+        (!Number.isInteger(form.quantidadeParcelas) || form.quantidadeParcelas < 2 || form.quantidadeParcelas > 500)) {
+      this.erroValidacao.set('Informe uma quantidade entre 2 e 500 parcelas.');
       return;
     }
 
