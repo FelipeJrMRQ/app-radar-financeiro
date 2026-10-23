@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { firstValueFrom, forkJoin } from 'rxjs';
 
 import { mensagemDeErro } from '../../../../core/http/api-error';
+import { MoedaBrInputDirective } from '../../../../shared/directives/moeda-br-input.directive';
 import { PrivacidadeValoresService } from '../../../../core/privacidade/privacidade-valores.service';
 import { dataHojeLocal, decimalPositivo, formatarMoeda, normalizarDecimalBr } from '../../../../shared/valor-monetario';
 import { Categoria } from '../../../categorias/models/categoria.model';
@@ -25,7 +26,7 @@ interface Linha {
 @Component({
   selector: 'app-conciliacao-inicial',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, MoedaBrInputDirective],
   templateUrl: './conciliacao-inicial.page.html',
   styleUrl: './conciliacao-inicial.page.scss',
 })
