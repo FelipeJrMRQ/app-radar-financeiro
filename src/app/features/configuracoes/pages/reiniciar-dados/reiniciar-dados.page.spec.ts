@@ -106,6 +106,28 @@ describe('Reset seguro de dados financeiros', () => {
     expect(sair).not.toHaveBeenCalled();
   });
 
+  it('bloqueia a exclusão enquanto o código ainda não foi enviado', async () => {
+    const fixture = TestBed.createComponent(ReiniciarDadosPage);
+    fixture.componentInstance.senha.controls.senha.setValue('senha');
+    const envio = fixture.componentInstance.solicitar();
+    TestBed.inject(HttpTestingController).expectOne(
+      '/api/usuarios/me/reinicio-financeiro/solicitacoes')
+      .flush(null, { status: 202, statusText: 'Accepted' });
+    await envio;
+    fixture.componentInstance.confirmacao.patchValue({
+      codigo: '12345678', texto: 'APAGAR DADOS',
+    });
+    const confirmar = fixture.componentInstance.confirmar();
+    TestBed.inject(HttpTestingController).expectOne(
+      '/api/usuarios/me/reinicio-financeiro/solicitacoes/status')
+      .flush({ situacao: 'AGUARDANDO_ENVIO' });
+    await confirmar;
+    TestBed.inject(HttpTestingController).expectNone(
+      '/api/usuarios/me/reinicio-financeiro/confirmacoes');
+    expect(fixture.componentInstance.erro()).toContain('aguardando envio');
+    expect(sair).not.toHaveBeenCalled();
+  });
+
   it('devolve erro do servidor sem encerrar a sessão e permite tentar novamente', async () => {
     const fixture = TestBed.createComponent(ReiniciarDadosPage);
     fixture.componentInstance.senha.controls.senha.setValue('senha');
@@ -135,6 +157,10 @@ describe('Reset seguro de dados financeiros', () => {
     const rota = TestBed.inject(Router);
     const navegar = spyOn(rota, 'navigateByUrl').and.resolveTo(true);
     const confirmar = fixture.componentInstance.confirmar();
+    const status = TestBed.inject(HttpTestingController).expectOne(
+      '/api/usuarios/me/reinicio-financeiro/solicitacoes/status');
+    status.flush({ situacao: 'ENVIADO' });
+    await Promise.resolve();
     const req = TestBed.inject(HttpTestingController).expectOne(
       '/api/usuarios/me/reinicio-financeiro/confirmacoes');
     expect(req.request.method).toBe('POST');
