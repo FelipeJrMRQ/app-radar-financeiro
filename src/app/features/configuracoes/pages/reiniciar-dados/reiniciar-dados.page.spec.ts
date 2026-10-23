@@ -160,7 +160,8 @@ describe('Reset seguro de dados financeiros', () => {
     const status = TestBed.inject(HttpTestingController).expectOne(
       '/api/usuarios/me/reinicio-financeiro/solicitacoes/status');
     status.flush({ situacao: 'ENVIADO' });
-    await Promise.resolve();
+    // A confirmação aguarda duas etapas assíncronas: consulta de status e POST.
+    await new Promise<void>(resolve => setTimeout(resolve, 0));
     const req = TestBed.inject(HttpTestingController).expectOne(
       '/api/usuarios/me/reinicio-financeiro/confirmacoes');
     expect(req.request.method).toBe('POST');
