@@ -31,6 +31,7 @@ export class CartaoFormPage implements OnInit {
   readonly carregando = signal(this.editando);
   readonly salvando = signal(false);
   readonly erro = signal<string | null>(null);
+  readonly jaUtilizo = signal(false);
   readonly form = this.fb.group({
     nome: ['', [Validators.required, Validators.maxLength(150)]],
     limiteCredito: ['', valorValido],
@@ -77,10 +78,17 @@ export class CartaoFormPage implements OnInit {
         nome: f.nome.trim(), limiteCredito: limite,
         diaFechamento: f.diaFechamento, diaVencimento: f.diaVencimento,
       };
-      if (this.editando) await firstValueFrom(this.api.atualizar(this.id, dados));
-      else await firstValueFrom(this.api.criar(dados));
-      if (!this.destruir.destroyed)
-        await this.router.navigate(['/cartoes']);
+      if (this.editando) {
+        await firstValueFrom(this.api.atualizar(this.id, dados));
+        if (!this.destruir.destroyed) await this.router.navigate(['/cartoes']);
+      } else {
+        const novo = await firstValueFrom(this.api.criar(dados));
+        if (!this.destruir.destroyed) {
+          await this.router.navigate(this.jaUtilizo()
+            ? ['/cartoes', novo.id, 'conciliacao-inicial']
+            : ['/cartoes', novo.id]);
+        }
+      }
     } catch (e) {
       if (!this.destruir.destroyed) this.erro.set(mensagemDeErro(e));
     } finally {

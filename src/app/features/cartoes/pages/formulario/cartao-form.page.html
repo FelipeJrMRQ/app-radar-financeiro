@@ -50,6 +50,17 @@
         <p class="cartoes-note">
           O servidor calcula os ciclos de faturamento, inclusive meses sem o dia 31.
         </p>
+        @if (!editando) {
+          <div class="cartoes-field">
+            <label for="cartao-ja-utilizo">Você já utiliza este cartão?</label>
+            <label class="cartoes-note" for="cartao-ja-utilizo">
+              <input id="cartao-ja-utilizo" type="checkbox" [checked]="jaUtilizo()"
+                (change)="jaUtilizo.set(!jaUtilizo())" />
+              Sim, quero conferir a fatura atual e cadastrar parcelas em andamento após salvar
+            </label>
+            <small>O histórico já pago não será recriado.</small>
+          </div>
+        }
         <div class="cartoes-acoes">
           <a routerLink="/cartoes" class="cartoes-secondary">Cancelar</a>
           <button type="submit" class="cartoes-primary" [disabled]="salvando()">
