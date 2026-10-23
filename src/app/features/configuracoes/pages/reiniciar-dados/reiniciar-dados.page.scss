@@ -23,3 +23,7 @@
 .reinicio-perigo:hover:not(:disabled) {background:#87232d;}
 .reinicio-perigo:disabled {opacity:.5;cursor:not-allowed;}
 @media(max-width:480px){.reinicio-acoes>*{flex:1 1 100%;}}
+
+.reinicio-consultar-envio {min-height:40px;margin-top:12px;padding:8px 11px;border:1px solid var(--rf-theme-border,#dce7eb);border-radius:9px;background:var(--rf-theme-surface,#fff);font:inherit;font-size:12px;font-weight:700;color:var(--rf-theme-accent,#087d73);cursor:pointer;}
+.reinicio-consultar-envio:disabled {opacity:.65;cursor:wait;}
+.reinicio-consultar-envio:focus-visible {outline:2px solid var(--rf-theme-accent,#087d73);outline-offset:2px;}

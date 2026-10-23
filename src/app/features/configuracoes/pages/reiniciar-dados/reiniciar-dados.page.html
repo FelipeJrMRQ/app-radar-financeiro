@@ -39,8 +39,34 @@
     } @else {
       <form [formGroup]="confirmacao" (ngSubmit)="confirmar()" novalidate>
         <h2>2. Confirme a exclusão</h2>
-        <p>Enviamos um código para <strong>{{ usuario()?.email }}</strong>.
-          Ele expira em dez minutos, funciona uma única vez e aceita até cinco tentativas.</p>
+        <p>A solicitação foi registrada para <strong>{{ usuario()?.email }}</strong>.
+          O envio ocorre automaticamente, mesmo se o serviço de e-mail estiver temporariamente indisponível.
+          Após o envio, o código vale por dez minutos, funciona uma única vez e aceita até cinco tentativas.</p>
+        <div class="reinicio-alerta" role="status">
+          @switch (situacaoEnvio()) {
+            @case ('AGUARDANDO_ENVIO') {
+              <strong>Aguardando envio do e-mail</strong>
+              <p>Seu pedido está salvo. Se houver falha no envio, o Radar tentará novamente.</p>
+            }
+            @case ('ENVIADO') {
+              <strong>Código aceito pelo serviço de e-mail</strong>
+              <p>Confira sua caixa de entrada e a pasta de spam.</p>
+            }
+            @case ('EXPIRADO') {
+              <strong>Código expirado</strong>
+              <p>Inicie uma nova solicitação após o prazo de segurança.</p>
+            }
+            @default {
+              <strong>Nenhuma solicitação ativa</strong>
+              <p>Retorne à etapa anterior para iniciar novamente.</p>
+            }
+          }
+          <button type="button" class="reinicio-consultar-envio"
+            [disabled]="verificandoEnvio() || carregando()"
+            (click)="verificarEnvio()">
+            {{ verificandoEnvio() ? 'Consultando…' : 'Verificar envio' }}
+          </button>
+        </div>
         <label for="reinicio-codigo">Código recebido por e-mail</label>
         <input id="reinicio-codigo" type="text" formControlName="codigo" maxlength="8"
           inputmode="numeric" autocomplete="one-time-code" required />

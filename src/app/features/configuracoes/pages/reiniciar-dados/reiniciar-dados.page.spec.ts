@@ -59,6 +59,30 @@ describe('Reset seguro de dados financeiros', () => {
     expect(sair).not.toHaveBeenCalled();
   });
 
+  it('informa que 202 é mensagem pendente e consulta o estado real sem expor código', async () => {
+    const fixture = TestBed.createComponent(ReiniciarDadosPage);
+    fixture.componentInstance.senha.controls.senha.setValue('senha');
+    const envio = fixture.componentInstance.solicitar();
+    TestBed.inject(HttpTestingController).expectOne(
+      '/api/usuarios/me/reinicio-financeiro/solicitacoes')
+      .flush(null, { status: 202, statusText: 'Accepted' });
+    await envio;
+    fixture.detectChanges();
+    expect(fixture.componentInstance.situacaoEnvio()).toBe('AGUARDANDO_ENVIO');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Seu pedido está salvo');
+
+    const consulta = fixture.componentInstance.verificarEnvio();
+    const req = TestBed.inject(HttpTestingController).expectOne(
+      '/api/usuarios/me/reinicio-financeiro/solicitacoes/status');
+    expect(req.request.method).toBe('GET');
+    req.flush({ situacao: 'ENVIADO' });
+    await consulta;
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).textContent)
+      .toContain('Código aceito pelo serviço de e-mail');
+    expect(sair).not.toHaveBeenCalled();
+  });
+
   it('não confirma código inválido ou texto diferente de APAGAR DADOS', async () => {
     const fixture = TestBed.createComponent(ReiniciarDadosPage);
     fixture.componentInstance.senha.controls.senha.setValue('senha');

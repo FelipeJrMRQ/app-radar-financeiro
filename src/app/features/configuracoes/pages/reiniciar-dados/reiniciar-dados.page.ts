@@ -24,6 +24,8 @@ export class ReiniciarDadosPage {
   readonly usuario = this.auth.usuario;
   readonly etapa = signal<'SENHA' | 'CODIGO'>('SENHA');
   readonly carregando = signal(false);
+  readonly verificandoEnvio = signal(false);
+  readonly situacaoEnvio = signal<'AGUARDANDO_ENVIO' | 'ENVIADO' | 'EXPIRADO' | 'SEM_SOLICITACAO'>('AGUARDANDO_ENVIO');
   readonly erro = signal<string | null>(null);
   readonly senha = this.fb.group({ senha: ['', [Validators.required]] });
   readonly confirmacao = this.fb.group({
@@ -41,11 +43,28 @@ export class ReiniciarDadosPage {
       await firstValueFrom(this.http.post<void>(this.url + '/solicitacoes',
         { senha: this.senha.controls.senha.value }));
       this.senha.reset();
+      // 202 confirma persistência no Outbox, NÃO o aceite pelo SMTP.
+      this.situacaoEnvio.set('AGUARDANDO_ENVIO');
       this.etapa.set('CODIGO');
     } catch (erro) {
       this.erro.set(mensagemDeErro(erro));
     } finally {
       this.carregando.set(false);
+    }
+  }
+
+  async verificarEnvio(): Promise<void> {
+    if (this.verificandoEnvio() || this.carregando() || this.etapa() !== 'CODIGO') return;
+    this.verificandoEnvio.set(true);
+    this.erro.set(null);
+    try {
+      const resposta = await firstValueFrom(this.http.get<{ situacao: 'AGUARDANDO_ENVIO' | 'ENVIADO' | 'EXPIRADO' | 'SEM_SOLICITACAO' }>(
+        this.url + '/solicitacoes/status'));
+      this.situacaoEnvio.set(resposta.situacao);
+    } catch (erro) {
+      this.erro.set(mensagemDeErro(erro));
+    } finally {
+      this.verificandoEnvio.set(false);
     }
   }
 
