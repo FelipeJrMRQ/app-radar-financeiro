@@ -1,0 +1,89 @@
+<section class="reinicio-page">
+  <a class="reinicio-voltar" routerLink="/configuracoes">← Voltar às configurações</a>
+  <div class="reinicio-cartao">
+    <span class="reinicio-selo">PRIVACIDADE E SEGURANÇA</span>
+    <h1>Apagar meus dados financeiros</h1>
+    <p>Esta operação é <strong>irreversível</strong>. Seu cadastro e seus dados de acesso serão preservados,
+      mas você perderá todas as movimentações e configurações financeiras.</p>
+
+    <div class="reinicio-alerta" role="note">
+      <strong>O que será apagado?</strong>
+      <p>Contas e saldos cadastrados, lançamentos, transferências, categorias pessoais,
+        recorrências, parcelamentos, cartões, compras, parcelas, faturas, pagamentos e
+        preferências financeiras.</p>
+      <p><strong>O que permanece?</strong> Seu nome, e-mail, senha e acesso ao Radar.
+        Você poderá cadastrar novos dados após entrar novamente.</p>
+      <p>Se o espaço for compartilhado com outras pessoas, o reset será bloqueado
+        para não apagar informações delas.</p>
+    </div>
+
+    @if (erro()) {
+      <p class="reinicio-erro" role="alert">{{ erro() }}</p>
+    }
+
+    @if (etapa() === 'SENHA') {
+      <form [formGroup]="senha" (ngSubmit)="solicitar()" novalidate>
+        <h2>1. Confirme sua senha</h2>
+        <p>Enviaremos um código para o e-mail cadastrado
+          <strong>{{ usuario()?.email }}</strong>, após validar sua senha.</p>
+        <label for="reinicio-senha">Senha atual</label>
+        <input id="reinicio-senha" type="password" formControlName="senha"
+          autocomplete="current-password" required />
+        <div class="reinicio-acoes">
+          <a class="reinicio-cancelar" routerLink="/configuracoes">Cancelar</a>
+          <button type="submit" class="reinicio-perigo" [disabled]="carregando() || senha.invalid">
+            {{ carregando() ? 'Verificando…' : 'Validar senha e enviar código' }}
+          </button>
+        </div>
+      </form>
+    } @else {
+      <form [formGroup]="confirmacao" (ngSubmit)="confirmar()" novalidate>
+        <h2>2. Confirme a exclusão</h2>
+        <p>A solicitação foi registrada para <strong>{{ usuario()?.email }}</strong>.
+          O envio ocorre automaticamente, mesmo se o serviço de e-mail estiver temporariamente indisponível.
+          Após o envio, o código vale por dez minutos, funciona uma única vez e aceita até cinco tentativas.</p>
+        <div class="reinicio-alerta" role="status">
+          @switch (situacaoEnvio()) {
+            @case ('AGUARDANDO_ENVIO') {
+              <strong>Aguardando envio do e-mail</strong>
+              <p>Seu pedido está salvo. Se houver falha no envio, o Radar tentará novamente.</p>
+            }
+            @case ('ENVIADO') {
+              <strong>Código aceito pelo serviço de e-mail</strong>
+              <p>Confira sua caixa de entrada e a pasta de spam.</p>
+            }
+            @case ('EXPIRADO') {
+              <strong>Código expirado</strong>
+              <p>Inicie uma nova solicitação após o prazo de segurança.</p>
+            }
+            @default {
+              <strong>Nenhuma solicitação ativa</strong>
+              <p>Retorne à etapa anterior para iniciar novamente.</p>
+            }
+          }
+          <button type="button" class="reinicio-consultar-envio"
+            [disabled]="verificandoEnvio() || carregando()"
+            (click)="verificarEnvio()">
+            {{ verificandoEnvio() ? 'Consultando…' : 'Verificar envio' }}
+          </button>
+        </div>
+        <label for="reinicio-codigo">Código recebido por e-mail</label>
+        <input id="reinicio-codigo" type="text" formControlName="codigo" maxlength="8"
+          inputmode="numeric" autocomplete="one-time-code" required />
+        <label for="reinicio-texto">Para confirmar, digite APAGAR DADOS</label>
+        <input id="reinicio-texto" type="text" formControlName="texto"
+          autocomplete="off" spellcheck="false" required />
+        <p class="reinicio-atencao">Ao confirmar, os dados serão excluídos e sua sessão será encerrada.
+          O Radar não conseguirá desfazer a operação.</p>
+        <div class="reinicio-acoes">
+          <button type="button" class="reinicio-cancelar" (click)="voltar()"
+            [disabled]="carregando()">Voltar</button>
+          <button type="submit" class="reinicio-perigo"
+            [disabled]="carregando() || verificandoEnvio() || situacaoEnvio() !== 'ENVIADO' || confirmacao.invalid || confirmacao.controls.texto.value !== 'APAGAR DADOS'">
+            {{ carregando() ? 'Apagando…' : 'Apagar permanentemente os dados' }}
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</section>
