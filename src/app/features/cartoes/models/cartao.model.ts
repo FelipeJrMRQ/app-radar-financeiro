@@ -26,6 +26,8 @@ export interface CompraCartao {
   valorTotal: ValorFinanceiroApi;
   dataCompra: string;
   quantidadeParcelas: number;
+  origem?: 'COMPRA' | 'CONCILIACAO';
+  parcelaInicial?: number | null;
   observacao: string | null;
   ativo: boolean;
   criadoEm: string;
@@ -55,7 +57,7 @@ export interface CompraParceladaResultado {
 }
 export interface ItemFatura {
   origem: string;
-  compraCartaoId: number;
+  compraCartaoId: number | null;
   parcelaCompraCartaoId: number | null;
   numeroParcela: number | null;
   quantidadeParcelas: number | null;
@@ -98,4 +100,78 @@ export interface ResumoPagamentos {
   saldoRestante: ValorFinanceiroApi;
   quitada: boolean;
   pagamentos: PagamentoFatura[];
+}
+
+// Onboarding manual: as parcelas anteriores à competência inicial já foram pagas
+// fora do Radar e não devem gerar novas obrigações ou movimentações bancárias.
+export interface ItemConciliacaoInicial {
+  descricao: string;
+  categoriaId: number;
+  valorParcela: string;
+  numeroParcela: number;
+  quantidadeParcelas: number;
+}
+export interface AjusteConciliacaoInicial {
+  descricao: string;
+  categoriaId: number;
+  valor: string; // sinal positivo = débito, negativo = crédito informado
+}
+export interface DadosConciliacaoInicial {
+  chaveIdempotencia: string;
+  competencia: string; // yyyy-MM
+  valorFaturaBanco: string;
+  itens: ItemConciliacaoInicial[];
+  ajuste: AjusteConciliacaoInicial | null;
+}
+export interface PreviaConciliacaoInicial {
+  competencia: string;
+  valorFaturaBanco: ValorFinanceiroApi;
+  valorAtualRadar: ValorFinanceiroApi;
+  valorItensImportados: ValorFinanceiroApi;
+  valorAjusteDeclarado: ValorFinanceiroApi;
+  totalConciliado: ValorFinanceiroApi;
+  diferenca: ValorFinanceiroApi;
+  proximasFaturas: { competencia: string; totalPrevisto: ValorFinanceiroApi }[];
+}
+export interface ConfirmacaoConciliacaoInicial {
+  jaConfirmada: boolean;
+  competencia: string;
+  totalConciliado: ValorFinanceiroApi;
+}
+
+// Correção segura, exclusiva para itens 1/1 da conciliação inicial.
+export interface CorrecaoParcelamentoInicial {
+  parcelaAtual: number;
+  totalParcelas: number;
+}
+export interface ResultadoCorrecaoParcelamento {
+  compraId: number;
+  competencia: string;
+  parcelaAtual: number;
+  totalParcelas: number;
+  valorParcela: ValorFinanceiroApi;
+  compromissoRestante: ValorFinanceiroApi;
+}
+
+// A revisao altera o lote completo com controle de concorrencia otimista.
+export interface ItemRevisaoConciliacao extends ItemConciliacaoInicial {
+  compraId: number | null;
+}
+export interface ConciliacaoEditavel {
+  revisao: number;
+  competencia: string;
+  valorFaturaBanco: ValorFinanceiroApi;
+  itens: (Omit<ItemRevisaoConciliacao, 'valorParcela'> & { valorParcela: ValorFinanceiroApi })[];
+  ajuste: (Omit<AjusteConciliacaoInicial, 'valor'> & { valor: ValorFinanceiroApi }) | null;
+}
+export interface DadosRevisaoConciliacao {
+  revisao: number;
+  valorFaturaBanco: string;
+  itens: ItemRevisaoConciliacao[];
+  ajuste: AjusteConciliacaoInicial | null;
+}
+export interface ResultadoRevisaoConciliacao {
+  revisao: number;
+  competencia: string;
+  totalConciliado: ValorFinanceiroApi;
 }

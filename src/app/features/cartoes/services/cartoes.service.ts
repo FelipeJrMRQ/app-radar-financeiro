@@ -8,6 +8,9 @@ import { API_BASE_URL } from '../../../core/config/api.config';
 import {
   CartaoCredito, DadosCartaoCredito, CompraCartao, DadosCompraCartao, DadosCompraParcelada,
   CompraParceladaResultado, FaturaCartao, FaturaResumo, PagamentoFatura, ParcelaCompra, ResumoPagamentos,
+  DadosConciliacaoInicial, PreviaConciliacaoInicial, ConfirmacaoConciliacaoInicial,
+  CorrecaoParcelamentoInicial, ResultadoCorrecaoParcelamento,
+  ConciliacaoEditavel, DadosRevisaoConciliacao, ResultadoRevisaoConciliacao,
 } from '../models/cartao.model';
 
 @Injectable({ providedIn: 'root' })
@@ -37,6 +40,33 @@ export class CartoesService {
     return this.http.put<CartaoCredito>(this.cartao(id), dados);
   }
   inativar(id: number): Observable<void> { return this.http.delete<void>(this.cartao(id)); }
+
+  previaConciliacaoInicial(id: number, dados: DadosConciliacaoInicial): Observable<PreviaConciliacaoInicial> {
+    return this.http.post<PreviaConciliacaoInicial>(
+      this.cartao(id) + '/conciliacao-inicial/previa', dados);
+  }
+  confirmarConciliacaoInicial(id: number, dados: DadosConciliacaoInicial): Observable<ConfirmacaoConciliacaoInicial> {
+    return this.http.post<ConfirmacaoConciliacaoInicial>(
+      this.cartao(id) + '/conciliacao-inicial/confirmacao', dados);
+  }
+
+  carregarRevisaoConciliacao(id: number): Observable<ConciliacaoEditavel> {
+    return this.http.get<ConciliacaoEditavel>(this.cartao(id) + '/conciliacao-inicial/edicao');
+  }
+  previaRevisaoConciliacao(id: number, dados: DadosRevisaoConciliacao): Observable<PreviaConciliacaoInicial> {
+    return this.http.post<PreviaConciliacaoInicial>(
+      this.cartao(id) + '/conciliacao-inicial/edicao/previa', dados);
+  }
+  salvarRevisaoConciliacao(id: number, dados: DadosRevisaoConciliacao): Observable<ResultadoRevisaoConciliacao> {
+    return this.http.put<ResultadoRevisaoConciliacao>(
+      this.cartao(id) + '/conciliacao-inicial/edicao', dados);
+  }
+
+  corrigirParcelamentoInicial(id: number, compraId: number,
+      dados: CorrecaoParcelamentoInicial): Observable<ResultadoCorrecaoParcelamento> {
+    return this.http.put<ResultadoCorrecaoParcelamento>(
+      this.cartao(id) + '/conciliacao-inicial/compras/' + compraId + '/parcelamento', dados);
+  }
 
   listarCompras(id: number): Observable<CompraCartao[]> {
     return this.http.get<CompraCartao[]>(this.compras(id));

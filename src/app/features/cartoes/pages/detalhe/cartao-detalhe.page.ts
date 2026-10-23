@@ -64,6 +64,8 @@ export class CartaoDetalhePage implements OnInit {
   readonly pagamentos = signal<ResumoPagamentos | null>(null);
   readonly limiteCompras = signal(20);
   readonly comprasVisiveis = computed(() => this.compras().slice(0, this.limiteCompras()));
+  readonly comprasImportadas = computed(() =>
+    this.compras().some(compra => compra.origem === 'CONCILIACAO'));
   readonly cancelarCompra = signal<CompraCartao | null>(null);
   readonly estornar = signal<PagamentoFatura | null>(null);
 
@@ -75,6 +77,12 @@ export class CartaoDetalhePage implements OnInit {
     const resultado = this.rota.snapshot.queryParamMap.get('resultado');
     if (resultado === 'compra-criada') this.sucesso.set('Compra registrada com sucesso.');
     if (resultado === 'compra-editada') this.sucesso.set('Compra atualizada com sucesso.');
+    if (resultado === 'parcelas-corrigidas')
+      this.sucesso.set('Parcelas corrigidas. O limite comprometido e as próximas faturas foram atualizados.');
+    if (resultado === 'conciliacao-revisada')
+      this.sucesso.set('Conciliação revisada. Faturas futuras e limite comprometido recalculados.');
+    if (resultado === 'conciliacao-concluida')
+      this.sucesso.set('Conciliação inicial concluída. Confira as parcelas desta e das próximas faturas.');
     if (resultado === 'pagamento-registrado')
       this.sucesso.set('Pagamento registrado. O saldo da fatura e da conta financeira foi atualizado.');
     void this.carregar();
