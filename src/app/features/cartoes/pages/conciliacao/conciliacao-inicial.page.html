@@ -1,0 +1,141 @@
+<section class="conciliacao-page">
+  <a class="conciliacao-voltar" [routerLink]="['/cartoes', cartaoId]">← Voltar ao cartão</a>
+  <header>
+    <span class="conciliacao-selo">CONFIGURAÇÃO INICIAL</span>
+    <h1>Conferir minha fatura</h1>
+    <p>Para um cartão que você já utiliza, registre somente as parcelas e os valores ainda em aberto.
+      O Radar não recriará parcelas anteriores nem pagamentos antigos.</p>
+  </header>
+
+  @if (erro()) { <p class="conciliacao-erro" role="alert">{{ erro() }}</p> }
+  @if (carregando()) { <p role="status">Carregando cartão e categorias…</p> }
+  @else if (cartao(); as atual) {
+    <div class="conciliacao-painel">
+      <h2>1. Fatura do banco</h2>
+      <p>Cartão: <strong>{{ atual.nome }}</strong>. Fechamento dia {{ atual.diaFechamento }},
+        vencimento dia {{ atual.diaVencimento }}.</p>
+      <div class="conciliacao-grade">
+        <label>Mês da fatura
+          <input type="month" [(ngModel)]="competencia" (ngModelChange)="alterou()" />
+        </label>
+        <label>Valor total informado pelo banco
+          <input type="text" inputmode="decimal" placeholder="Ex.: 1.480,00"
+            [(ngModel)]="faturaBanco" (ngModelChange)="alterou()" />
+        </label>
+      </div>
+      <p class="conciliacao-ajuda">Escolha a competência conforme a fatura do banco, não a data de uma compra antiga.</p>
+    </div>
+
+    <div class="conciliacao-painel">
+      <h2>2. Parcelas que continuam em aberto</h2>
+      <p>Exemplo: um celular em 6/15 entra na fatura selecionada como parcela 6 de 15.
+        O Radar projetará somente 6/15 a 15/15.</p>
+      @for (linha of linhas; track linha.idLocal; let i = $index) {
+        <div class="conciliacao-item">
+          <div class="conciliacao-linha-cabecalho">
+            <strong>Item {{ i + 1 }}</strong>
+            @if (linhas.length > 1) {
+              <button type="button" class="conciliacao-texto" (click)="removerLinha(linha.idLocal)">Remover</button>
+            }
+          </div>
+          <div class="conciliacao-grade">
+            <label>Descrição
+              <input type="text" maxlength="200" placeholder="Ex.: Celular"
+                [(ngModel)]="linha.descricao" (ngModelChange)="alterou()" />
+            </label>
+            <label>Categoria
+              <select [(ngModel)]="linha.categoriaId" (ngModelChange)="alterou()">
+                <option [ngValue]="null">Selecione</option>
+                @for (categoria of categorias(); track categoria.id) {
+                  <option [ngValue]="categoria.id">{{ categoria.nome }}</option>
+                }
+              </select>
+            </label>
+            <label>Valor desta parcela
+              <input type="text" inputmode="decimal" placeholder="Ex.: 143,79"
+                [(ngModel)]="linha.valorParcela" (ngModelChange)="alterou()" />
+            </label>
+          </div>
+          <div class="conciliacao-grade conciliacao-graduacao">
+            <label>Parcela atual
+              <input type="number" min="1" max="500"
+                [(ngModel)]="linha.numeroParcela" (ngModelChange)="alterou()" />
+            </label>
+            <label>Total de parcelas
+              <input type="number" min="1" max="500"
+                [(ngModel)]="linha.quantidadeParcelas" (ngModelChange)="alterou()" />
+            </label>
+          </div>
+        </div>
+      }
+      <button type="button" class="conciliacao-secundario" [disabled]="linhas.length >= 30"
+        (click)="adicionarLinha()">+ Adicionar outro item</button>
+    </div>
+
+    <div class="conciliacao-painel">
+      <h2>3. Ajustes da primeira fatura</h2>
+      <label class="conciliacao-checkbox">
+        <input type="checkbox" [(ngModel)]="incluirAjuste" (ngModelChange)="alterou()" />
+        Preciso informar tarifas, créditos ou outros ajustes
+      </label>
+      @if (incluirAjuste) {
+        <div class="conciliacao-grade">
+          <label>Descrição do ajuste
+            <input type="text" maxlength="200" [(ngModel)]="ajusteDescricao"
+              (ngModelChange)="alterou()" placeholder="Ex.: Crédito do banco" />
+          </label>
+          <label>Categoria
+            <select [(ngModel)]="ajusteCategoriaId" (ngModelChange)="alterou()">
+              <option [ngValue]="null">Selecione</option>
+              @for (categoria of categorias(); track categoria.id) {
+                <option [ngValue]="categoria.id">{{ categoria.nome }}</option>
+              }
+            </select>
+          </label>
+          <label>Valor do ajuste
+            <input type="text" inputmode="decimal" [(ngModel)]="ajusteValor"
+              (ngModelChange)="alterou()" placeholder="Ex.: -50,00 ou 25,00" />
+          </label>
+        </div>
+        <p class="conciliacao-ajuda">Valor positivo acrescenta despesa; negativo representa um crédito explícito nesta fatura.</p>
+      }
+    </div>
+
+    <div class="conciliacao-painel">
+      <h2>4. Comparar e confirmar</h2>
+      <button type="button" class="conciliacao-secundario" [disabled]="operando()"
+        (click)="conferir()">{{ operando() ? 'Consultando…' : 'Calcular prévia da conciliação' }}</button>
+      @if (previa(); as resumo) {
+        <div class="conciliacao-resumo" aria-live="polite">
+          <div><span>Fatura do banco</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.valorFaturaBanco) : '••••••' }}</strong></div>
+          <div><span>Itens já registrados no Radar</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.valorAtualRadar) : '••••••' }}</strong></div>
+          <div><span>Novas parcelas e itens</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.valorItensImportados) : '••••••' }}</strong></div>
+          <div><span>Ajuste declarado</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.valorAjusteDeclarado) : '••••••' }}</strong></div>
+          <div><span>Total calculado pelo Radar</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.totalConciliado) : '••••••' }}</strong></div>
+          <div class="conciliacao-diferenca"><span>Diferença a conferir</span>
+            <strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.diferenca) : '••••••' }}</strong></div>
+        </div>
+        @if (!diferencaZerada(resumo.diferenca)) {
+          <p class="conciliacao-erro">Ainda existe diferença. Confira itens e informe o ajuste explicitamente
+            antes de confirmar. Nenhum dado foi gravado.</p>
+        } @else {
+          <p class="conciliacao-sucesso">Valores conferidos. Os pagamentos passados não serão recriados.</p>
+        }
+        @if (resumo.proximasFaturas.length) {
+          <h3>Prévia das próximas faturas</h3>
+          @for (mes of resumo.proximasFaturas; track mes.competencia) {
+            <div class="conciliacao-projecao">
+              <span>{{ mes.competencia }}</span>
+              <strong>{{ privacidade.valoresVisiveis() ? moeda(mes.totalPrevisto) : '••••••' }}</strong>
+            </div>
+          }
+        }
+        <p class="conciliacao-ajuda">Esta configuração pode ser feita apenas uma vez por cartão. Não é possível
+          inserir compromissos em faturas que já possuem pagamentos registrados.</p>
+        <button type="button" class="conciliacao-principal"
+          [disabled]="operando() || !diferencaZerada(resumo.diferenca)"
+          (click)="confirmar()">{{ operando() ? 'Salvando…' : 'Confirmar conciliação inicial' }}</button>
+      }
+    </div>
+  }
+</section>
