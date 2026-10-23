@@ -38,6 +38,12 @@ export const CARTOES_ROUTES: Routes = [
     loadComponent: () => import('./pages/compra/compra-form.page').then(m => m.CompraCartaoFormPage),
   },
   {
+    path: 'cartoes/:cartaoId/compras/:compraId/corrigir-parcelas',
+    title: 'Corrigir parcelas da conciliação | Radar Financeiro',
+    loadComponent: () => import('./pages/conciliacao/corrigir-parcelamento.page')
+      .then(m => m.CorrigirParcelamentoPage),
+  },
+  {
     path: 'cartoes/:cartaoId/compras/:compraId/editar',
     title: 'Editar compra no cartão | Radar Financeiro',
     loadComponent: () => import('./pages/compra/compra-form.page').then(m => m.CompraCartaoFormPage),

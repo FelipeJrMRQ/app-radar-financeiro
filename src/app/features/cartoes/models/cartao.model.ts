@@ -138,3 +138,17 @@ export interface ConfirmacaoConciliacaoInicial {
   competencia: string;
   totalConciliado: ValorFinanceiroApi;
 }
+
+// Correção segura, exclusiva para itens 1/1 da conciliação inicial.
+export interface CorrecaoParcelamentoInicial {
+  parcelaAtual: number;
+  totalParcelas: number;
+}
+export interface ResultadoCorrecaoParcelamento {
+  compraId: number;
+  competencia: string;
+  parcelaAtual: number;
+  totalParcelas: number;
+  valorParcela: ValorFinanceiroApi;
+  compromissoRestante: ValorFinanceiroApi;
+}

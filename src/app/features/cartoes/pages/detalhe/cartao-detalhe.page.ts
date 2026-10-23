@@ -77,6 +77,8 @@ export class CartaoDetalhePage implements OnInit {
     const resultado = this.rota.snapshot.queryParamMap.get('resultado');
     if (resultado === 'compra-criada') this.sucesso.set('Compra registrada com sucesso.');
     if (resultado === 'compra-editada') this.sucesso.set('Compra atualizada com sucesso.');
+    if (resultado === 'parcelas-corrigidas')
+      this.sucesso.set('Parcelas corrigidas. O limite comprometido e as próximas faturas foram atualizados.');
     if (resultado === 'conciliacao-concluida')
       this.sucesso.set('Conciliação inicial concluída. Confira as parcelas desta e das próximas faturas.');
     if (resultado === 'pagamento-registrado')
