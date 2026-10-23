@@ -75,7 +75,7 @@ describe('Conciliação inicial de cartão já utilizado', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const campos = fixture.nativeElement.querySelectorAll<HTMLInputElement>('input[rfMoedaBr]');
+    const campos = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLInputElement>('input[rfMoedaBr]');
     expect(campos.length).toBe(3);
 
     campos[0].value = '25000';
