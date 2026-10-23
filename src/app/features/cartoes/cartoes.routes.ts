@@ -18,6 +18,13 @@ export const CARTOES_ROUTES: Routes = [
     loadComponent: () => import('./pages/conciliacao/conciliacao-inicial.page').then(m => m.ConciliacaoInicialPage),
   },
   {
+    path: 'cartoes/:cartaoId/conciliacao-inicial/editar',
+    title: 'Revisar conciliação inicial | Radar Financeiro',
+    data: { edicao: true },
+    loadComponent: () => import('./pages/conciliacao/conciliacao-inicial.page')
+      .then(m => m.ConciliacaoInicialPage),
+  },
+  {
     path: 'cartoes/:cartaoId/editar',
     title: 'Editar cartão | Radar Financeiro',
     loadComponent: () => import('./pages/formulario/cartao-form.page').then(m => m.CartaoFormPage),
@@ -39,9 +46,10 @@ export const CARTOES_ROUTES: Routes = [
   },
   {
     path: 'cartoes/:cartaoId/compras/:compraId/corrigir-parcelas',
-    title: 'Corrigir parcelas da conciliação | Radar Financeiro',
-    loadComponent: () => import('./pages/conciliacao/corrigir-parcelamento.page')
-      .then(m => m.CorrigirParcelamentoPage),
+    title: 'Revisar conciliação inicial | Radar Financeiro',
+    data: { edicao: true },
+    loadComponent: () => import('./pages/conciliacao/conciliacao-inicial.page')
+      .then(m => m.ConciliacaoInicialPage),
   },
   {
     path: 'cartoes/:cartaoId/compras/:compraId/editar',

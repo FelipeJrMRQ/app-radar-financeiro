@@ -1,10 +1,13 @@
 <section class="conciliacao-page">
   <a class="conciliacao-voltar" [routerLink]="['/cartoes', cartaoId]">← Voltar ao cartão</a>
   <header>
-    <span class="conciliacao-selo">CONFIGURAÇÃO INICIAL</span>
-    <h1>Conferir minha fatura</h1>
-    <p>Para um cartão que você já utiliza, registre somente as parcelas e os valores ainda em aberto.
-      O Radar não recriará parcelas anteriores nem pagamentos antigos.</p>
+    <span class="conciliacao-selo">{{ edicao ? 'REVISÃO DA CONCILIAÇÃO' : 'CONFIGURAÇÃO INICIAL' }}</span>
+    <h1>{{ edicao ? 'Revisar minha conciliação' : 'Conferir minha fatura' }}</h1>
+    <p>{{ edicao
+      ? 'Corrija descrição, categoria, valores, parcelas, itens e ajustes da fatura inicial.
+         O Radar recalculará as próximas faturas sem recriar pagamentos passados.'
+      : 'Para um cartão que você já utiliza, registre somente as parcelas e os valores ainda em aberto.
+         O Radar não recriará parcelas anteriores nem pagamentos antigos.' }}</p>
   </header>
 
   @if (erro()) { <p class="conciliacao-erro" role="alert">{{ erro() }}</p> }
@@ -16,20 +19,23 @@
         vencimento dia {{ atual.diaVencimento }}.</p>
       <div class="conciliacao-grade">
         <label>Mês da fatura
-          <input type="month" [(ngModel)]="competencia" (ngModelChange)="alterou()" />
+          <input type="month" [(ngModel)]="competencia" [disabled]="edicao" (ngModelChange)="alterou()" />
         </label>
         <label>Valor total informado pelo banco
           <input type="text" inputmode="numeric" rfMoedaBr placeholder="R$ 0,00"
             [(ngModel)]="faturaBanco" (ngModelChange)="alterou()" />
         </label>
       </div>
-      <p class="conciliacao-ajuda">Escolha a competência conforme a fatura do banco, não a data de uma compra antiga.</p>
+      <p class="conciliacao-ajuda">{{ edicao
+        ? 'A competência original fica fixa para preservar o histórico das parcelas. O total do banco pode ser corrigido.'
+        : 'Escolha a competência conforme a fatura do banco, não a data de uma compra antiga.' }}</p>
     </div>
 
     <div class="conciliacao-painel">
       <h2>2. Parcelas que continuam em aberto</h2>
       <p>Exemplo: um celular em 6/15 entra na fatura selecionada como parcela 6 de 15.
-        O Radar projetará somente 6/15 a 15/15.</p>
+        O Radar projetará somente 6/15 a 15/15. Na revisão, você também pode remover itens errados
+        ou adicionar compras esquecidas.</p>
       @for (linha of linhas; track linha.idLocal; let i = $index) {
         <div class="conciliacao-item">
           <div class="conciliacao-linha-cabecalho">
@@ -108,8 +114,8 @@
       @if (previa(); as resumo) {
         <div class="conciliacao-resumo" aria-live="polite">
           <div><span>Fatura do banco</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.valorFaturaBanco) : '••••••' }}</strong></div>
-          <div><span>Itens já registrados no Radar</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.valorAtualRadar) : '••••••' }}</strong></div>
-          <div><span>Novas parcelas e itens</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.valorItensImportados) : '••••••' }}</strong></div>
+          <div><span>{{ edicao ? 'Outros itens não importados' : 'Itens já registrados no Radar' }}</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.valorAtualRadar) : '••••••' }}</strong></div>
+          <div><span>{{ edicao ? 'Itens revisados da conciliação' : 'Novas parcelas e itens' }}</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.valorItensImportados) : '••••••' }}</strong></div>
           <div><span>Ajuste declarado</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.valorAjusteDeclarado) : '••••••' }}</strong></div>
           <div><span>Total calculado pelo Radar</span><strong>{{ privacidade.valoresVisiveis() ? moeda(resumo.totalConciliado) : '••••••' }}</strong></div>
           <div class="conciliacao-diferenca"><span>Diferença a conferir</span>
@@ -130,11 +136,13 @@
             </div>
           }
         }
-        <p class="conciliacao-ajuda">Esta configuração pode ser feita apenas uma vez por cartão. Não é possível
-          inserir compromissos em faturas que já possuem pagamentos registrados.</p>
+        <p class="conciliacao-ajuda">{{ edicao
+          ? 'As alterações são gravadas juntas e auditadas. O Radar bloqueia revisões de faturas já fechadas ou pagas.'
+          : 'Esta configuração inicial pode ser feita uma vez por cartão. Depois, é possível revisar seus itens
+             enquanto a fatura não estiver fechada ou paga.' }}</p>
         <button type="button" class="conciliacao-principal"
           [disabled]="operando() || !diferencaZerada(resumo.diferenca)"
-          (click)="confirmar()">{{ operando() ? 'Salvando…' : 'Confirmar conciliação inicial' }}</button>
+          (click)="confirmar()">{{ operando() ? 'Salvando…' : (edicao ? 'Salvar revisão da conciliação' : 'Confirmar conciliação inicial') }}</button>
       }
     </div>
   }

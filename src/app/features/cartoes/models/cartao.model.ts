@@ -152,3 +152,26 @@ export interface ResultadoCorrecaoParcelamento {
   valorParcela: ValorFinanceiroApi;
   compromissoRestante: ValorFinanceiroApi;
 }
+
+// A revisao altera o lote completo com controle de concorrencia otimista.
+export interface ItemRevisaoConciliacao extends ItemConciliacaoInicial {
+  compraId: number | null;
+}
+export interface ConciliacaoEditavel {
+  revisao: number;
+  competencia: string;
+  valorFaturaBanco: ValorFinanceiroApi;
+  itens: (Omit<ItemRevisaoConciliacao, 'valorParcela'> & { valorParcela: ValorFinanceiroApi })[];
+  ajuste: (Omit<AjusteConciliacaoInicial, 'valor'> & { valor: ValorFinanceiroApi }) | null;
+}
+export interface DadosRevisaoConciliacao {
+  revisao: number;
+  valorFaturaBanco: string;
+  itens: ItemRevisaoConciliacao[];
+  ajuste: AjusteConciliacaoInicial | null;
+}
+export interface ResultadoRevisaoConciliacao {
+  revisao: number;
+  competencia: string;
+  totalConciliado: ValorFinanceiroApi;
+}

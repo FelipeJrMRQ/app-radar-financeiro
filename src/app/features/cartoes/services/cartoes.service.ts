@@ -10,6 +10,7 @@ import {
   CompraParceladaResultado, FaturaCartao, FaturaResumo, PagamentoFatura, ParcelaCompra, ResumoPagamentos,
   DadosConciliacaoInicial, PreviaConciliacaoInicial, ConfirmacaoConciliacaoInicial,
   CorrecaoParcelamentoInicial, ResultadoCorrecaoParcelamento,
+  ConciliacaoEditavel, DadosRevisaoConciliacao, ResultadoRevisaoConciliacao,
 } from '../models/cartao.model';
 
 @Injectable({ providedIn: 'root' })
@@ -47,6 +48,18 @@ export class CartoesService {
   confirmarConciliacaoInicial(id: number, dados: DadosConciliacaoInicial): Observable<ConfirmacaoConciliacaoInicial> {
     return this.http.post<ConfirmacaoConciliacaoInicial>(
       this.cartao(id) + '/conciliacao-inicial/confirmacao', dados);
+  }
+
+  carregarRevisaoConciliacao(id: number): Observable<ConciliacaoEditavel> {
+    return this.http.get<ConciliacaoEditavel>(this.cartao(id) + '/conciliacao-inicial/edicao');
+  }
+  previaRevisaoConciliacao(id: number, dados: DadosRevisaoConciliacao): Observable<PreviaConciliacaoInicial> {
+    return this.http.post<PreviaConciliacaoInicial>(
+      this.cartao(id) + '/conciliacao-inicial/edicao/previa', dados);
+  }
+  salvarRevisaoConciliacao(id: number, dados: DadosRevisaoConciliacao): Observable<ResultadoRevisaoConciliacao> {
+    return this.http.put<ResultadoRevisaoConciliacao>(
+      this.cartao(id) + '/conciliacao-inicial/edicao', dados);
   }
 
   corrigirParcelamentoInicial(id: number, compraId: number,

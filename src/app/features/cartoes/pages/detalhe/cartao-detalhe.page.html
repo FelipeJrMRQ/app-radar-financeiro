@@ -18,7 +18,11 @@
       <div class="cartoes-acoes">
         @if (cartaoAtual.ativo) {
           <a class="cartoes-primary" [routerLink]="['/cartoes', cartaoId, 'compras', 'nova']">+ Nova compra</a>
-          @if (!comprasImportadas()) {
+          @if (comprasImportadas()) {
+            <a class="cartoes-secondary" [routerLink]="['/cartoes', cartaoId, 'conciliacao-inicial', 'editar']">
+              Revisar conciliação inicial
+            </a>
+          } @else {
             <a class="cartoes-secondary" [routerLink]="['/cartoes', cartaoId, 'conciliacao-inicial']"
               [queryParams]="{ competencia: competencia() }">Já utilizo este cartão · Conferir fatura</a>
           }
@@ -163,16 +167,7 @@
               </small>
             </div>
             <strong class="cartoes-row-value" [title]="compra.origem === 'CONCILIACAO' ? 'Compromisso restante informado na conciliação, não valor original da compra' : 'Valor da compra'">{{ privacidade.valoresVisiveis() ? moeda(compra.valorTotal) : '••••••' }}</strong>
-            @if (cartaoAtual.ativo && compra.origem === 'CONCILIACAO'
-                    && compra.quantidadeParcelas === 1 && compra.parcelaInicial === 1) {
-              <div class="cartoes-acoes cartoes-compra-acoes">
-                <a class="cartoes-secondary"
-                   [routerLink]="['/cartoes', cartaoId, 'compras', compra.id, 'corrigir-parcelas']">
-                  Corrigir parcelas
-                </a>
-              </div>
-            }
-            @if (cartaoAtual.ativo && compra.origem !== 'CONCILIACAO') {
+             @if (cartaoAtual.ativo && compra.origem !== 'CONCILIACAO') {
               <div class="cartoes-acoes cartoes-compra-acoes">
                 @if (compra.quantidadeParcelas === 1) {
                   <a class="cartoes-secondary" [routerLink]="['/cartoes', cartaoId, 'compras', compra.id, 'editar']">Editar</a>

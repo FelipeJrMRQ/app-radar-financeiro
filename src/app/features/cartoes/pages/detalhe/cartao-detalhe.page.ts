@@ -79,6 +79,8 @@ export class CartaoDetalhePage implements OnInit {
     if (resultado === 'compra-editada') this.sucesso.set('Compra atualizada com sucesso.');
     if (resultado === 'parcelas-corrigidas')
       this.sucesso.set('Parcelas corrigidas. O limite comprometido e as próximas faturas foram atualizados.');
+    if (resultado === 'conciliacao-revisada')
+      this.sucesso.set('Conciliação revisada. Faturas futuras e limite comprometido recalculados.');
     if (resultado === 'conciliacao-concluida')
       this.sucesso.set('Conciliação inicial concluída. Confira as parcelas desta e das próximas faturas.');
     if (resultado === 'pagamento-registrado')

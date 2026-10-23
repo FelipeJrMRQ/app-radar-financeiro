@@ -1,21 +1,23 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { firstValueFrom, forkJoin } from 'rxjs';
+import { firstValueFrom, forkJoin, of } from 'rxjs';
 
 import { mensagemDeErro } from '../../../../core/http/api-error';
 import { MoedaBrInputDirective } from '../../../../shared/directives/moeda-br-input.directive';
 import { PrivacidadeValoresService } from '../../../../core/privacidade/privacidade-valores.service';
-import { dataHojeLocal, decimalPositivo, formatarMoeda, normalizarDecimalBr } from '../../../../shared/valor-monetario';
+import { dataHojeLocal, decimalPositivo, formatarMoeda, normalizarDecimalBr, ValorFinanceiroApi } from '../../../../shared/valor-monetario';
 import { Categoria } from '../../../categorias/models/categoria.model';
 import { CategoriasService } from '../../../categorias/services/categorias.service';
 import {
   CartaoCredito, DadosConciliacaoInicial, ItemConciliacaoInicial, PreviaConciliacaoInicial,
+  DadosRevisaoConciliacao,
 } from '../../models/cartao.model';
 import { CartoesService } from '../../services/cartoes.service';
 
 interface Linha {
   idLocal: number;
+  compraId: number | null;
   descricao: string;
   categoriaId: number | null;
   valorParcela: string;
@@ -39,8 +41,11 @@ export class ConciliacaoInicialPage implements OnInit {
   readonly privacidade = inject(PrivacidadeValoresService);
   readonly moeda = formatarMoeda;
   readonly cartaoId = Number(this.rota.snapshot.paramMap.get('cartaoId'));
+  readonly edicao = this.rota.snapshot.data?.['edicao'] === true;
   private readonly chaveIdempotencia = crypto.randomUUID();
   private proximoId = 1;
+  private revisao = 0;
+  private alteracoes = 0;
 
   readonly carregando = signal(true);
   readonly operando = signal(false);
@@ -72,11 +77,28 @@ export class ConciliacaoInicialPage implements OnInit {
       const dados = await firstValueFrom(forkJoin({
         cartao: this.api.buscar(this.cartaoId),
         categorias: this.categoriasApi.listar(),
+        conciliacao: this.edicao ? this.api.carregarRevisaoConciliacao(this.cartaoId) : of(null),
       }));
       if (this.destruir.destroyed) return;
       if (!dados.cartao.ativo) { this.erro.set('Cartão inativo.'); return; }
       this.cartao.set(dados.cartao);
       this.categorias.set(dados.categorias.filter(c => c.ativo && c.tipo === 'DESPESA'));
+      if (dados.conciliacao) {
+        const registro = dados.conciliacao;
+        this.revisao = registro.revisao;
+        this.competencia = registro.competencia;
+        this.faturaBanco = this.valorNoCampo(registro.valorFaturaBanco);
+        this.linhas = registro.itens.map(item => ({
+          idLocal: this.proximoId++, compraId: item.compraId,
+          descricao: item.descricao, categoriaId: item.categoriaId,
+          valorParcela: this.valorNoCampo(item.valorParcela),
+          numeroParcela: item.numeroParcela, quantidadeParcelas: item.quantidadeParcelas,
+        }));
+        this.incluirAjuste = registro.ajuste !== null;
+        this.ajusteDescricao = registro.ajuste?.descricao ?? '';
+        this.ajusteCategoriaId = registro.ajuste?.categoriaId ?? null;
+        this.ajusteValor = registro.ajuste ? this.valorNoCampo(registro.ajuste.valor) : '';
+      }
     } catch (erro) {
       if (!this.destruir.destroyed) this.erro.set(mensagemDeErro(erro));
     } finally {
@@ -84,9 +106,13 @@ export class ConciliacaoInicialPage implements OnInit {
     }
   }
 
+  private valorNoCampo(valor: ValorFinanceiroApi): string {
+    return Number(valor).toFixed(2).replace('.', ',');
+  }
+
   adicionarLinha(): void {
     this.linhas.push({
-      idLocal: this.proximoId++, descricao: '', categoriaId: null,
+      idLocal: this.proximoId++, compraId: null, descricao: '', categoriaId: null,
       valorParcela: '', numeroParcela: 1, quantidadeParcelas: 1,
     });
     this.alterou();
@@ -99,6 +125,7 @@ export class ConciliacaoInicialPage implements OnInit {
   }
 
   alterou(): void {
+    this.alteracoes++;
     this.previa.set(null);
     this.erro.set(null);
   }
@@ -158,15 +185,27 @@ export class ConciliacaoInicialPage implements OnInit {
     };
   }
 
+  private prepararRevisao(dados: DadosConciliacaoInicial): DadosRevisaoConciliacao {
+    return {
+      revisao: this.revisao,
+      valorFaturaBanco: dados.valorFaturaBanco,
+      itens: dados.itens.map((item, i) => ({ ...item, compraId: this.linhas[i].compraId })),
+      ajuste: dados.ajuste,
+    };
+  }
+
   async conferir(): Promise<void> {
     if (this.operando() || this.carregando()) return;
     const dados = this.preparar();
     if (!dados) return;
     this.operando.set(true);
     this.erro.set(null);
+    const versaoCampos = this.alteracoes;
     try {
-      const previa = await firstValueFrom(this.api.previaConciliacaoInicial(this.cartaoId, dados));
-      if (!this.destruir.destroyed) this.previa.set(previa);
+      const previa = await firstValueFrom(this.edicao
+        ? this.api.previaRevisaoConciliacao(this.cartaoId, this.prepararRevisao(dados))
+        : this.api.previaConciliacaoInicial(this.cartaoId, dados));
+      if (!this.destruir.destroyed && versaoCampos === this.alteracoes) this.previa.set(previa);
     } catch (erro) {
       if (!this.destruir.destroyed) this.erro.set(mensagemDeErro(erro));
     } finally {
@@ -183,11 +222,15 @@ export class ConciliacaoInicialPage implements OnInit {
     this.operando.set(true);
     this.erro.set(null);
     try {
-      const resultado = await firstValueFrom(this.api.confirmarConciliacaoInicial(this.cartaoId, dados));
+      const resultado = this.edicao
+        ? await firstValueFrom(this.api.salvarRevisaoConciliacao(
+            this.cartaoId, this.prepararRevisao(dados)))
+        : await firstValueFrom(this.api.confirmarConciliacaoInicial(this.cartaoId, dados));
       if (this.destruir.destroyed) return;
       await this.router.navigate(['/cartoes', this.cartaoId], {
         queryParams: {
-          competencia: resultado.competencia, resultado: 'conciliacao-concluida',
+          competencia: resultado.competencia,
+          resultado: this.edicao ? 'conciliacao-revisada' : 'conciliacao-concluida',
         },
       });
     } catch (erro) {
