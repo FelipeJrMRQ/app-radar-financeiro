@@ -2,6 +2,7 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import { PreferenciasFluxoCaixaService } from '../../services/preferencias-fluxo-caixa.service';
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { AuthService } from '../../../../core/auth/auth.service';
 import { PrivacidadeValoresService } from '../../../../core/privacidade/privacidade-valores.service';
@@ -11,6 +12,9 @@ import { dataLocalIso } from '../../../contas-financeiras/utils/formatacao-conta
 import { formatarDiaMes, formatarMoeda } from '../../../../shared/valor-monetario';
 import { FluxoCaixaConsolidado, PainelFinanceiro, TotalCategoria } from '../../models/painel-financeiro.model';
 import { PainelFinanceiroService } from '../../services/painel-financeiro.service';
+import { CartoesService } from '../../../cartoes/services/cartoes.service';
+import { CartaoPainel } from '../../models/painel-cartoes.model';
+import { MeusCartoesCardComponent } from '../../components/meus-cartoes/meus-cartoes.component';
 import { PainelPreferenciasService } from '../../services/painel-preferencias.service';
 import { ContasReceberCardComponent } from '../../components/contas-receber/contas-receber.component';
 import { ContasPagarCardComponent } from '../../components/contas-pagar/contas-pagar.component';
@@ -22,13 +26,14 @@ import { MosaicoPainelItemDirective } from '../../directives/mosaico-painel-item
 @Component({
   selector: 'app-inicio-page',
   standalone: true,
-  imports: [RouterLink, ContasReceberCardComponent, ContasPagarCardComponent, SaldosContasCardComponent, FluxoCaixaCardComponent, DespesasCategoriaCardComponent, MosaicoPainelItemDirective],
+  imports: [RouterLink, ContasReceberCardComponent, ContasPagarCardComponent, SaldosContasCardComponent, FluxoCaixaCardComponent, DespesasCategoriaCardComponent, MeusCartoesCardComponent, MosaicoPainelItemDirective],
   templateUrl: './inicio.page.html',
   styleUrl: './inicio.page.scss',
 })
 export class InicioPage implements OnInit {
   private readonly sessao = inject(AuthService);
   private readonly api = inject(PainelFinanceiroService);
+  private readonly cartoesApi = inject(CartoesService);
   readonly privacidade = inject(PrivacidadeValoresService);
   readonly preferencias = inject(PainelPreferenciasService);
   readonly preferenciasFluxo = inject(PreferenciasFluxoCaixaService);
@@ -36,6 +41,7 @@ export class InicioPage implements OnInit {
   private destruido = false;
   private versao = 0;
   private versaoGrafico = 0;
+  private versaoCartoes = 0;
 
   readonly primeiroNome = computed(() => this.sessao.usuario()?.nome.trim().split(/\s+/)[0] || 'você');
   readonly mes = signal(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
@@ -67,13 +73,16 @@ export class InicioPage implements OnInit {
   readonly erroFluxo = signal<string | null>(null);
   readonly aReceber = computed(() => this.painel()?.proximosVencimentos.filter(p => p.tipo === 'RECEITA').slice(0, 5) ?? []);
   readonly aPagar = computed(() => this.painel()?.proximosVencimentos.filter(p => p.tipo === 'DESPESA').slice(0, 5) ?? []);
+  readonly cartoesPainel = signal<CartaoPainel[]>([]);
+  readonly carregandoCartoes = signal(false);
+  readonly erroCartoes = signal<string | null>(null);
   readonly categorias = signal<TotalCategoria[]>([]);
   readonly erroCategorias = signal<string | null>(null);
   readonly moeda = formatarMoeda;
   readonly dataCurta = formatarDiaMes;
   readonly saldoProjetadoNegativo = computed(() => Number(this.painel()?.saldoProjetado ?? 0) < 0);
 
-  constructor() { this.destroyRef.onDestroy(() => { this.destruido = true; this.versao++; this.versaoGrafico++; }); }
+  constructor() { this.destroyRef.onDestroy(() => { this.destruido = true; this.versao++; this.versaoGrafico++; this.versaoCartoes++; }); }
 
   ngOnInit(): void { void this.iniciar(); }
 
@@ -105,6 +114,7 @@ export class InicioPage implements OnInit {
   async carregar(): Promise<void> {
     const versao = ++this.versao;
     this.versaoGrafico++;
+    this.versaoCartoes++;
     this.carregando.set(true);
     this.erro.set(null);
     this.rotaNaoEncontrada.set(false);
@@ -115,6 +125,7 @@ export class InicioPage implements OnInit {
       const dados = await firstValueFrom(this.api.consultar(inicio, fim));
       if (this.destruido || versao !== this.versao) return;
       this.painel.set(dados);
+      if (this.preferencias.estaVisivel('MEUS_CARTOES')) void this.carregarCartoes();
       this.contasGraficoIds.set(this.contasEfetivas());
       if (this.preferencias.estaVisivel('FLUXO_CAIXA')) void this.carregarFluxo();
       if (this.preferencias.estaVisivel('DESPESAS_CATEGORIA')) {
@@ -175,6 +186,36 @@ export class InicioPage implements OnInit {
     } finally {
       if (!this.destruido && versao === this.versaoGrafico) this.carregandoFluxo.set(false);
     }
+  }
+
+  async carregarCartoes(): Promise<void> {
+    const versao = ++this.versaoCartoes;
+    this.carregandoCartoes.set(true);
+    this.erroCartoes.set(null);
+    try {
+      const dados = await firstValueFrom(this.cartoesApi.consultarPainel(this.mesReferencia()));
+      if (!this.destruido && versao === this.versaoCartoes) this.cartoesPainel.set(dados);
+    } catch (erro) {
+      if (!this.destruido && versao === this.versaoCartoes) {
+        this.cartoesPainel.set([]);
+        this.erroCartoes.set(this.mensagemErroCartoes(erro));
+      }
+    } finally {
+      if (!this.destruido && versao === this.versaoCartoes) this.carregandoCartoes.set(false);
+    }
+  }
+
+  private mensagemErroCartoes(erro: unknown): string {
+    // Se a versão do Java não tem GET /cartoes-credito/painel,
+    // o GET cai na rota legada /{cartaoCreditoId}, tenta converter
+    // o texto "painel" para Long e devolve 400.
+    if (erro instanceof HttpErrorResponse
+        && (erro.status === 404 || (erro.status === 400
+          && erro.error?.detail === 'A requisição está ausente ou possui formato inválido.'))) {
+      return 'A API Java em execução parece estar desatualizada para o resumo de cartões. '
+        + 'Atualize a branch feature/cartoes do backend e reinicie o servidor Java.';
+    }
+    return mensagemDeErro(erro);
   }
 
   private async carregarCategorias(versao: number, inicio: string, fim: string): Promise<void> {

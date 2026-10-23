@@ -1,5 +1,6 @@
 @use './app/features/dashboard/styles/dashboard';
 @use './tema-escuro';
+@use './app/features/cartoes/styles/cartoes.page';
 @use './tema-escuro-acabamento';
 :root {
   /* Tokens centrais para ajustes futuros da identidade sem alterar cada feature. */

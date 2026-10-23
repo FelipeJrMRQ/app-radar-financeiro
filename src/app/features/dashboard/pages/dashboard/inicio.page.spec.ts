@@ -1,9 +1,11 @@
+import { CartoesService } from '../../../cartoes/services/cartoes.service';
 import { TemaService } from '../../../../core/tema/tema.service';
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { PrivacidadeValoresService } from '../../../../core/privacidade/privacidade-valores.service';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { AuthService } from '../../../../core/auth/auth.service';
 import { PainelFinanceiro } from '../../models/painel-financeiro.model';
@@ -37,6 +39,7 @@ describe('Resumo sem redundâncias do painel inicial', () => {
       item => !codigos || codigos.includes(item.codigoComponente),
     );
     const consultar = jasmine.createSpy('consultar').and.returnValue(of(dados));
+    const consultarCartoes = jasmine.createSpy('consultarPainel').and.returnValue(of([]));
     const fluxoCaixaConsolidado = jasmine.createSpy('fluxoCaixaConsolidado').and.returnValue(of({
       dataInicio: dados.dataInicio,
       dataFim: dados.dataFim,
@@ -55,6 +58,7 @@ describe('Resumo sem redundâncias do painel inicial', () => {
         provideRouter([]),
         { provide: PrivacidadeValoresService, useValue: { valoresVisiveis: visibilidade.asReadonly() } },
         { provide: AuthService, useValue: { usuario: () => ({ nome: 'Teste' }) } },
+        { provide: CartoesService, useValue: { consultarPainel: consultarCartoes } },
         { provide: PainelFinanceiroService, useValue: {
           consultar,
           fluxoCaixaConsolidado,
@@ -79,7 +83,7 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
-    return { fixture, consultar, fluxoCaixaConsolidado, visibilidade };
+    return { fixture, consultar, fluxoCaixaConsolidado, consultarCartoes, visibilidade };
   }
 
   it('oculta apenas contas realmente zeradas, preservando preferências manuais', async () => {
@@ -119,6 +123,19 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     expect(raiz.querySelector('.stats-grid')?.textContent).toContain('1.619,76');
   });
 
+  it('orienta atualizar o backend quando rota do card conflita com ID numerico', async () => {
+    const { fixture, consultarCartoes } = await montar();
+    consultarCartoes.and.returnValue(throwError(() => new HttpErrorResponse({
+      status: 400,
+      error: { detail: 'A requisição está ausente ou possui formato inválido.' },
+    })));
+    await fixture.componentInstance.carregarCartoes();
+    expect(fixture.componentInstance.erroCartoes()).toContain('feature/cartoes');
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).textContent)
+      .toContain('reinicie o servidor Java');
+  });
+
   it('troca Em atraso por projeção do fim do mês de todas as contas', async () => {
     const { fixture } = await montar();
     const raiz = fixture.nativeElement as HTMLElement;
@@ -153,6 +170,9 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     expect(fixture.componentInstance.contasGraficoIds()).toEqual([7, 8]);
     expect(fluxoCaixaConsolidado).not.toHaveBeenCalledWith([7], jasmine.any(String), jasmine.any(String));
     expect(raiz.querySelector('.cash-balances-total')?.textContent).toContain('119,76');
+    expect(raiz.querySelector('.cash-balances-total')?.textContent).not.toContain('630,24');
+    (raiz.querySelector('.cash-balances-switch') as HTMLButtonElement).click();
+    fixture.detectChanges();
     expect(raiz.querySelector('.cash-balances-total')?.textContent).toContain('630,24');
     expect(raiz.querySelector('.stats-grid')?.textContent).toContain('1.619,76');
   });
@@ -186,11 +206,21 @@ describe('Resumo sem redundâncias do painel inicial', () => {
     expect(raiz.querySelectorAll('.eyebrow').length).toBe(0);
     for (const titulo of [
       'Saldos de caixa', 'Despesas por categoria', 'Fluxo de caixa consolidado',
-      'Contas a pagar', 'Contas a receber', 'O que deseja fazer?',
+      'Contas a pagar', 'Contas a receber', 'Meus cartões', 'O que deseja fazer?',
     ]) {
       expect(raiz.textContent).toContain(titulo);
     }
     expect(raiz.querySelectorAll('.cash-flow-footer')).toHaveSize(0);
+  });
+
+  it('consulta cartões da competência selecionada sem interferir no painel', async () => {
+    const { fixture, consultarCartoes } = await montar();
+    expect(consultarCartoes).toHaveBeenCalledWith(fixture.componentInstance.mesReferencia());
+    const anterior = fixture.componentInstance.mesReferencia();
+    fixture.componentInstance.mudarMes(1);
+    await fixture.whenStable();
+    expect(fixture.componentInstance.mesReferencia()).not.toBe(anterior);
+    expect(consultarCartoes).toHaveBeenCalledWith(fixture.componentInstance.mesReferencia());
   });
 
   it('distingue projeção positiva de negativa somente pela cor do valor', async () => {

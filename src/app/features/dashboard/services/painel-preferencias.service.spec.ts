@@ -31,7 +31,7 @@ describe('PainelPreferenciasService', () => {
     const promise = api.salvar(itens);
     const req = http.expectOne('/api/usuarios/me/preferencias-painel');
     expect(req.request.method).toBe('PUT');
-    expect(req.request.body.componentes).toHaveSize(5);
+    expect(req.request.body.componentes).toHaveSize(6);
     expect(req.request.body.componentes[2].visivel).toBeFalse();
     req.flush(itens);
     await promise;
@@ -44,6 +44,6 @@ describe('PainelPreferenciasService', () => {
     expect(req.request.method).toBe('DELETE');
     req.flush(null);
     await promise;
-    expect(api.visiveis().length).toBe(5);
+    expect(api.visiveis().length).toBe(6);
   });
 });

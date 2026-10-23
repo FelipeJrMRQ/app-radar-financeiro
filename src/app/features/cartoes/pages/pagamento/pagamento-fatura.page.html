@@ -1,0 +1,120 @@
+<section class="cartoes-page cartoes-pagamento-page">
+  <a class="cartoes-back" [routerLink]="['/cartoes', cartaoId]"
+    [queryParams]="{ competencia: competencia }">← Voltar à fatura</a>
+
+  <header class="cartoes-heading">
+    <div>
+      <span class="cartoes-eyebrow">REGISTRO FINANCEIRO</span>
+      <h1>Registrar pagamento</h1>
+      <p>Informe um pagamento da fatura que já foi realizado.</p>
+    </div>
+  </header>
+
+  @if (carregando()) {
+    <div class="cartoes-empty" role="status">Carregando fatura e contas…</div>
+  } @else if (erro()) {
+    <p class="cartoes-error" role="alert">{{ erro() }}</p>
+    <button type="button" class="cartoes-secondary" (click)="carregar()">Tentar novamente</button>
+  } @else if (cartao() && fatura() && resumo()) {
+    <div class="cartoes-pagamento-bloco">
+      <div class="cartoes-pagamento-cabecalho">
+        <strong>{{ cartao()!.nome }}</strong>
+        <span>{{ mesDescricao() }}</span>
+      </div>
+      <div class="cartoes-pagamento-total">
+        <span>Valor pendente</span>
+        <strong>{{ privacidade.valoresVisiveis() ? moeda(saldoExato()) : '••••••' }}</strong>
+        <small>Vencimento: {{ data(fatura()!.dataVencimento) }}</small>
+      </div>
+      @if (!saldoPendente()) {
+        <p class="cartoes-note">Esta fatura não possui saldo pendente. Não é necessário registrar pagamento.</p>
+        <a class="cartoes-secondary" [routerLink]="['/cartoes', cartaoId]"
+          [queryParams]="{ competencia: competencia }">Consultar fatura</a>
+      } @else if (contas().length === 0) {
+        <p class="cartoes-note">Cadastre uma conta financeira ativa para registrar o pagamento.</p>
+        <a class="cartoes-secondary" routerLink="/contas">Ver contas financeiras</a>
+      } @else {
+        @if (erroFormulario()) {
+          <p class="cartoes-error" role="alert">{{ erroFormulario() }}</p>
+        }
+        @if (!confirmando()) {
+          <form [formGroup]="form" (ngSubmit)="prepararConfirmacao()" novalidate>
+            <fieldset class="cartoes-modo-pagamento">
+              <legend>Quanto foi pago?</legend>
+              <button type="button" [class.selecionado]="modo() === 'INTEGRAL'"
+                [attr.aria-pressed]="modo() === 'INTEGRAL'"
+                (click)="selecionarModo('INTEGRAL')">
+                Valor integral
+              </button>
+              <button type="button" [class.selecionado]="modo() === 'PARCIAL'"
+                [attr.aria-pressed]="modo() === 'PARCIAL'"
+                (click)="selecionarModo('PARCIAL')">
+                Outro valor
+              </button>
+            </fieldset>
+            @if (modo() === 'INTEGRAL') {
+              <p class="cartoes-pagamento-exato">
+                Será registrado o saldo integral informado pela API:
+                <strong>{{ privacidade.valoresVisiveis() ? moeda(saldoExato()) : '••••••' }}</strong>
+              </p>
+            } @else {
+              <div class="cartoes-field">
+                <label for="valor-parcial-fatura">Valor efetivamente pago</label>
+                <input id="valor-parcial-fatura" type="text" inputmode="numeric"
+                  formControlName="valorPago" rfMoedaBr placeholder="R$ 0,00"/>
+                <small>O valor deve ser maior que zero e não pode superar o saldo pendente.</small>
+              </div>
+            }
+            <div class="cartoes-field">
+              <label for="conta-pagamento-fatura">Conta usada no pagamento</label>
+              <select id="conta-pagamento-fatura" formControlName="contaFinanceiraId">
+                <option [ngValue]="null">Selecione uma conta</option>
+                @for (conta of contas(); track conta.id) {
+                  <option [ngValue]="conta.id">{{ conta.nome }}</option>
+                }
+              </select>
+            </div>
+            <div class="cartoes-field">
+              <label for="data-pagamento-fatura">Data em que pagou</label>
+              <input id="data-pagamento-fatura" type="date" formControlName="dataPagamento"
+                [max]="hoje" />
+            </div>
+            <p class="cartoes-note">
+              O Radar não envia dinheiro ao banco. O registro descontará o valor da conta
+              financeira escolhida e atualizará a fatura.
+            </p>
+            <div class="cartoes-acoes">
+              <a class="cartoes-secondary" [routerLink]="['/cartoes', cartaoId]"
+                [queryParams]="{ competencia: competencia }">Cancelar</a>
+              <button class="cartoes-primary" type="submit">Continuar para confirmação</button>
+            </div>
+          </form>
+        } @else {
+          <div class="cartoes-pagamento-confirmacao" aria-labelledby="confirmar-fatura-titulo">
+            <h2 id="confirmar-fatura-titulo">Confirme os dados</h2>
+            <p class="cartoes-pagamento-aviso">
+              Confirme somente se este pagamento já foi realizado fora do Radar.
+              Nenhum pagamento será enviado ao banco.
+            </p>
+            <dl>
+              <div><dt>Cartão e competência</dt><dd>{{ cartao()!.nome }} · {{ mesDescricao() }}</dd></div>
+              <div><dt>Conta financeira</dt><dd>{{ contaSelecionada() }}</dd></div>
+              <div><dt>Valor registrado</dt>
+                <dd>{{ privacidade.valoresVisiveis() ? moeda(valorConfirmacao()) : '••••••' }}</dd></div>
+              <div><dt>Data do pagamento</dt><dd>{{ data(form.controls.dataPagamento.value) }}</dd></div>
+              <div><dt>Modalidade</dt><dd>{{ modo() === 'INTEGRAL' ? 'Integral' : 'Parcial' }}</dd></div>
+            </dl>
+            <div class="cartoes-acoes">
+              <button type="button" class="cartoes-secondary" (click)="voltarEdicao()"
+                [disabled]="salvando()">Corrigir informações</button>
+              <button type="button" class="cartoes-primary" (click)="confirmarPagamento()"
+                [disabled]="salvando()">
+                {{ salvando() ? 'Registrando…' : 'Confirmar registro do pagamento' }}
+              </button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  }
+</section>

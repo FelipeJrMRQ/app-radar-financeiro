@@ -55,4 +55,15 @@ describe('LancamentoNovoPage', () => {
     pagina.selecionarTipo('RECEITA');
     expect(pagina.form.controls.categoriaId.value).toBeNull();
   });
+  it('permite 360 e 500 parcelas e bloqueia 501 no formulario', () => {
+    const pagina = TestBed.createComponent(LancamentoNovoPage).componentInstance;
+    pagina.selecionarModalidade('PARCELADO');
+    pagina.form.controls.quantidadeParcelas.setValue(360);
+    expect(pagina.form.controls.quantidadeParcelas.valid).toBeTrue();
+    pagina.form.controls.quantidadeParcelas.setValue(500);
+    expect(pagina.form.controls.quantidadeParcelas.valid).toBeTrue();
+    pagina.form.controls.quantidadeParcelas.setValue(501);
+    expect(pagina.form.controls.quantidadeParcelas.hasError('max')).toBeTrue();
+  });
+
 });

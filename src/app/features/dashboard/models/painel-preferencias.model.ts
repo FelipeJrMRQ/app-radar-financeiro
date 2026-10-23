@@ -4,6 +4,7 @@ export const CODIGOS_COMPONENTES = [
   'SALDOS_CONTAS',
   'FLUXO_CAIXA',
   'DESPESAS_CATEGORIA',
+  'MEUS_CARTOES',
 ] as const;
 
 export type CodigoComponentePainel = typeof CODIGOS_COMPONENTES[number];
@@ -20,6 +21,7 @@ export const TITULOS_COMPONENTES: Readonly<Record<CodigoComponentePainel, string
   SALDOS_CONTAS: 'Saldo das contas',
   FLUXO_CAIXA: 'Fluxo de caixa',
   DESPESAS_CATEGORIA: 'Despesas por categoria',
+  MEUS_CARTOES: 'Meus cartões',
 };
 
 export function preferenciasPadrao(): PreferenciaComponentePainel[] {

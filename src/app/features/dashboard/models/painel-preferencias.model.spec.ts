@@ -1,11 +1,12 @@
 import { moverComponente, normalizarPreferencias, preferenciasPadrao } from './painel-preferencias.model';
 
 describe('Organização do dashboard', () => {
-  it('usa os cinco cards visíveis por padrão', () => {
+  it('usa os seis cards visíveis por padrão', () => {
     const p = preferenciasPadrao();
-    expect(p.length).toBe(5);
+    expect(p.length).toBe(6);
     expect(p.every(item => item.visivel)).toBeTrue();
     expect(p[0].codigoComponente).toBe('CONTAS_RECEBER');
+    expect(p[5].codigoComponente).toBe('MEUS_CARTOES');
   });
 
   it('move itens e mantém ocultos na sequência', () => {
@@ -16,7 +17,7 @@ describe('Organização do dashboard', () => {
     const movidos = moverComponente(ocultos, 1, 4);
     expect(movidos[4].codigoComponente).toBe('CONTAS_PAGAR');
     expect(movidos[4].visivel).toBeFalse();
-    expect(movidos.map(item => item.ordemExibicao)).toEqual([0,1,2,3,4]);
+    expect(movidos.map(item => item.ordemExibicao)).toEqual([0,1,2,3,4,5]);
   });
 
   it('mantém defaults para códigos novos e preserva preferências salvas', () => {
@@ -33,7 +34,7 @@ describe('Organização do dashboard', () => {
       { codigoComponente: 'CONTAS_PAGAR', visivel: false, ordemExibicao: 0 },
       { codigoComponente: 'CONTAS_PAGAR', visivel: true, ordemExibicao: 1 },
     ]);
-    expect(configuracao.length).toBe(5);
+    expect(configuracao.length).toBe(6);
     expect(configuracao[0].visivel).toBeFalse();
   });
 });

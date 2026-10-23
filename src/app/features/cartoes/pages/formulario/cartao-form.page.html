@@ -1,0 +1,62 @@
+<section class="cartoes-page">
+  <a routerLink="/cartoes" class="cartoes-back">← Voltar aos cartões</a>
+  <header class="cartoes-heading">
+    <div>
+      <span class="cartoes-eyebrow">CADASTRO DE CRÉDITO</span>
+      <h1>{{ editando ? 'Editar cartão' : 'Novo cartão' }}</h1>
+      <p>Informe o limite e as datas do ciclo de faturamento.</p>
+    </div>
+  </header>
+  @if (carregando()) { <div class="cartoes-empty" role="status">Carregando cartão…</div> }
+  @else {
+    <div class="cartoes-form-card">
+      @if (erro()) { <p class="cartoes-error" role="alert">{{ erro() }}</p> }
+      <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+        <div class="cartoes-field">
+          <label for="cartao-nome">Nome do cartão</label>
+          <input id="cartao-nome" type="text" formControlName="nome" maxlength="150"
+            placeholder="Ex.: Cartão principal" />
+          @if (form.controls.nome.touched && (form.controls.nome.invalid || !form.controls.nome.value.trim())) {
+            <small class="cartoes-field-error">Informe um nome de até 150 caracteres.</small>
+          }
+        </div>
+        <div class="cartoes-field">
+          <label for="cartao-limite">Limite total cadastrado</label>
+          <input id="cartao-limite" type="text" inputmode="numeric" rfMoedaBr
+            formControlName="limiteCredito" placeholder="R$ 0,00" />
+          @if (form.controls.limiteCredito.touched && form.controls.limiteCredito.invalid) {
+            <small class="cartoes-field-error">Informe um valor positivo válido.</small>
+          }
+          <small>Este é o limite cadastrado, não o limite disponível calculado.</small>
+        </div>
+        <div class="cartoes-field-grid">
+          <div class="cartoes-field">
+            <label for="cartao-fechamento">Dia do fechamento</label>
+            <input id="cartao-fechamento" type="number" min="1" max="31"
+              formControlName="diaFechamento" />
+            @if (form.controls.diaFechamento.touched && form.controls.diaFechamento.invalid) {
+              <small class="cartoes-field-error">Escolha um dia de 1 a 31.</small>
+            }
+          </div>
+          <div class="cartoes-field">
+            <label for="cartao-vencimento">Dia do vencimento</label>
+            <input id="cartao-vencimento" type="number" min="1" max="31"
+              formControlName="diaVencimento" />
+            @if (form.controls.diaVencimento.touched && form.controls.diaVencimento.invalid) {
+              <small class="cartoes-field-error">Escolha um dia de 1 a 31.</small>
+            }
+          </div>
+        </div>
+        <p class="cartoes-note">
+          O servidor calcula os ciclos de faturamento, inclusive meses sem o dia 31.
+        </p>
+        <div class="cartoes-acoes">
+          <a routerLink="/cartoes" class="cartoes-secondary">Cancelar</a>
+          <button type="submit" class="cartoes-primary" [disabled]="salvando()">
+            {{ salvando() ? 'Salvando…' : 'Salvar cartão' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</section>
