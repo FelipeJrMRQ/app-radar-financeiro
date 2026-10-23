@@ -150,3 +150,97 @@ describe('Conciliação inicial de cartão já utilizado', () => {
     });
   });
 });
+
+describe('Revisão editável da conciliação já confirmada', () => {
+  let api: jasmine.SpyObj<CartoesService>;
+  beforeEach(async () => {
+    api = jasmine.createSpyObj<CartoesService>('CartoesService', [
+      'buscar', 'carregarRevisaoConciliacao', 'previaRevisaoConciliacao',
+      'salvarRevisaoConciliacao', 'previaConciliacaoInicial', 'confirmarConciliacaoInicial',
+    ]);
+    api.buscar.and.returnValue(of({
+      id: 7, nome: 'Nubank', limiteCredito: '5000.00',
+      diaFechamento: 17, diaVencimento: 25, ativo: true,
+      criadoEm: '2026-10-01T00:00:00', atualizadoEm: '2026-10-01T00:00:00',
+    }));
+    api.carregarRevisaoConciliacao.and.returnValue(of({
+      revisao: 2, competencia: '2026-11', valorFaturaBanco: '210.77',
+      itens: [
+        { compraId: 12, descricao: 'Chuveiro', categoriaId: 5,
+          valorParcela: '66.98', numeroParcela: 1, quantidadeParcelas: 1 },
+        { compraId: 13, descricao: 'Item antigo', categoriaId: 5,
+          valorParcela: '143.79', numeroParcela: 6, quantidadeParcelas: 15 },
+      ],
+      ajuste: null,
+    }));
+    const categorias = jasmine.createSpyObj<CategoriasService>('CategoriasService', ['listar']);
+    categorias.listar.and.returnValue(of([{
+      id: 5, nome: 'Compras', tipo: 'DESPESA', ativo: true,
+    }] as ReturnType<typeof categorias.listar> extends import('rxjs').Observable<infer T> ? T : never));
+    await TestBed.configureTestingModule({
+      imports: [ConciliacaoInicialPage],
+      providers: [
+        provideRouter([]),
+        { provide: ActivatedRoute, useValue: { snapshot: {
+          paramMap: convertToParamMap({ cartaoId: '7' }),
+          queryParamMap: convertToParamMap({ competencia: '2026-12' }),
+          data: { edicao: true },
+        } } },
+        { provide: CartoesService, useValue: api },
+        { provide: CategoriasService, useValue: categorias },
+        { provide: PrivacidadeValoresService, useValue: { valoresVisiveis: signal(true) } },
+      ],
+    }).compileComponents();
+  });
+
+  it('reabre todos os itens, permite corrigir valores e numeração e grava uma única revisão', async () => {
+    const fixture = TestBed.createComponent(ConciliacaoInicialPage);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const page = fixture.componentInstance;
+
+    expect(page.edicao).toBeTrue();
+    expect(page.competencia).toBe('2026-11');
+    expect(page.faturaBanco).toBe('210,77');
+    expect(page.linhas.length).toBe(2);
+
+    page.removerLinha(page.linhas[1].idLocal);
+    page.linhas[0].valorParcela = '70,00';
+    page.linhas[0].quantidadeParcelas = 3;
+    page.adicionarLinha();
+    page.linhas[1].descricao = 'Compra esquecida';
+    page.linhas[1].categoriaId = 5;
+    page.linhas[1].valorParcela = '140,00';
+    page.linhas[1].numeroParcela = 2;
+    page.linhas[1].quantidadeParcelas = 4;
+    page.faturaBanco = '210,00';
+    page.alterou();
+
+    api.previaRevisaoConciliacao.and.returnValue(of({
+      competencia: '2026-11', valorFaturaBanco: '210.00', valorAtualRadar: '0.00',
+      valorItensImportados: '210.00', valorAjusteDeclarado: '0.00',
+      totalConciliado: '210.00', diferenca: '0.00',
+      proximasFaturas: [{ competencia: '2026-12', totalPrevisto: '210.00' }],
+    }));
+    await page.conferir();
+    const dados = api.previaRevisaoConciliacao.calls.mostRecent().args[1];
+    expect(dados.revisao).toBe(2);
+    expect(dados.itens.length).toBe(2);
+    expect(dados.itens[0]).toEqual({
+      compraId: 12, descricao: 'Chuveiro', categoriaId: 5,
+      valorParcela: '70.00', numeroParcela: 1, quantidadeParcelas: 3,
+    });
+    expect(dados.itens[1].compraId).toBeNull();
+    expect(api.previaConciliacaoInicial).not.toHaveBeenCalled();
+
+    api.salvarRevisaoConciliacao.and.returnValue(of({
+      revisao: 3, competencia: '2026-11', totalConciliado: '210.00',
+    }));
+    const navegar = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
+    await page.confirmar();
+    expect(api.salvarRevisaoConciliacao).toHaveBeenCalledOnceWith(7, dados);
+    expect(navegar).toHaveBeenCalledWith(['/cartoes', 7], {
+      queryParams: { competencia: '2026-11', resultado: 'conciliacao-revisada' },
+    });
+  });
+});
