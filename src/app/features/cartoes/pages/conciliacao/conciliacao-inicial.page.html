@@ -19,7 +19,7 @@
           <input type="month" [(ngModel)]="competencia" (ngModelChange)="alterou()" />
         </label>
         <label>Valor total informado pelo banco
-          <input type="text" inputmode="decimal" placeholder="Ex.: 1.480,00"
+          <input type="text" inputmode="numeric" rfMoedaBr placeholder="R$ 0,00"
             [(ngModel)]="faturaBanco" (ngModelChange)="alterou()" />
         </label>
       </div>
@@ -52,7 +52,7 @@
               </select>
             </label>
             <label>Valor desta parcela
-              <input type="text" inputmode="decimal" placeholder="Ex.: 143,79"
+              <input type="text" inputmode="numeric" rfMoedaBr placeholder="R$ 0,00"
                 [(ngModel)]="linha.valorParcela" (ngModelChange)="alterou()" />
             </label>
           </div>
@@ -93,8 +93,8 @@
             </select>
           </label>
           <label>Valor do ajuste
-            <input type="text" inputmode="decimal" [(ngModel)]="ajusteValor"
-              (ngModelChange)="alterou()" placeholder="Ex.: -50,00 ou 25,00" />
+            <input type="text" inputmode="numeric" rfMoedaBr [rfMoedaBrPermiteNegativo]="true"
+              [(ngModel)]="ajusteValor" (ngModelChange)="alterou()" placeholder="R$ 0,00" />
           </label>
         </div>
         <p class="conciliacao-ajuda">Valor positivo acrescenta despesa; negativo representa um crédito explícito nesta fatura.</p>
