@@ -79,7 +79,7 @@
           <button type="button" class="reinicio-cancelar" (click)="voltar()"
             [disabled]="carregando()">Voltar</button>
           <button type="submit" class="reinicio-perigo"
-            [disabled]="carregando() || confirmacao.invalid || confirmacao.controls.texto.value !== 'APAGAR DADOS'">
+            [disabled]="carregando() || verificandoEnvio() || situacaoEnvio() !== 'ENVIADO' || confirmacao.invalid || confirmacao.controls.texto.value !== 'APAGAR DADOS'">
             {{ carregando() ? 'Apagando…' : 'Apagar permanentemente os dados' }}
           </button>
         </div>
