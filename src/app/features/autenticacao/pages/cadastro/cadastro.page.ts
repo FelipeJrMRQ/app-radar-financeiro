@@ -30,7 +30,7 @@ export class CadastroPage {
   readonly formulario = this.fb.group({
     nome: ['', [Validators.required, Validators.maxLength(150)]],
     email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
-    senha: ['', [Validators.required, Validators.minLength(15), Validators.maxLength(128)]],
+    senha: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(128)]],
     confirmacaoSenha: ['', Validators.required],
   }, { validators: grupo => this.senhasConferem(grupo) });
 
