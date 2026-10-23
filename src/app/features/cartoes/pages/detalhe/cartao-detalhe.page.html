@@ -163,7 +163,7 @@
               </small>
             </div>
             <strong class="cartoes-row-value" [title]="compra.origem === 'CONCILIACAO' ? 'Compromisso restante informado na conciliação, não valor original da compra' : 'Valor da compra'">{{ privacidade.valoresVisiveis() ? moeda(compra.valorTotal) : '••••••' }}</strong>
-            @if (cartaoAtual.ativo) {
+            @if (cartaoAtual.ativo && compra.origem !== 'CONCILIACAO') {
               <div class="cartoes-acoes cartoes-compra-acoes">
                 @if (compra.quantidadeParcelas === 1) {
                   <a class="cartoes-secondary" [routerLink]="['/cartoes', cartaoId, 'compras', compra.id, 'editar']">Editar</a>

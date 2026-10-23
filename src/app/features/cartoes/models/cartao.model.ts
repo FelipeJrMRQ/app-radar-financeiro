@@ -57,7 +57,7 @@ export interface CompraParceladaResultado {
 }
 export interface ItemFatura {
   origem: string;
-  compraCartaoId: number;
+  compraCartaoId: number | null;
   parcelaCompraCartaoId: number | null;
   numeroParcela: number | null;
   quantidadeParcelas: number | null;
