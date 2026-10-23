@@ -1,12 +1,15 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, timer } from 'rxjs';
 
 import { API_BASE_URL } from '../../../../core/config/api.config';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { mensagemDeErro } from '../../../../core/http/api-error';
+
+type SituacaoEnvio = 'AGUARDANDO_ENVIO' | 'ENVIADO' | 'EXPIRADO' | 'SEM_SOLICITACAO';
 
 @Component({
   selector: 'app-reiniciar-dados',
@@ -20,18 +23,36 @@ export class ReiniciarDadosPage {
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
   private readonly fb = inject(FormBuilder).nonNullable;
+  private readonly destruir = inject(DestroyRef);
   private readonly url = API_BASE_URL + '/usuarios/me/reinicio-financeiro';
   readonly usuario = this.auth.usuario;
   readonly etapa = signal<'SENHA' | 'CODIGO'>('SENHA');
   readonly carregando = signal(false);
   readonly verificandoEnvio = signal(false);
-  readonly situacaoEnvio = signal<'AGUARDANDO_ENVIO' | 'ENVIADO' | 'EXPIRADO' | 'SEM_SOLICITACAO'>('AGUARDANDO_ENVIO');
+  readonly situacaoEnvio = signal<SituacaoEnvio>('AGUARDANDO_ENVIO');
   readonly erro = signal<string | null>(null);
   readonly senha = this.fb.group({ senha: ['', [Validators.required]] });
   readonly confirmacao = this.fb.group({
     codigo: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
     texto: ['', [Validators.required]],
   });
+
+  constructor() {
+    // Consulta leve somente durante a etapa de confirmação; encerra ao sair da tela.
+    timer(10000, 10000).pipe(takeUntilDestroyed(this.destruir)).subscribe(() => {
+      if (this.etapa() === 'CODIGO' && !this.carregando() && !this.verificandoEnvio()
+          && this.situacaoEnvio() !== 'EXPIRADO' && this.situacaoEnvio() !== 'SEM_SOLICITACAO') {
+        void this.verificarEnvio(true);
+      }
+    });
+  }
+
+  private async consultarSituacaoEnvio(): Promise<SituacaoEnvio> {
+    const resposta = await firstValueFrom(this.http.get<{ situacao: SituacaoEnvio }>(
+      this.url + '/solicitacoes/status'));
+    this.situacaoEnvio.set(resposta.situacao);
+    return resposta.situacao;
+  }
 
   async solicitar(): Promise<void> {
     if (this.carregando() || this.etapa() !== 'SENHA') return;
@@ -53,16 +74,14 @@ export class ReiniciarDadosPage {
     }
   }
 
-  async verificarEnvio(): Promise<void> {
+  async verificarEnvio(silencioso = false): Promise<void> {
     if (this.verificandoEnvio() || this.carregando() || this.etapa() !== 'CODIGO') return;
     this.verificandoEnvio.set(true);
-    this.erro.set(null);
+    if (!silencioso) this.erro.set(null);
     try {
-      const resposta = await firstValueFrom(this.http.get<{ situacao: 'AGUARDANDO_ENVIO' | 'ENVIADO' | 'EXPIRADO' | 'SEM_SOLICITACAO' }>(
-        this.url + '/solicitacoes/status'));
-      this.situacaoEnvio.set(resposta.situacao);
+      await this.consultarSituacaoEnvio();
     } catch (erro) {
-      this.erro.set(mensagemDeErro(erro));
+      if (!silencioso) this.erro.set(mensagemDeErro(erro));
     } finally {
       this.verificandoEnvio.set(false);
     }
@@ -79,6 +98,14 @@ export class ReiniciarDadosPage {
     this.carregando.set(true);
     this.erro.set(null);
     try {
+      // Confirmação destrutiva somente após revalidar a situação no backend.
+      const situacao = await this.consultarSituacaoEnvio();
+      if (situacao !== 'ENVIADO') {
+        this.erro.set(situacao === 'AGUARDANDO_ENVIO'
+          ? 'O código ainda está aguardando envio. Verifique o status antes de confirmar.'
+          : 'Não há código válido para confirmar. Volte e solicite outro após o prazo de segurança.');
+        return;
+      }
       await firstValueFrom(this.http.post<void>(this.url + '/confirmacoes', {
         codigo: this.confirmacao.controls.codigo.value,
         confirmacao: this.confirmacao.controls.texto.value,
