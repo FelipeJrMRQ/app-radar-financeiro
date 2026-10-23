@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - chatgpt/fundacao-angular
+      - 'feature/**'
 
 jobs:
   build-test:
