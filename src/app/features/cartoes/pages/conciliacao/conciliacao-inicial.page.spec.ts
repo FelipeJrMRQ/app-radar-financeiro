@@ -69,6 +69,31 @@ describe('Conciliação inicial de cartão já utilizado', () => {
     pagina.ajusteValor = '1.086,21';
   }
 
+  it('aplica a mesma máscara monetária BRL da compra na fatura, nos itens e no ajuste negativo', async () => {
+    const fixture = await tela();
+    fixture.componentInstance.incluirAjuste = true;
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const campos = fixture.nativeElement.querySelectorAll<HTMLInputElement>('input[rfMoedaBr]');
+    expect(campos.length).toBe(3);
+
+    campos[0].value = '25000';
+    campos[0].dispatchEvent(new Event('input', { bubbles: true }));
+    campos[1].value = '12500';
+    campos[1].dispatchEvent(new Event('input', { bubbles: true }));
+    campos[2].value = '-500';
+    campos[2].dispatchEvent(new Event('input', { bubbles: true }));
+    fixture.detectChanges();
+
+    expect(campos[0].value).toBe('R$ 250,00');
+    expect(campos[1].value).toBe('R$ 125,00');
+    expect(campos[2].value).toBe('R$ -5,00');
+    expect(fixture.componentInstance.faturaBanco).toBe('250,00');
+    expect(fixture.componentInstance.linhas[0].valorParcela).toBe('125,00');
+    expect(fixture.componentInstance.ajusteValor).toBe('-5,00');
+  });
+
   it('envia parcela 6/15 sem recalcular valores no Angular', async () => {
     const fixture = await tela();
     informarDados(fixture.componentInstance);
