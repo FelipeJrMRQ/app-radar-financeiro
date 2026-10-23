@@ -1,0 +1,93 @@
+@if (estado(); as progresso) {
+  @if (!progresso.concluido) {
+    @if (progresso.dispensado) {
+      <div class="primeiros-passos-retomar">
+        <button type="button" (click)="registrar('RETOMAR')" [disabled]="salvando()">
+          <fa-icon [icon]="iconeRetomar" aria-hidden="true"></fa-icon>
+          Retomar primeiros passos
+        </button>
+        @if (erro()) { <span role="alert">{{ erro() }}</span> }
+      </div>
+    } @else {
+      <section class="primeiros-passos" aria-labelledby="primeiros-passos-titulo">
+        <div class="primeiros-passos-cabecalho">
+          <div>
+            <span class="passos-etiqueta">COMECE POR AQUI</span>
+            <h2 id="primeiros-passos-titulo">Vamos configurar seu Radar</h2>
+            <p>Sem pressa: configure suas finanças no seu ritmo. Você pode continuar depois.</p>
+          </div>
+          <button type="button" class="passos-pausar"
+                  (click)="registrar('PAUSAR')" [disabled]="salvando()"
+                  aria-label="Pausar orientação inicial">
+            <fa-icon [icon]="iconePausar" aria-hidden="true"></fa-icon>
+            Agora não
+          </button>
+        </div>
+        <div class="passos-progresso">
+          <span>{{ quantidadeConcluida(progresso) }} de 4 etapas concluídas</span>
+          <strong>{{ quantidadeConcluida(progresso) * 25 }}%</strong>
+        </div>
+        <div class="passos-trilha" role="progressbar"
+             [attr.aria-valuenow]="quantidadeConcluida(progresso)"
+             aria-valuemin="0" aria-valuemax="4"
+             aria-label="Progresso da configuração inicial">
+          <div [style.width.%]="quantidadeConcluida(progresso) * 25"></div>
+        </div>
+        <ol class="passos-lista">
+          <li [class.concluido]="progresso.boasVindasConcluidas">
+            <fa-icon [icon]="progresso.boasVindasConcluidas ? iconeConcluido : iconePendente"
+                     aria-hidden="true"></fa-icon>
+            <div>
+              <strong>Conhecer o Radar Financeiro</strong>
+              <small>Entenda por onde começar e avance para sua primeira conta.</small>
+            </div>
+            @if (!progresso.boasVindasConcluidas) {
+              <button type="button" class="passos-acao" [disabled]="salvando()"
+                      (click)="registrar('CONCLUIR_BOAS_VINDAS')">Começar</button>
+            }
+          </li>
+          <li [class.concluido]="progresso.primeiraContaConcluida">
+            <fa-icon [icon]="progresso.primeiraContaConcluida ? iconeConcluido : iconePendente"
+                     aria-hidden="true"></fa-icon>
+            <div>
+              <strong>Cadastrar sua primeira conta</strong>
+              <small>Informe sua conta ou carteira e o saldo inicial real.</small>
+            </div>
+            @if (!progresso.primeiraContaConcluida) {
+              <a class="passos-acao" routerLink="/contas/nova">Cadastrar <fa-icon [icon]="iconeAvancar" aria-hidden="true"></fa-icon></a>
+            }
+          </li>
+          <li [class.concluido]="progresso.primeiroLancamentoConcluido">
+            <fa-icon [icon]="progresso.primeiroLancamentoConcluido ? iconeConcluido : iconePendente"
+                     aria-hidden="true"></fa-icon>
+            <div>
+              <strong>Registrar uma movimentação</strong>
+              <small>Adicione uma receita ou despesa prevista ou já realizada.</small>
+            </div>
+            @if (!progresso.primeiroLancamentoConcluido) {
+              <a class="passos-acao" routerLink="/lancamentos/novo">Registrar <fa-icon [icon]="iconeAvancar" aria-hidden="true"></fa-icon></a>
+            }
+          </li>
+          <li [class.concluido]="progresso.painelConhecido">
+            <fa-icon [icon]="progresso.painelConhecido ? iconeConcluido : iconePendente"
+                     aria-hidden="true"></fa-icon>
+            <div>
+              <strong>Explorar seu painel</strong>
+              <small>Aqui você acompanha saldos, contas e projeções. Alterne os meses pelas setas.</small>
+            </div>
+            @if (!progresso.painelConhecido) {
+              <button type="button" class="passos-acao" [disabled]="salvando()"
+                      (click)="registrar('CONHECER_PAINEL')">Entendi</button>
+            }
+          </li>
+        </ol>
+        <div class="passos-rodape">
+          <span><fa-icon [icon]="iconeCartao" aria-hidden="true"></fa-icon>
+            Usa cartão de crédito? <a routerLink="/cartoes">Configure quando quiser</a> — é opcional.
+          </span>
+        </div>
+        @if (erro()) { <p class="passos-erro" role="alert">{{ erro() }}</p> }
+      </section>
+    }
+  }
+}

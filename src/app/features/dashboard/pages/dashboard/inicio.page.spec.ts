@@ -16,6 +16,7 @@ import { PainelFinanceiroService } from '../../services/painel-financeiro.servic
 import { PainelPreferenciasService } from '../../services/painel-preferencias.service';
 import { PreferenciasFluxoCaixaService } from '../../services/preferencias-fluxo-caixa.service';
 import { InicioPage } from './inicio.page';
+import { PrimeirosPassosService } from '../../services/primeiros-passos.service';
 
 describe('Resumo sem redundâncias do painel inicial', () => {
   const dados: PainelFinanceiro = {
@@ -55,6 +56,13 @@ describe('Resumo sem redundâncias do painel inicial', () => {
       imports: [InicioPage],
       providers: [
         { provide: TemaService, useValue: { efetivo: signal('CLARO') } },
+        { provide: PrimeirosPassosService, useValue: {
+          consultar: () => of({
+            boasVindasConcluidas: true, primeiraContaConcluida: true,
+            primeiroLancamentoConcluido: true, painelConhecido: true,
+            dispensado: true, concluido: true,
+          }),
+        } },
         provideRouter([]),
         { provide: PrivacidadeValoresService, useValue: { valoresVisiveis: visibilidade.asReadonly() } },
         { provide: AuthService, useValue: { usuario: () => ({ nome: 'Teste' }) } },
