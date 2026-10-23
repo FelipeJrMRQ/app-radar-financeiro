@@ -22,11 +22,12 @@ import { SaldosContasCardComponent } from '../../components/saldos-contas/saldos
 import { FluxoCaixaCardComponent } from '../../components/fluxo-caixa/fluxo-caixa.component';
 import { DespesasCategoriaCardComponent } from '../../components/despesas-categoria/despesas-categoria.component';
 import { MosaicoPainelItemDirective } from '../../directives/mosaico-painel-item.directive';
+import { PrimeirosPassosComponent } from '../../components/primeiros-passos/primeiros-passos.component';
 
 @Component({
   selector: 'app-inicio-page',
   standalone: true,
-  imports: [RouterLink, ContasReceberCardComponent, ContasPagarCardComponent, SaldosContasCardComponent, FluxoCaixaCardComponent, DespesasCategoriaCardComponent, MeusCartoesCardComponent, MosaicoPainelItemDirective],
+  imports: [RouterLink, ContasReceberCardComponent, ContasPagarCardComponent, SaldosContasCardComponent, FluxoCaixaCardComponent, DespesasCategoriaCardComponent, MeusCartoesCardComponent, MosaicoPainelItemDirective, PrimeirosPassosComponent],
   templateUrl: './inicio.page.html',
   styleUrl: './inicio.page.scss',
 })
