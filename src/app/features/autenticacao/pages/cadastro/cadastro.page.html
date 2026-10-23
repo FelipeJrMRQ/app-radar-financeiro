@@ -29,7 +29,7 @@
         <label for="senha">Crie uma senha</label>
         <div class="password-field">
           <input id="senha" [type]="mostrarSenha() ? 'text' : 'password'"
-                 formControlName="senha" autocomplete="new-password" placeholder="Pelo menos 8 caracteres"
+                 formControlName="senha" autocomplete="new-password" placeholder="Use 8 caracteres ou mais"
                  [attr.aria-invalid]="formulario.controls.senha.touched && formulario.controls.senha.invalid" />
           <button type="button" class="show-password" (click)="mostrarSenha.set(!mostrarSenha())"
                   [attr.aria-label]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'">
@@ -37,9 +37,27 @@
           </button>
         </div>
         @if (formulario.controls.senha.touched && formulario.controls.senha.invalid) {
-          <small class="field-error">Use uma senha entre 8 e 100 caracteres.</small>
+          <small class="field-error">Use uma senha entre 8 e 128 caracteres.</small>
         }
       </div>
+      <div class="field">
+        <label for="confirmacaoSenha">Confirme sua senha</label>
+        <div class="password-field">
+          <input id="confirmacaoSenha" [type]="mostrarSenha() ? 'text' : 'password'"
+                 formControlName="confirmacaoSenha" autocomplete="new-password"
+                 placeholder="Digite novamente a senha"
+                 [attr.aria-invalid]="formulario.controls.confirmacaoSenha.touched &&
+                   (formulario.controls.confirmacaoSenha.invalid || formulario.hasError('senhasDiferentes'))" />
+        </div>
+        @if (formulario.controls.confirmacaoSenha.touched && formulario.controls.confirmacaoSenha.invalid) {
+          <small class="field-error">Confirme sua senha.</small>
+        } @else if (formulario.controls.confirmacaoSenha.touched && formulario.hasError('senhasDiferentes')) {
+          <small class="field-error">As senhas informadas não coincidem.</small>
+        }
+      </div>
+      <p class="subtitle" style="font-size:12px;margin-bottom:12px">
+        Prefira uma frase longa e única. São permitidos espaços, símbolos e gerenciadores de senhas.
+      </p>
       <button class="primary-button" type="submit" [disabled]="carregando()">
         {{ carregando() ? 'Criando conta...' : 'Criar minha conta' }}
         <span aria-hidden="true">→</span>
