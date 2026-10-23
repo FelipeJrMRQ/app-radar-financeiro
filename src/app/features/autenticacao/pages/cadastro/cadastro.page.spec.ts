@@ -29,10 +29,17 @@ describe('Segurança do cadastro', () => {
   it('rejeita senhas curtas e não tenta cadastrar', async () => {
     const fixture = TestBed.createComponent(CadastroPage);
     const page = fixture.componentInstance;
-    preencher(page, 'senha123', 'senha123');
+    preencher(page, 'senha12', 'senha12');
     expect(page.formulario.invalid).toBeTrue();
     await page.cadastrar();
     expect(cadastrar).not.toHaveBeenCalled();
+  });
+
+  it('aceita senha de exatamente oito caracteres', async () => {
+    const fixture = TestBed.createComponent(CadastroPage);
+    const page = fixture.componentInstance;
+    preencher(page, 'senha123', 'senha123');
+    expect(page.formulario.valid).toBeTrue();
   });
 
   it('impede cadastro quando a confirmação é diferente', async () => {
