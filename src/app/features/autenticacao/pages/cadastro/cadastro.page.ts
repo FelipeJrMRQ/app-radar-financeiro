@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -21,11 +21,18 @@ export class CadastroPage {
   readonly mostrarSenha = signal(false);
   readonly erro = signal<string | null>(null);
 
+  private senhasConferem(grupo: AbstractControl): ValidationErrors | null {
+    const senha = grupo.get('senha')?.value;
+    const confirmacao = grupo.get('confirmacaoSenha')?.value;
+    return senha === confirmacao ? null : { senhasDiferentes: true };
+  }
+
   readonly formulario = this.fb.group({
     nome: ['', [Validators.required, Validators.maxLength(150)]],
     email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
-    senha: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(100)]],
-  });
+    senha: ['', [Validators.required, Validators.minLength(15), Validators.maxLength(128)]],
+    confirmacaoSenha: ['', Validators.required],
+  }, { validators: grupo => this.senhasConferem(grupo) });
 
   async cadastrar(): Promise<void> {
     if (this.carregando()) return;
@@ -35,7 +42,11 @@ export class CadastroPage {
     this.carregando.set(true);
     this.erro.set(null);
     try {
-      await this.sessao.cadastrar(this.formulario.getRawValue());
+      const dados = this.formulario.getRawValue();
+      // Confirmação é validada somente no formulário e nunca enviada à API.
+      await this.sessao.cadastrar({
+        nome: dados.nome, email: dados.email, senha: dados.senha,
+      });
       await this.router.navigate(['/entrar'], { queryParams: { cadastro: 'ok' } });
     } catch (erro) {
       this.erro.set(mensagemDeErro(erro));
