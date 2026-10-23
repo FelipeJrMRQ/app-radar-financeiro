@@ -8,6 +8,7 @@ import { API_BASE_URL } from '../../../core/config/api.config';
 import {
   CartaoCredito, DadosCartaoCredito, CompraCartao, DadosCompraCartao, DadosCompraParcelada,
   CompraParceladaResultado, FaturaCartao, FaturaResumo, PagamentoFatura, ParcelaCompra, ResumoPagamentos,
+  DadosConciliacaoInicial, PreviaConciliacaoInicial, ConfirmacaoConciliacaoInicial,
 } from '../models/cartao.model';
 
 @Injectable({ providedIn: 'root' })
@@ -37,6 +38,15 @@ export class CartoesService {
     return this.http.put<CartaoCredito>(this.cartao(id), dados);
   }
   inativar(id: number): Observable<void> { return this.http.delete<void>(this.cartao(id)); }
+
+  previaConciliacaoInicial(id: number, dados: DadosConciliacaoInicial): Observable<PreviaConciliacaoInicial> {
+    return this.http.post<PreviaConciliacaoInicial>(
+      this.cartao(id) + '/conciliacao-inicial/previa', dados);
+  }
+  confirmarConciliacaoInicial(id: number, dados: DadosConciliacaoInicial): Observable<ConfirmacaoConciliacaoInicial> {
+    return this.http.post<ConfirmacaoConciliacaoInicial>(
+      this.cartao(id) + '/conciliacao-inicial/confirmacao', dados);
+  }
 
   listarCompras(id: number): Observable<CompraCartao[]> {
     return this.http.get<CompraCartao[]>(this.compras(id));

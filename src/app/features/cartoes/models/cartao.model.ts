@@ -26,6 +26,8 @@ export interface CompraCartao {
   valorTotal: ValorFinanceiroApi;
   dataCompra: string;
   quantidadeParcelas: number;
+  origem?: 'COMPRA' | 'CONCILIACAO';
+  parcelaInicial?: number | null;
   observacao: string | null;
   ativo: boolean;
   criadoEm: string;
@@ -98,4 +100,41 @@ export interface ResumoPagamentos {
   saldoRestante: ValorFinanceiroApi;
   quitada: boolean;
   pagamentos: PagamentoFatura[];
+}
+
+// Onboarding manual: as parcelas anteriores à competência inicial já foram pagas
+// fora do Radar e não devem gerar novas obrigações ou movimentações bancárias.
+export interface ItemConciliacaoInicial {
+  descricao: string;
+  categoriaId: number;
+  valorParcela: string;
+  numeroParcela: number;
+  quantidadeParcelas: number;
+}
+export interface AjusteConciliacaoInicial {
+  descricao: string;
+  categoriaId: number;
+  valor: string; // sinal positivo = débito, negativo = crédito informado
+}
+export interface DadosConciliacaoInicial {
+  chaveIdempotencia: string;
+  competencia: string; // yyyy-MM
+  valorFaturaBanco: string;
+  itens: ItemConciliacaoInicial[];
+  ajuste: AjusteConciliacaoInicial | null;
+}
+export interface PreviaConciliacaoInicial {
+  competencia: string;
+  valorFaturaBanco: ValorFinanceiroApi;
+  valorAtualRadar: ValorFinanceiroApi;
+  valorItensImportados: ValorFinanceiroApi;
+  valorAjusteDeclarado: ValorFinanceiroApi;
+  totalConciliado: ValorFinanceiroApi;
+  diferenca: ValorFinanceiroApi;
+  proximasFaturas: { competencia: string; totalPrevisto: ValorFinanceiroApi }[];
+}
+export interface ConfirmacaoConciliacaoInicial {
+  jaConfirmada: boolean;
+  competencia: string;
+  totalConciliado: ValorFinanceiroApi;
 }
