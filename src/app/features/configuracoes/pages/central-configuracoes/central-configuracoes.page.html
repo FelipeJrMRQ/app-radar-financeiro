@@ -67,38 +67,38 @@
 
   <div class="menu-grid">
     <a class="menu-card" routerLink="/configuracoes/painel">
-      <span class="card-icon" aria-hidden="true">▦</span>
+      <span class="card-icon" aria-hidden="true"><fa-icon [icon]="iconePersonalizacao" [fixedWidth]="true"></fa-icon></span>
       <span class="card-copy">
         <strong>Personalização do painel</strong>
         <span>Organize os cards, defina a ordem e escolha o que deseja exibir.</span>
       </span>
-      <span class="card-arrow" aria-hidden="true">→</span>
+      <span class="card-arrow" aria-hidden="true"><fa-icon [icon]="iconeAvancar"></fa-icon></span>
     </a>
     <a class="menu-card" routerLink="/configuracoes/perfil">
-      <span class="card-icon" aria-hidden="true">♙</span>
+      <span class="card-icon" aria-hidden="true"><fa-icon [icon]="iconePerfil" [fixedWidth]="true"></fa-icon></span>
       <span class="card-copy">
         <strong>Meu perfil</strong>
         <span>Consulte seus dados cadastrais e informações da conta.</span>
       </span>
-      <span class="card-arrow" aria-hidden="true">→</span>
+      <span class="card-arrow" aria-hidden="true"><fa-icon [icon]="iconeAvancar"></fa-icon></span>
     </a>
     <a class="menu-card" routerLink="/configuracoes/reiniciar-dados">
-      <span class="card-icon" aria-hidden="true">⌫</span>
+      <span class="card-icon" aria-hidden="true"><fa-icon [icon]="iconeApagarDados" [fixedWidth]="true"></fa-icon></span>
       <span class="card-copy">
         <strong>Apagar dados financeiros</strong>
         <span>Recomeçar com os dados zerados, mediante confirmação de senha e código por e-mail.</span>
       </span>
-      <span class="card-arrow" aria-hidden="true">→</span>
+      <span class="card-arrow" aria-hidden="true"><fa-icon [icon]="iconeAvancar"></fa-icon></span>
     </a>
     <article class="menu-card unavailable" aria-label="Segurança e senha, funcionalidade futura">
-      <span class="card-icon" aria-hidden="true">⌑</span>
+      <span class="card-icon" aria-hidden="true"><fa-icon [icon]="iconeSeguranca" [fixedWidth]="true"></fa-icon></span>
       <span class="card-copy">
         <strong>Segurança e senha <span class="tag">Em breve</span></strong>
         <span>Configurações de acesso e alteração de senha.</span>
       </span>
     </article>
     <article class="menu-card unavailable" aria-label="Notificações, funcionalidade futura">
-      <span class="card-icon" aria-hidden="true">◉</span>
+      <span class="card-icon" aria-hidden="true"><fa-icon [icon]="iconeNotificacoes" [fixedWidth]="true"></fa-icon></span>
       <span class="card-copy">
         <strong>Notificações <span class="tag">Em breve</span></strong>
         <span>Preferências de avisos, vencimentos e lembretes.</span>
