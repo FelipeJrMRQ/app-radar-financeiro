@@ -10,6 +10,13 @@ export const CONFIGURACOES_ROUTES: Routes = [
         .then(m => m.CentralConfiguracoesPage),
   },
   {
+    path: 'configuracoes/reiniciar-dados',
+    title: 'Apagar dados financeiros | Radar Financeiro',
+    loadComponent: () =>
+      import('./pages/reiniciar-dados/reiniciar-dados.page')
+        .then(m => m.ReiniciarDadosPage),
+  },
+  {
     path: 'configuracoes/perfil',
     title: 'Meu perfil | Radar Financeiro',
     loadComponent: () =>
